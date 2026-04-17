@@ -88,7 +88,7 @@ export default function TasksListPage() {
                     </TableCell>
                     <TableCell>
                       <span className="text-sm">
-                        {task.hazardCount > 0 ? (
+                        {(task.hazardCount ?? 0) > 0 ? (
                           <span>
                             <span className="font-medium">{task.hazardCount}</span>
                             <span className="text-muted-foreground text-xs">
