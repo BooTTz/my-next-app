@@ -108,8 +108,8 @@ export default function PlansListPage() {
                             <MoreHorizontal className="size-3.5" />
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem asChild>
-                              <Link href={`/team/t1/plans/${plan.id}`}>
+                            <DropdownMenuItem>
+                              <Link href={`/team/t1/plans/${plan.id}`} className="flex items-center">
                                 <Eye className="size-3.5 mr-2" /> 查看详情
                               </Link>
                             </DropdownMenuItem>
