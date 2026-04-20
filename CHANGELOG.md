@@ -1,5 +1,27 @@
 # 版本更新记录
 
+## v1.0.1 (2026-04-17)
+
+**标签**: `v1.0.1`  
+**对应提交**: `24bacb2`  
+**GitHub**: https://github.com/BooTTz/my-next-app/releases/tag/v1.0.1
+
+### 包含内容
+- 新增版本管理规范到 Vibe-Qoder.md
+- 初始化 CHANGELOG.md 版本记录文档
+- 新增项目设计方案文档（specs 目录）
+
+### 如何恢复到此版本
+```bash
+# 方式1：创建新分支恢复（推荐）
+git checkout -b restore-v1.0.1 v1.0.1
+
+# 方式2：直接重置（慎用，会丢失之后的提交）
+git reset --hard v1.0.1
+```
+
+---
+
 ## v1.0.0 (2026-04-17)
 
 **标签**: `v1.0.0`  
