@@ -1,57 +1,129 @@
 "use client";
 
 import { useState } from "react";
-import { PageHeader, ListToolbar } from "@/components/shared/PageHeader";
-import { Card, CardContent } from "@/components/ui/card";
+import { PageHeader } from "@/components/shared/PageHeader";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { MOCK_MEMBERS } from "@/lib/mock-data";
+import { useAppStore } from "@/lib/store";
+import { MOCK_MEMBERS, MOCK_TEAMS } from "@/lib/mock-data";
 import { USER_TYPE_MAP } from "@/lib/types";
-import { UserPlus, MoreHorizontal } from "lucide-react";
+import { UserPlus, MoreHorizontal, Users, Building2, MapPin } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 export default function MembersPage() {
+  const { currentTeam } = useAppStore();
   const [search, setSearch] = useState("");
   const [tab, setTab] = useState("all");
 
-  const filtered = MOCK_MEMBERS.filter((m) => {
+  if (!currentTeam) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <p className="text-muted-foreground">请先选择一个团队</p>
+      </div>
+    );
+  }
+
+  // 获取当前团队的成员
+  const teamMembers = MOCK_MEMBERS.filter((m) => m.teamId === currentTeam.id);
+
+  const filtered = teamMembers.filter((m) => {
     const matchSearch = (m.user?.realName || "").includes(search) || (m.user?.phone || "").includes(search);
     if (tab === "all") return matchSearch;
     return matchSearch && m.userType === tab;
   });
 
-  const supervisors = MOCK_MEMBERS.filter((m) => m.userType === "supervisor");
-  const inspectors = MOCK_MEMBERS.filter((m) => m.userType === "inspector");
-  const enterprises = MOCK_MEMBERS.filter((m) => m.userType === "enterprise");
+  const supervisors = teamMembers.filter((m) => m.userType === "supervisor");
+  const inspectors = teamMembers.filter((m) => m.userType === "inspector");
+  const enterprises = teamMembers.filter((m) => m.userType === "enterprise");
 
   const userTypeColor: Record<string, string> = {
-    supervisor: "bg-status-info/10 text-status-info",
-    inspector: "bg-status-success/10 text-status-success",
-    enterprise: "bg-status-warning/10 text-status-warning",
+    supervisor: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
+    inspector: "bg-green-500/10 text-green-600 dark:text-green-400",
+    enterprise: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
+  };
+
+  const typeColors = {
+    supervisor: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
+    inspector: "bg-green-500/10 text-green-600 dark:text-green-400",
+    enterprise: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
   };
 
   return (
     <div className="space-y-4">
-      <PageHeader title="成员管理" description="管理团队内三方成员">
+      <PageHeader 
+        title={`${currentTeam.name} - 成员管理`} 
+        description="管理团队内的成员"
+      >
         <Button size="sm" onClick={() => toast.info("邀请成员功能")}>
           <UserPlus className="size-3.5" /> 邀请成员
         </Button>
       </PageHeader>
+
+      {/* 团队信息卡片 */}
+      <div className="grid grid-cols-4 gap-4">
+        <Card>
+          <CardContent className="p-4 flex items-center gap-3">
+            <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10">
+              <Building2 className="size-5 text-primary" />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">团队名称</p>
+              <p className="font-semibold truncate">{currentTeam.name}</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 flex items-center gap-3">
+            <div className={cn("flex size-10 items-center justify-center rounded-lg", typeColors[currentTeam.teamType])}>
+              <Users className="size-5" />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">团队类型</p>
+              <Badge className={typeColors[currentTeam.teamType]}>{USER_TYPE_MAP[currentTeam.teamType]}</Badge>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 flex items-center gap-3">
+            <div className="flex size-10 items-center justify-center rounded-lg bg-muted">
+              <Users className="size-5 text-muted-foreground" />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">成员数量</p>
+              <p className="font-semibold">{currentTeam.memberCount || 0} 人</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 flex items-center gap-3">
+            <div className="flex size-10 items-center justify-center rounded-lg bg-muted">
+              <MapPin className="size-5 text-muted-foreground" />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">所属区域</p>
+              <p className="font-semibold truncate">{currentTeam.region}</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       <Card>
         <CardContent className="p-4">
           <Tabs value={tab} onValueChange={setTab}>
             <div className="flex items-center justify-between">
               <TabsList>
-                <TabsTrigger value="all">全部 ({MOCK_MEMBERS.length})</TabsTrigger>
+                <TabsTrigger value="all">全部 ({teamMembers.length})</TabsTrigger>
                 <TabsTrigger value="supervisor">监管方 ({supervisors.length})</TabsTrigger>
                 <TabsTrigger value="inspector">服务方 ({inspectors.length})</TabsTrigger>
                 <TabsTrigger value="enterprise">履行方 ({enterprises.length})</TabsTrigger>
@@ -59,13 +131,23 @@ export default function MembersPage() {
             </div>
 
             <div className="mt-3">
-              <ListToolbar
-                searchPlaceholder="搜索姓名、手机号..."
-                searchValue={search}
-                onSearchChange={setSearch}
-                onExport={() => toast.info("导出功能")}
-                onRefresh={() => toast.info("已刷新")}
-              />
+              <div className="relative max-w-sm">
+                <input
+                  type="text"
+                  placeholder="搜索姓名、手机号..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="h-8 w-full rounded-md border border-input bg-background px-3 pr-8 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                />
+                {search && (
+                  <button
+                    onClick={() => setSearch("")}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
             </div>
 
             <TabsContent value={tab} className="mt-4">
@@ -108,7 +190,7 @@ export default function MembersPage() {
                         </TableCell>
                         <TableCell className="text-xs">{member.joinedAt}</TableCell>
                         <TableCell>
-                          <Badge variant="secondary" className="text-[10px] bg-status-success/10 text-status-success">
+                          <Badge variant="secondary" className="text-[10px] bg-green-500/10 text-green-600">
                             正常
                           </Badge>
                         </TableCell>
@@ -120,7 +202,7 @@ export default function MembersPage() {
                             <DropdownMenuContent align="end">
                               <DropdownMenuItem>查看详情</DropdownMenuItem>
                               <DropdownMenuItem>修改角色</DropdownMenuItem>
-                              <DropdownMenuItem className="text-status-danger">移除成员</DropdownMenuItem>
+                              <DropdownMenuItem className="text-red-500">移除成员</DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </TableCell>

@@ -10,6 +10,9 @@ export type UserStatus = "active" | "disabled" | "pending";
 /** 团队中的用户类型 */
 export type UserType = "supervisor" | "inspector" | "enterprise";
 
+/** 工作组状态 */
+export type WorkspaceStatus = "active" | "archived";
+
 /** 团队状态 */
 export type TeamStatus = "active" | "archived";
 
@@ -126,17 +129,82 @@ export interface User {
   lastLoginAt?: string;
 }
 
+/** 工作组角色 */
+export type WorkspaceRole = "admin" | "member";
+
+/** 团队角色 */
+export type TeamRole = "admin" | "member";
+
+/** 工作组管理员 */
+export interface WorkspaceAdmin {
+  userId: string;
+  userType: UserType;
+  roleName: string;
+  user?: User;
+}
+
+/** 工作组 */
+export interface Workspace {
+  id: string;
+  name: string;
+  region: string;
+  creatorId: string;
+  status: WorkspaceStatus;
+  enterpriseCount?: number;
+  serviceCount?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** 行政区划节点 */
+export interface RegionNode {
+  id: string;
+  workspaceId: string;
+  parentId?: string;
+  name: string;
+  sortOrder: number;
+  createdAt: string;
+  children?: RegionNode[];
+}
+
+/** 团队-工作组关联 */
+export interface TeamWorkspace {
+  id: string;
+  teamId: string;
+  workspaceId: string;
+  regionId: string;
+  joinedAt: string;
+}
+
 /** 团队 */
 export interface Team {
   id: string;
   name: string;
   description?: string;
   region: string;
+  /** 团队类型：监管方/服务方/履行方 */
+  teamType: UserType;
   creatorId: string;
   inviteCode: string;
   status: TeamStatus;
   createdAt: string;
   memberCount?: number;
+  /** 所属工作组ID列表 */
+  workspaceIds?: string[];
+  /** 监管行业（监管方） */
+  supervisoryIndustry?: string;
+  /** 机构资质（服务方） */
+  qualification?: string;
+  /** 主要服务领域（服务方） */
+  mainServiceField?: string;
+  /** 机构人数（服务方） */
+  agencyStaffCount?: number;
+  /** 行业类型（履行方） */
+  industryType?: string;
+  /** 细分行业领域（履行方） */
+  subIndustryField?: string;
+  /** 企业规模（履行方） */
+  scale?: EnterpriseScale;
 }
 
 /** 团队成员 */
@@ -318,6 +386,10 @@ export interface Notification {
 }
 
 // ============ 辅助映射 ============
+
+export const WORKSPACE_STATUS_MAP: Record<WorkspaceStatus, string> = {
+  active: "活跃", archived: "已归档",
+};
 
 export const USER_TYPE_MAP: Record<UserType, string> = {
   supervisor: "监管方",

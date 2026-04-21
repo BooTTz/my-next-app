@@ -90,14 +90,14 @@
   --chart-4: oklch(0.77 0.15 70);
   --chart-5: oklch(0.63 0.22 25);
   --radius: 0.5rem;
-  /* 深蓝色侧边栏 */
-  --sidebar: oklch(0.25 0.055 250);
-  --sidebar-foreground: oklch(0.92 0.01 250);
-  --sidebar-primary: oklch(0.98 0.002 250);
-  --sidebar-primary-foreground: oklch(0.25 0.055 250);
-  --sidebar-accent: oklch(0.32 0.06 250);
-  --sidebar-accent-foreground: oklch(0.98 0.002 250);
-  --sidebar-border: oklch(0.35 0.06 250);
+  /* 浅色侧边栏 - 白色 */
+  --sidebar: oklch(1 0 0);
+  --sidebar-foreground: oklch(0.18 0.02 255);
+  --sidebar-primary: oklch(0.33 0.06 250);
+  --sidebar-primary-foreground: oklch(0.98 0.002 250);
+  --sidebar-accent: oklch(0.96 0.005 250);
+  --sidebar-accent-foreground: oklch(0.18 0.02 255);
+  --sidebar-border: oklch(0.91 0.005 250);
   --sidebar-ring: oklch(0.45 0.08 250);
   /* 平台状态色 */
   --status-info: #3B82F6;
@@ -112,6 +112,53 @@
   --success: oklch(0.72 0.19 150);
   --success-foreground: oklch(0.20 0.05 150);
   --info: oklch(0.62 0.19 260);
+  --info-foreground: oklch(0.98 0.002 250);
+}
+
+/* 深色主题 */
+.dark {
+  --background: oklch(0.14 0.005 250);
+  --foreground: oklch(0.93 0.005 250);
+  --card: oklch(0.18 0.01 250);
+  --card-foreground: oklch(0.93 0.005 250);
+  --popover: oklch(0.18 0.01 250);
+  --popover-foreground: oklch(0.93 0.005 250);
+  --primary: oklch(0.55 0.12 250);
+  --primary-foreground: oklch(0.98 0.002 250);
+  --secondary: oklch(0.22 0.01 250);
+  --secondary-foreground: oklch(0.93 0.005 250);
+  --muted: oklch(0.22 0.01 250);
+  --muted-foreground: oklch(0.65 0.02 250);
+  --accent: oklch(0.25 0.015 250);
+  --accent-foreground: oklch(0.93 0.005 250);
+  --destructive: oklch(0.55 0.22 25);
+  --border: oklch(0.28 0.01 250);
+  --input: oklch(0.28 0.01 250);
+  --ring: oklch(0.55 0.12 250);
+  --chart-1: oklch(0.55 0.12 250);
+  --chart-2: oklch(0.60 0.19 260);
+  --chart-3: oklch(0.70 0.19 150);
+  --chart-4: oklch(0.75 0.15 70);
+  --chart-5: oklch(0.55 0.22 25);
+  --sidebar: oklch(0.16 0.02 250);
+  --sidebar-foreground: oklch(0.90 0.01 250);
+  --sidebar-primary: oklch(0.55 0.12 250);
+  --sidebar-primary-foreground: oklch(0.98 0.002 250);
+  --sidebar-accent: oklch(0.25 0.03 250);
+  --sidebar-accent-foreground: oklch(0.93 0.005 250);
+  --sidebar-border: oklch(0.28 0.02 250);
+  --sidebar-ring: oklch(0.55 0.12 250);
+  --status-info: #60A5FA;
+  --status-success: #4ADE80;
+  --status-warning: #FBBF24;
+  --status-danger: #F87171;
+  --status-neutral: #6B7280;
+  --status-light: #4B5563;
+  --warning: oklch(0.72 0.15 70);
+  --warning-foreground: oklch(0.98 0.002 250);
+  --success: oklch(0.65 0.19 150);
+  --success-foreground: oklch(0.98 0.002 250);
+  --info: oklch(0.60 0.19 260);
   --info-foreground: oklch(0.98 0.002 250);
 }
 
@@ -141,8 +188,14 @@
     background: oklch(0.78 0.01 250);
     border-radius: 3px;
   }
+  .dark ::-webkit-scrollbar-thumb {
+    background: oklch(0.35 0.01 250);
+  }
   ::-webkit-scrollbar-thumb:hover {
     background: oklch(0.65 0.02 250);
+  }
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: oklch(0.45 0.02 250);
   }
 }
 
@@ -172,4 +225,74 @@
 @keyframes slideInRight {
   from { opacity: 0; transform: translateX(10px); }
   to { opacity: 1; transform: translateX(0); }
+}
+
+/* 现代 SaaS 风格增强 */
+@layer utilities {
+  /* 卡片悬浮效果 */
+  .card-hover {
+    @apply transition-all duration-200;
+  }
+  .card-hover:hover {
+    @apply shadow-md -translate-y-0.5;
+  }
+
+  /* 按钮点击效果 */
+  .btn-press:active {
+    @apply scale-[0.98];
+  }
+
+  /* 渐变背景 */
+  .gradient-primary {
+    background: linear-gradient(135deg, var(--primary) 0%, oklch(0.45 0.12 250) 100%);
+  }
+
+  /* 玻璃态效果 */
+  .glass {
+    @apply bg-background/80 backdrop-blur-sm;
+  }
+
+  /* 文字渐变 */
+  .text-gradient {
+    background: linear-gradient(135deg, var(--primary) 0%, oklch(0.62 0.19 260) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* 边框渐变 */
+  .border-gradient {
+    border: 1px solid transparent;
+    background: linear-gradient(var(--card), var(--card)) padding-box,
+                linear-gradient(135deg, var(--primary), var(--border)) border-box;
+  }
+
+  /* Focus ring */
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+  }
+
+  /* 空状态样式 */
+  .empty-state {
+    @apply flex flex-col items-center justify-center py-12 text-center;
+  }
+  .empty-state-icon {
+    @apply size-12 rounded-full bg-muted flex items-center justify-center mb-4;
+  }
+  .empty-state-title {
+    @apply text-lg font-medium mb-1;
+  }
+  .empty-state-description {
+    @apply text-sm text-muted-foreground max-w-sm;
+  }
+
+  /* 骨架屏 */
+  .skeleton {
+    @apply animate-pulse rounded-md bg-muted;
+  }
+
+  /* 平滑滚动 */
+  .smooth-scroll {
+    scroll-behavior: smooth;
+  }
 }

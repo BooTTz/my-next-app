@@ -7,9 +7,14 @@ import { useAppStore } from "@/lib/store";
 import {
   LayoutDashboard, ClipboardList, FileCheck, AlertTriangle,
   FileText, BarChart3, Users, Building2, Settings, Bell,
-  Wrench, ChevronDown, ChevronRight, Shield,
+  Wrench, ChevronDown, ChevronRight, Shield, MapPin,
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem,
+  DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 interface NavItem {
   label: string;
@@ -36,16 +41,7 @@ function getNavItems(teamId: string, userType: string): NavItem[] {
       { label: "隐患总览", icon: <AlertTriangle className="size-4" />, href: `${base}/hazards` },
       { label: "检查报告", icon: <FileText className="size-4" />, href: `${base}/reports` },
       { label: "数据统计", icon: <BarChart3 className="size-4" />, href: `${base}/statistics` },
-      {
-        label: "成员管理", icon: <Users className="size-4" />,
-        children: [
-          { label: "监管方列表", href: `${base}/members/supervisors` },
-          { label: "服务方列表", href: `${base}/members/inspectors` },
-          { label: "履行方列表", href: `${base}/members/enterprises` },
-        ],
-      },
-      { label: "组织架构", icon: <Building2 className="size-4" />, href: `${base}/organization` },
-      { label: "团队设置", icon: <Settings className="size-4" />, href: `${base}/settings` },
+      // 成员管理已整合到团队详情页（/team/[teamId]）
     ];
   }
 
@@ -60,7 +56,6 @@ function getNavItems(teamId: string, userType: string): NavItem[] {
           { label: "报告列表", href: `${base}/reports` },
         ],
       },
-      { label: "成员管理", icon: <Users className="size-4" />, href: `${base}/members` },
       { label: "通知中心", icon: <Bell className="size-4" />, href: `${base}/notifications` },
     ];
   }
@@ -147,7 +142,7 @@ function NavGroup({ item, pathname }: { item: NavItem; pathname: string }) {
 
 export default function AppSidebar() {
   const pathname = usePathname();
-  const { currentTeam, currentUserType } = useAppStore();
+  const { currentTeam, currentUserType, currentWorkspace, workspaces, switchWorkspace } = useAppStore();
 
   if (!currentTeam) return null;
 
@@ -155,15 +150,55 @@ export default function AppSidebar() {
 
   return (
     <aside className="flex h-screen w-56 flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border">
-      {/* Logo 区域 */}
-      <div className="flex h-14 items-center gap-2.5 border-b border-sidebar-border px-4">
-        <div className="flex size-8 items-center justify-center rounded-md bg-sidebar-primary">
-          <Shield className="size-4 text-sidebar-primary-foreground" />
+      {/* 工作组选择区 */}
+      <div className="flex flex-col border-b border-sidebar-border px-3 py-3 gap-2">
+        <div className="flex items-center gap-2">
+          <div className="flex size-8 items-center justify-center rounded-md bg-sidebar-primary">
+            <Shield className="size-4 text-sidebar-primary-foreground" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="truncate text-sm font-semibold text-sidebar-foreground">安全监管平台</p>
+            <p className="truncate text-[10px] text-sidebar-foreground/50">工贸三方协同</p>
+          </div>
         </div>
-        <div className="flex-1 min-w-0">
-          <p className="truncate text-sm font-semibold text-sidebar-foreground">安全监管平台</p>
-          <p className="truncate text-[10px] text-sidebar-foreground/50">工贸三方协同</p>
-        </div>
+        
+        {/* 工作组选择器 */}
+        <DropdownMenu>
+          <DropdownMenuTrigger className="flex items-center gap-2 w-full rounded-md px-2 py-1.5 text-sm bg-sidebar-accent/50 hover:bg-sidebar-accent transition-colors outline-none">
+            <MapPin className="size-3.5 text-sidebar-foreground/60" />
+            <span className="flex-1 truncate text-left text-xs font-medium">{currentWorkspace?.name || "选择工作组"}</span>
+            <ChevronDown className="size-3 text-sidebar-foreground/60" />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-56">
+            <div className="px-2 py-1.5 text-xs font-medium text-sidebar-foreground/60">切换工作组</div>
+            <DropdownMenuSeparator />
+            {workspaces.map((ws) => (
+              <DropdownMenuItem
+                key={ws.id}
+                onSelect={() => switchWorkspace(ws)}
+                className={cn(
+                  "flex flex-col items-start gap-0.5 cursor-pointer",
+                  ws.id === currentWorkspace?.id && "bg-sidebar-accent"
+                )}
+              >
+                <span className="font-medium text-sm">{ws.name}</span>
+                <span className="text-[10px] text-sidebar-foreground/60">
+                  {ws.region}
+                </span>
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {/* 工作组管理入口（仅监管方可见） */}
+        {currentUserType === "supervisor" && (
+          <Link href="/workspace/settings">
+            <Button variant="ghost" size="sm" className="h-7 w-full justify-start text-xs">
+              <Settings className="size-3 mr-1.5" />
+              工作组管理
+            </Button>
+          </Link>
+        )}
       </div>
 
       {/* 导航菜单 */}
@@ -176,7 +211,7 @@ export default function AppSidebar() {
       {/* 底部信息 */}
       <div className="border-t border-sidebar-border p-3">
         <p className="text-[10px] text-sidebar-foreground/40 text-center">
-          工贸三方监管平台 v1.0
+          工贸三方监管平台 v1.1.1
         </p>
       </div>
     </aside>

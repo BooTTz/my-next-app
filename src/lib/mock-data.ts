@@ -4,6 +4,7 @@
 import type {
   User, Team, TeamMember, Enterprise, InspectionPlan,
   InspectionTask, Hazard, InspectionReport, Notification,
+  Workspace, RegionNode, TeamWorkspace, WorkspaceAdmin,
 } from "./types";
 
 // ============ 用户数据 ============
@@ -18,31 +19,86 @@ export const MOCK_USERS: User[] = [
   { id: "u8", username: "wuming", realName: "吴明", phone: "13800001008", status: "active", createdAt: "2024-10-01", lastLoginAt: "2025-04-09" },
 ];
 
+// ============ 工作组数据 ============
+export const MOCK_WORKSPACES: Workspace[] = [
+  { id: "ws1", name: "博兴县2025年度安全检查工作组", region: "滨州市博兴县", creatorId: "u1", status: "active", enterpriseCount: 5, serviceCount: 1, createdAt: "2025-01-10", updatedAt: "2025-04-15" },
+  { id: "ws2", name: "博兴县冶金行业专项检查组", region: "滨州市博兴县", creatorId: "u1", status: "active", enterpriseCount: 3, serviceCount: 1, createdAt: "2025-02-15", updatedAt: "2025-04-10" },
+];
+
+// ============ 行政区划数据 ============
+export const MOCK_REGIONS: RegionNode[] = [
+  {
+    id: "r0", workspaceId: "ws1", name: "博兴县2025年度安全检查工作组", sortOrder: 0, createdAt: "2025-01-10",
+    children: [
+      { id: "r1", workspaceId: "ws1", parentId: "r0", name: "博兴县", sortOrder: 1, createdAt: "2025-01-10",
+        children: [
+          { id: "r1-1", workspaceId: "ws1", parentId: "r1", name: "店子镇", sortOrder: 1, createdAt: "2025-01-12" },
+          { id: "r1-2", workspaceId: "ws1", parentId: "r1", name: "兴福镇", sortOrder: 2, createdAt: "2025-01-12" },
+          { id: "r1-3", workspaceId: "ws1", parentId: "r1", name: "湖滨镇", sortOrder: 3, createdAt: "2025-01-12" },
+          { id: "r1-4", workspaceId: "ws1", parentId: "r1", name: "吕艺镇", sortOrder: 4, createdAt: "2025-01-12" },
+          { id: "r1-5", workspaceId: "ws1", parentId: "r1", name: "城东街道", sortOrder: 5, createdAt: "2025-01-12" },
+        ],
+      },
+    ],
+  },
+];
+
+// ============ 团队-工作组关联 ============
+export const MOCK_TEAM_WORKSPACES: TeamWorkspace[] = [
+  { id: "tw1", teamId: "t1", workspaceId: "ws1", regionId: "r1", joinedAt: "2025-01-15" },
+  { id: "tw2", teamId: "t2", workspaceId: "ws1", regionId: "r1", joinedAt: "2025-01-18" },
+  { id: "tw3", teamId: "t3", workspaceId: "ws1", regionId: "r1-1", joinedAt: "2025-01-20" },
+  { id: "tw4", teamId: "t4", workspaceId: "ws1", regionId: "r1-3", joinedAt: "2025-02-01" },
+  { id: "tw5", teamId: "t5", workspaceId: "ws1", regionId: "r1-2", joinedAt: "2025-02-05" },
+  { id: "tw6", teamId: "t6", workspaceId: "ws1", regionId: "r1-4", joinedAt: "2025-02-10" },
+  { id: "tw7", teamId: "t7", workspaceId: "ws1", regionId: "r1-5", joinedAt: "2025-02-15" },
+  { id: "tw8", teamId: "t1", workspaceId: "ws2", regionId: "r0", joinedAt: "2025-02-20" },
+  { id: "tw9", teamId: "t3", workspaceId: "ws2", regionId: "r0", joinedAt: "2025-02-22" },
+];
+
 // ============ 团队数据 ============
 export const MOCK_TEAMS: Team[] = [
-  { id: "t1", name: "博兴县2025年度安全检查工作组", description: "博兴县工贸企业安全生产专项检查工作组", region: "博兴县", creatorId: "u1", inviteCode: "BX2025", status: "active", createdAt: "2025-01-10", memberCount: 8 },
-  { id: "t2", name: "博兴县冶金行业专项检查组", description: "针对冶金行业企业的专项安全检查", region: "博兴县", creatorId: "u1", inviteCode: "YJ2025", status: "active", createdAt: "2025-02-15", memberCount: 5 },
+  { id: "t1", name: "博兴县应急管理局", description: "博兴县安全生产监管部门", region: "博兴县", teamType: "supervisor", creatorId: "u1", inviteCode: "BX2025", status: "active", createdAt: "2025-01-10", memberCount: 2, workspaceIds: ["ws1", "ws2"], supervisoryIndustry: "工贸行业" },
+  { id: "t2", name: "博兴安全技术服务有限公司", description: "地方安全管理服务机构", region: "博兴县", teamType: "inspector", creatorId: "u2", inviteCode: "AQFW2025", status: "active", createdAt: "2025-01-15", memberCount: 3, workspaceIds: ["ws1"], qualification: "AQ-2024-0021", mainServiceField: "工贸行业安全检查", agencyStaffCount: 15 },
+  { id: "t3", name: "博兴县鑫盛金属制品有限公司", description: "冶金行业企业", region: "博兴县", teamType: "enterprise", creatorId: "u4", inviteCode: "XS2025", status: "active", createdAt: "2025-01-20", memberCount: 2, workspaceIds: ["ws1", "ws2"], industryType: "冶金", subIndustryField: "金属制品", scale: "medium" },
+  { id: "t4", name: "山东博兴华宇建材有限公司", description: "建材行业企业", region: "博兴县", teamType: "enterprise", creatorId: "u4", inviteCode: "HY2025", status: "active", createdAt: "2025-02-01", memberCount: 1, workspaceIds: ["ws1"], industryType: "建材", subIndustryField: "建筑材料", scale: "large" },
+  { id: "t5", name: "博兴县天成机械加工厂", description: "机械加工企业", region: "博兴县", teamType: "enterprise", creatorId: "u4", inviteCode: "TC2025", status: "active", createdAt: "2025-02-05", memberCount: 1, workspaceIds: ["ws1"], industryType: "机械", subIndustryField: "机械加工", scale: "small" },
+  { id: "t6", name: "博兴县宏达纺织有限公司", description: "纺织行业企业", region: "博兴县", teamType: "enterprise", creatorId: "u4", inviteCode: "HD2025", status: "active", createdAt: "2025-02-10", memberCount: 1, workspaceIds: ["ws1"], industryType: "纺织", subIndustryField: "纺织品制造", scale: "medium" },
+  { id: "t7", name: "博兴县兴隆轻工制品有限公司", description: "轻工行业企业", region: "博兴县", teamType: "enterprise", creatorId: "u4", inviteCode: "XL2025", status: "active", createdAt: "2025-02-15", memberCount: 1, workspaceIds: ["ws1"], industryType: "轻工", subIndustryField: "轻工制品", scale: "small" },
+];
+
+// ============ 演示账号 ============
+export const DEMO_ACCOUNTS = [
+  { username: "demo_supervisor", password: "demo123", realName: "演示-监管方", userType: "supervisor" as const, userId: "u1" },
+  { username: "demo_inspector", password: "demo123", realName: "演示-服务方", userType: "inspector" as const, userId: "u2" },
+  { username: "demo_enterprise", password: "demo123", realName: "演示-履行方", userType: "enterprise" as const, userId: "u4" },
 ];
 
 // ============ 团队成员 ============
 export const MOCK_MEMBERS: TeamMember[] = [
-  { teamId: "t1", userId: "u1", userType: "supervisor", roleName: "监管负责人", joinedAt: "2025-01-10", user: MOCK_USERS[0] },
-  { teamId: "t1", userId: "u5", userType: "supervisor", roleName: "监管人员", joinedAt: "2025-01-12", user: MOCK_USERS[4] },
-  { teamId: "t1", userId: "u2", userType: "inspector", roleName: "检查组长", joinedAt: "2025-01-15", user: MOCK_USERS[1] },
-  { teamId: "t1", userId: "u3", userType: "inspector", roleName: "检查员", joinedAt: "2025-01-15", user: MOCK_USERS[2] },
-  { teamId: "t1", userId: "u6", userType: "inspector", roleName: "检查员", joinedAt: "2025-01-18", user: MOCK_USERS[5] },
-  { teamId: "t1", userId: "u4", userType: "enterprise", roleName: "企业负责人", joinedAt: "2025-01-20", user: MOCK_USERS[3] },
-  { teamId: "t1", userId: "u7", userType: "enterprise", roleName: "企业安全员", joinedAt: "2025-01-22", user: MOCK_USERS[6] },
-  { teamId: "t1", userId: "u8", userType: "enterprise", roleName: "企业安全员", joinedAt: "2025-02-01", user: MOCK_USERS[7] },
+  { teamId: "t1", userId: "u1", userType: "supervisor", roleName: "管理员", joinedAt: "2025-01-10", user: MOCK_USERS[0] },
+  { teamId: "t1", userId: "u5", userType: "supervisor", roleName: "成员", joinedAt: "2025-01-12", user: MOCK_USERS[4] },
+  { teamId: "t2", userId: "u2", userType: "inspector", roleName: "管理员", joinedAt: "2025-01-15", user: MOCK_USERS[1] },
+  { teamId: "t2", userId: "u3", userType: "inspector", roleName: "成员", joinedAt: "2025-01-15", user: MOCK_USERS[2] },
+  { teamId: "t2", userId: "u6", userType: "inspector", roleName: "成员", joinedAt: "2025-01-18", user: MOCK_USERS[5] },
+  { teamId: "t3", userId: "u4", userType: "enterprise", roleName: "管理员", joinedAt: "2025-01-20", user: MOCK_USERS[3] },
+  { teamId: "t3", userId: "u7", userType: "enterprise", roleName: "成员", joinedAt: "2025-01-22", user: MOCK_USERS[6] },
+  { teamId: "t4", userId: "u8", userType: "enterprise", roleName: "管理员", joinedAt: "2025-02-01", user: MOCK_USERS[7] },
+];
+
+// ============ 工作组管理员数据 ============
+export const MOCK_WORKSPACE_ADMINS: WorkspaceAdmin[] = [
+  { userId: "u1", userType: "supervisor", roleName: "管理员", user: MOCK_USERS[0] },
+  { userId: "u5", userType: "supervisor", roleName: "成员", user: MOCK_USERS[4] },
 ];
 
 // ============ 企业数据 ============
 export const MOCK_ENTERPRISES: Enterprise[] = [
-  { id: "e1", teamId: "t1", name: "博兴县鑫盛金属制品有限公司", creditCode: "91371625MA3EXAMPLE1", legalPerson: "陈杰", safetyDirector: "周鑫", safetyDirectorPhone: "13800001007", industry: "metallurgy", scale: "medium", employeeCount: 280, address: "博兴县经济开发区金属产业园A区12号", riskLevel: "orange", status: "active", createdAt: "2025-01-20" },
-  { id: "e2", teamId: "t1", name: "山东博兴华宇建材有限公司", creditCode: "91371625MA3EXAMPLE2", legalPerson: "刘建国", safetyDirector: "吴明", safetyDirectorPhone: "13800001008", industry: "buildingMaterials", scale: "large", employeeCount: 520, address: "博兴县城东工业区建材路8号", riskLevel: "yellow", status: "active", createdAt: "2025-01-22" },
-  { id: "e3", teamId: "t1", name: "博兴县天成机械加工厂", creditCode: "91371625MA3EXAMPLE3", legalPerson: "马天成", safetyDirector: "李安全", safetyDirectorPhone: "13800002001", industry: "machinery", scale: "small", employeeCount: 85, address: "博兴县湖滨镇工业园区机械路3号", riskLevel: "yellow", status: "active", createdAt: "2025-02-01" },
-  { id: "e4", teamId: "t1", name: "博兴县宏达纺织有限公司", creditCode: "91371625MA3EXAMPLE4", legalPerson: "赵宏达", safetyDirector: "张安", safetyDirectorPhone: "13800002002", industry: "textiles", scale: "medium", employeeCount: 350, address: "博兴县吕艺镇纺织产业园D区", riskLevel: "blue", status: "active", createdAt: "2025-02-05" },
-  { id: "e5", teamId: "t1", name: "博兴县兴隆轻工制品有限公司", creditCode: "91371625MA3EXAMPLE5", legalPerson: "钱兴隆", safetyDirector: "孙建设", safetyDirectorPhone: "13800002003", industry: "lightIndustry", scale: "small", employeeCount: 120, address: "博兴县店子镇轻工产业区16号", riskLevel: "blue", status: "active", createdAt: "2025-02-10" },
+  { id: "e1", teamId: "t3", name: "博兴县鑫盛金属制品有限公司", creditCode: "91371625MA3EXAMPLE1", legalPerson: "陈杰", safetyDirector: "周鑫", safetyDirectorPhone: "13800001007", industry: "metallurgy", scale: "medium", employeeCount: 280, address: "博兴县经济开发区金属产业园A区12号", riskLevel: "orange", status: "active", createdAt: "2025-01-20" },
+  { id: "e2", teamId: "t4", name: "山东博兴华宇建材有限公司", creditCode: "91371625MA3EXAMPLE2", legalPerson: "刘建国", safetyDirector: "吴明", safetyDirectorPhone: "13800001008", industry: "buildingMaterials", scale: "large", employeeCount: 520, address: "博兴县城东工业区建材路8号", riskLevel: "yellow", status: "active", createdAt: "2025-01-22" },
+  { id: "e3", teamId: "t5", name: "博兴县天成机械加工厂", creditCode: "91371625MA3EXAMPLE3", legalPerson: "马天成", safetyDirector: "李安全", safetyDirectorPhone: "13800002001", industry: "machinery", scale: "small", employeeCount: 85, address: "博兴县湖滨镇工业园区机械路3号", riskLevel: "yellow", status: "active", createdAt: "2025-02-01" },
+  { id: "e4", teamId: "t6", name: "博兴县宏达纺织有限公司", creditCode: "91371625MA3EXAMPLE4", legalPerson: "赵宏达", safetyDirector: "张安", safetyDirectorPhone: "13800002002", industry: "textiles", scale: "medium", employeeCount: 350, address: "博兴县吕艺镇纺织产业园D区", riskLevel: "blue", status: "active", createdAt: "2025-02-05" },
+  { id: "e5", teamId: "t7", name: "博兴县兴隆轻工制品有限公司", creditCode: "91371625MA3EXAMPLE5", legalPerson: "钱兴隆", safetyDirector: "孙建设", safetyDirectorPhone: "13800002003", industry: "lightIndustry", scale: "small", employeeCount: 120, address: "博兴县店子镇轻工产业区16号", riskLevel: "blue", status: "active", createdAt: "2025-02-10" },
 ];
 
 // ============ 检查计划 ============
