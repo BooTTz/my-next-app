@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { PageHeader, ListToolbar } from "@/components/shared/PageHeader";
 import { PlanStatusBadge } from "@/components/shared/StatusBadge";
@@ -13,13 +14,12 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { MOCK_PLANS } from "@/lib/mock-data";
 import { PLAN_TYPE_MAP } from "@/lib/types";
-import { Eye, Edit, Trash2, MoreHorizontal, Copy } from "lucide-react";
-import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Eye, Edit, Trash2, Copy } from "lucide-react";
+import HoverActionMenu from "@/components/shared/HoverActionMenu";
 import { toast } from "sonner";
 
 export default function PlansListPage() {
+  const router = useRouter();
   const [search, setSearch] = useState("");
 
   const filteredPlans = MOCK_PLANS.filter(
@@ -103,27 +103,31 @@ export default function PlansListPage() {
                       </TableCell>
                       <TableCell className="text-sm">{plan.creatorName}</TableCell>
                       <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger className="inline-flex items-center justify-center rounded-md size-6 hover:bg-muted transition-colors outline-none">
-                            <MoreHorizontal className="size-3.5" />
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem>
-                              <Link href={`/team/t1/plans/${plan.id}`} className="flex items-center">
-                                <Eye className="size-3.5 mr-2" /> 查看详情
-                              </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                              <Edit className="size-3.5 mr-2" /> 编辑
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                              <Copy className="size-3.5 mr-2" /> 复制计划
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className="text-status-danger">
-                              <Trash2 className="size-3.5 mr-2" /> 删除
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                        <HoverActionMenu
+                          actions={[
+                            {
+                              label: "查看详情",
+                              icon: <Eye className="h-4 w-4" />,
+                              onClick: () => router.push(`/team/t1/plans/${plan.id}`),
+                            },
+                            {
+                              label: "编辑",
+                              icon: <Edit className="h-4 w-4" />,
+                              onClick: () => toast.info("编辑功能"),
+                            },
+                            {
+                              label: "复制计划",
+                              icon: <Copy className="h-4 w-4" />,
+                              onClick: () => toast.info("复制功能"),
+                            },
+                            {
+                              label: "删除",
+                              icon: <Trash2 className="h-4 w-4" />,
+                              onClick: () => toast.error("删除计划"),
+                              variant: "destructive",
+                            },
+                          ]}
+                        />
                       </TableCell>
                     </TableRow>
                   );

@@ -142,11 +142,12 @@ function NavGroup({ item, pathname }: { item: NavItem; pathname: string }) {
 
 export default function AppSidebar() {
   const pathname = usePathname();
-  const { currentTeam, currentUserType, currentWorkspace, workspaces, switchWorkspace } = useAppStore();
+  const { currentTeam, currentUserType, currentWorkspace, currentOrganization, workspaces, switchWorkspace } = useAppStore();
 
   if (!currentTeam) return null;
 
   const navItems = getNavItems(currentTeam.id, currentUserType);
+  const orgId = currentOrganization?.id || currentTeam?.id;
 
   return (
     <aside className="flex h-screen w-56 flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border">
@@ -209,7 +210,16 @@ export default function AppSidebar() {
       </nav>
 
       {/* 底部信息 */}
-      <div className="border-t border-sidebar-border p-3">
+      <div className="border-t border-sidebar-border p-3 space-y-1">
+        {/* 我的组织入口 */}
+        {orgId && (
+          <Link href={`/organization/${orgId}`}>
+            <Button variant="ghost" size="sm" className="h-7 w-full justify-start text-xs">
+              <Building2 className="size-3 mr-1.5" />
+              我的组织
+            </Button>
+          </Link>
+        )}
         <p className="text-[10px] text-sidebar-foreground/40 text-center">
           工贸三方监管平台 v1.1.1
         </p>

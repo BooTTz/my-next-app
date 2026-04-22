@@ -1,7 +1,6 @@
 "use client";
 
 import { useAppStore } from "@/lib/store";
-import { USER_TYPE_MAP } from "@/lib/types";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,32 +9,46 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
-import { Bell, ChevronDown, LogOut, User, Settings } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Bell, ChevronDown, LogOut, User, Settings, UserCircle } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ThemeToggle } from "@/components/shared/ThemeToggle";
 
 export default function TopBar() {
-  const { currentUser, currentTeam, currentUserType } = useAppStore();
+  const { currentUser, currentTeam, currentOrganization, logout } = useAppStore();
+  const router = useRouter();
 
   if (!currentUser || !currentTeam) return null;
 
-  const userTypeColors = {
-    supervisor: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
-    inspector: "bg-green-500/10 text-green-600 dark:text-green-400",
-    enterprise: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
-  };
+  const displayName = currentOrganization?.name || currentTeam?.name || "工贸三方监管平台";
+  const isNameLong = displayName.length > 10;
+
+  function handleLogout() {
+    logout();
+    router.push("/");
+  }
 
   return (
     <header className="flex h-14 items-center justify-between border-b bg-card px-4">
-      {/* 左侧 - 用户类型标签 */}
-      <div className="flex items-center gap-3">
-        {/* 用户类型标签 */}
-        <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium ${userTypeColors[currentUserType]}`}>
-          {USER_TYPE_MAP[currentUserType]}
-        </span>
-        <span className="text-sm text-muted-foreground">{currentTeam.name}</span>
+      {/* 左侧 - 组织名称 */}
+      <div className="flex items-center gap-2">
+        <Tooltip>
+          <TooltipTrigger className="cursor-default">
+            <div className="flex flex-col text-left">
+              <span className="truncate max-w-[200px] text-sm font-semibold leading-tight">
+                {displayName}
+              </span>
+              <span className="text-xs text-muted-foreground leading-tight">工贸三方监管平台</span>
+            </div>
+          </TooltipTrigger>
+          {isNameLong && (
+            <TooltipContent side="bottom">
+              <p>{displayName}</p>
+            </TooltipContent>
+          )}
+        </Tooltip>
       </div>
 
       {/* 右侧 - 主题 + 通知 + 用户 */}
@@ -70,6 +83,10 @@ export default function TopBar() {
               <p className="text-xs text-muted-foreground">{currentUser.phone}</p>
             </div>
             <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => router.push("/profile")}>
+              <UserCircle className="size-3.5 mr-2" />
+              个人中心
+            </DropdownMenuItem>
             <DropdownMenuItem>
               <User className="size-3.5 mr-2" />
               个人设置
@@ -79,7 +96,7 @@ export default function TopBar() {
               账号安全
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem variant="destructive">
+            <DropdownMenuItem variant="destructive" onClick={handleLogout}>
               <LogOut className="size-3.5 mr-2" />
               退出登录
             </DropdownMenuItem>

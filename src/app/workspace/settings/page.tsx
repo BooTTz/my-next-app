@@ -128,13 +128,13 @@ export default function WorkspaceSettingsPage() {
   const [regionDialogParentId, setRegionDialogParentId] = useState<string | null>(null);
   const [editingRegionId, setEditingRegionId] = useState<string | null>(null);
 
-  // 邀请团队相关状态
+  // 邀请组织相关状态
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
   const [inviteTeamType, setInviteTeamType] = useState<UserType>("enterprise");
   const [inviteTeamName, setInviteTeamName] = useState("");
   const [inviteRegionId, setInviteRegionId] = useState<string | null>("");
 
-  // 团队筛选状态
+  // 组织筛选状态
   const [teamSearch, setTeamSearch] = useState("");
   const [teamTypeFilter, setTeamTypeFilter] = useState<UserType | "all">("all");
 
@@ -150,13 +150,13 @@ export default function WorkspaceSettingsPage() {
     );
   }
 
-  // 获取工作组内的团队
+  // 获取工作组内的组织
   const workspaceTeamIds = MOCK_TEAM_WORKSPACES
     .filter((tw) => tw.workspaceId === currentWorkspace.id)
     .map((tw) => tw.teamId);
   const workspaceTeams = MOCK_TEAMS.filter((t) => workspaceTeamIds.includes(t.id));
 
-  // 筛选团队
+  // 筛选组织
   const filteredTeams = workspaceTeams.filter((team) => {
     const matchesSearch = team.name.toLowerCase().includes(teamSearch.toLowerCase()) ||
       team.description?.toLowerCase().includes(teamSearch.toLowerCase());
@@ -164,12 +164,12 @@ export default function WorkspaceSettingsPage() {
     return matchesSearch && matchesType;
   });
 
-  // 按类型分类团队
+  // 按类型分类组织
   const supervisorTeams = workspaceTeams.filter((t) => t.teamType === "supervisor");
   const inspectorTeams = workspaceTeams.filter((t) => t.teamType === "inspector");
   const enterpriseTeams = workspaceTeams.filter((t) => t.teamType === "enterprise");
 
-  // 获取区域内的团队
+  // 获取区域内的组织
   const getTeamsInRegion = (regionId: string) => {
     const regionTeamIds = MOCK_TEAM_WORKSPACES
       .filter((tw) => tw.workspaceId === currentWorkspace.id && tw.regionId === regionId)
@@ -212,16 +212,16 @@ export default function WorkspaceSettingsPage() {
   const handleDeleteRegion = (id: string) => {
     const regionTeamCount = getTeamsInRegion(id).length;
     if (regionTeamCount > 0) {
-      toast.error(`该区划下存在 ${regionTeamCount} 个团队，无法删除`);
+      toast.error(`该区划下存在 ${regionTeamCount} 个组织，无法删除`);
       return;
     }
     toast.success("已删除区划");
   };
 
-  // 邀请团队操作
+  // 邀请组织操作
   const handleInviteTeam = () => {
     if (!inviteTeamName.trim()) {
-      toast.error("请输入团队名称或邀请码");
+      toast.error("请输入组织名称或邀请码");
       return;
     }
     toast.success(`已向 ${inviteTeamName} 发送邀请`);
@@ -304,7 +304,7 @@ export default function WorkspaceSettingsPage() {
               </div>
               <div>
                 <p className="text-xl font-bold">{workspaceTeams.length}</p>
-                <p className="text-xs text-muted-foreground">团队总数</p>
+                <p className="text-xs text-muted-foreground">组织总数</p>
               </div>
             </div>
           </CardContent>
@@ -346,7 +346,7 @@ export default function WorkspaceSettingsPage() {
           <TabsTrigger value="enterprise">履行方 ({enterpriseTeams.length})</TabsTrigger>
         </TabsList>
 
-        {/* 组织信息 - 行政区划树 + 团队列表 */}
+        {/* 组织信息 - 行政区划树 + 组织列表 */}
         <TabsContent value="organization" className="mt-4">
           <div className="flex gap-4">
             {/* 左侧行政区划树 */}
@@ -376,18 +376,18 @@ export default function WorkspaceSettingsPage() {
               </CardContent>
             </Card>
 
-            {/* 右侧团队列表 */}
+            {/* 右侧组织列表 */}
             <Card className="flex-1">
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-sm font-medium">
                     {selectedRegionId
-                      ? `团队列表 (${selectedRegionTeams.length})`
-                      : `全部团队 (${filteredTeams.length})`}
+                      ? `组织列表 (${selectedRegionTeams.length})`
+                      : `全部组织 (${filteredTeams.length})`}
                   </CardTitle>
                   <Button size="sm" className="h-8" onClick={() => setInviteDialogOpen(true)}>
                     <UserPlus className="size-3.5 mr-1.5" />
-                    邀请团队
+                    邀请组织
                   </Button>
                 </div>
               </CardHeader>
@@ -397,7 +397,7 @@ export default function WorkspaceSettingsPage() {
                   <div className="relative flex-1">
                     <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                     <Input
-                      placeholder="搜索团队名称..."
+                      placeholder="搜索组织名称..."
                       value={teamSearch}
                       onChange={(e) => setTeamSearch(e.target.value)}
                       className="pl-9 h-8"
@@ -425,7 +425,7 @@ export default function WorkspaceSettingsPage() {
                   </Select>
                 </div>
 
-                {/* 团队列表 */}
+                {/* 组织列表 */}
                 <div className="space-y-3">
                   {(teamSearch || teamTypeFilter !== "all" ? filteredTeams : (selectedRegionId ? selectedRegionTeams : workspaceTeams)).map((team) => {
                     const typeColors = {
@@ -468,7 +468,7 @@ export default function WorkspaceSettingsPage() {
                     );
                   })}
                   {(teamSearch || teamTypeFilter !== "all" ? filteredTeams : (selectedRegionId ? selectedRegionTeams : workspaceTeams)).length === 0 && (
-                    <p className="text-center text-muted-foreground py-8">暂无团队</p>
+                    <p className="text-center text-muted-foreground py-8">暂无组织</p>
                   )}
                 </div>
               </CardContent>
@@ -500,7 +500,7 @@ export default function WorkspaceSettingsPage() {
                           </div>
                         </div>
                         <Link href={`/team/${team.id}`}>
-                          <Button variant="outline" size="sm">管理团队</Button>
+                          <Button variant="outline" size="sm">管理组织</Button>
                         </Link>
                       </div>
                       <div className="flex flex-wrap gap-2">
@@ -514,7 +514,7 @@ export default function WorkspaceSettingsPage() {
                   );
                 })}
                 {supervisorTeams.length === 0 && (
-                  <p className="text-center text-muted-foreground py-8">暂无监管方团队</p>
+                  <p className="text-center text-muted-foreground py-8">暂无监管方组织</p>
                 )}
               </div>
             </CardContent>
@@ -548,7 +548,7 @@ export default function WorkspaceSettingsPage() {
                           </div>
                         </div>
                         <Link href={`/team/${team.id}`}>
-                          <Button variant="outline" size="sm">管理团队</Button>
+                          <Button variant="outline" size="sm">管理组织</Button>
                         </Link>
                       </div>
                       <div className="flex flex-wrap gap-2">
@@ -562,7 +562,7 @@ export default function WorkspaceSettingsPage() {
                   );
                 })}
                 {inspectorTeams.length === 0 && (
-                  <p className="text-center text-muted-foreground py-8">暂无服务方团队</p>
+                  <p className="text-center text-muted-foreground py-8">暂无服务方组织</p>
                 )}
               </div>
             </CardContent>
@@ -596,7 +596,7 @@ export default function WorkspaceSettingsPage() {
                           </div>
                         </div>
                         <Link href={`/team/${team.id}`}>
-                          <Button variant="outline" size="sm">管理团队</Button>
+                          <Button variant="outline" size="sm">管理组织</Button>
                         </Link>
                       </div>
                       <div className="flex flex-wrap gap-2">
@@ -610,7 +610,7 @@ export default function WorkspaceSettingsPage() {
                   );
                 })}
                 {enterpriseTeams.length === 0 && (
-                  <p className="text-center text-muted-foreground py-8">暂无履行方团队</p>
+                  <p className="text-center text-muted-foreground py-8">暂无履行方组织</p>
                 )}
               </div>
             </CardContent>
@@ -679,18 +679,18 @@ export default function WorkspaceSettingsPage() {
         </DialogContent>
       </Dialog>
 
-      {/* 邀请团队 Dialog */}
+      {/* 邀请组织 Dialog */}
       <Dialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>邀请团队加入工作组</DialogTitle>
+            <DialogTitle>邀请组织加入工作组</DialogTitle>
             <DialogDescription>
-              输入团队名称或邀请码，选择团队类型和所属区划进行邀请
+              输入组织名称或邀请码，选择组织类型和所属区划进行邀请
             </DialogDescription>
           </DialogHeader>
           <div className="py-4 space-y-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">团队类型</label>
+              <label className="text-sm font-medium">组织类型</label>
               <Select value={inviteTeamType} onValueChange={(v) => setInviteTeamType(v as UserType)}>
                 <SelectTrigger>
                   <SelectValue />
@@ -703,9 +703,9 @@ export default function WorkspaceSettingsPage() {
               </Select>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">团队名称或邀请码</label>
+              <label className="text-sm font-medium">组织名称或邀请码</label>
               <Input
-                placeholder="请输入团队名称或邀请码"
+                placeholder="请输入组织名称或邀请码"
                 value={inviteTeamName}
                 onChange={(e) => setInviteTeamName(e.target.value)}
               />

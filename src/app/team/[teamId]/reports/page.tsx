@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { PageHeader, ListToolbar } from "@/components/shared/PageHeader";
 import { ReportStatusBadge } from "@/components/shared/StatusBadge";
@@ -10,13 +11,12 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { MOCK_REPORTS } from "@/lib/mock-data";
-import { Eye, Download, Share2, MoreHorizontal } from "lucide-react";
-import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Eye, Download, Share2 } from "lucide-react";
+import HoverActionMenu from "@/components/shared/HoverActionMenu";
 import { toast } from "sonner";
 
 export default function ReportsListPage() {
+  const router = useRouter();
   const [search, setSearch] = useState("");
 
   const filtered = MOCK_REPORTS.filter(
@@ -70,24 +70,25 @@ export default function ReportsListPage() {
                     <TableCell className="text-sm">{report.generatedByName}</TableCell>
                     <TableCell className="text-xs">{report.generatedAt}</TableCell>
                     <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger className="inline-flex items-center justify-center rounded-md size-6 hover:bg-muted transition-colors outline-none">
-                          <MoreHorizontal className="size-3.5" />
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem>
-                            <Link href={`/team/t1/reports/${report.id}`} className="flex items-center">
-                              <Eye className="size-3.5 mr-2" /> 在线预览
-                            </Link>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => toast.info("导出PDF")}>
-                            <Download className="size-3.5 mr-2" /> 导出PDF
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => toast.info("已生成分享链接")}>
-                            <Share2 className="size-3.5 mr-2" /> 分享链接
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      <HoverActionMenu
+                        actions={[
+                          {
+                            label: "在线预览",
+                            icon: <Eye className="h-4 w-4" />,
+                            onClick: () => router.push(`/team/t1/reports/${report.id}`),
+                          },
+                          {
+                            label: "导出 PDF",
+                            icon: <Download className="h-4 w-4" />,
+                            onClick: () => toast.info("导出 PDF"),
+                          },
+                          {
+                            label: "分享链接",
+                            icon: <Share2 className="h-4 w-4" />,
+                            onClick: () => toast.info("已生成分享链接"),
+                          },
+                        ]}
+                      />
                     </TableCell>
                   </TableRow>
                 ))}

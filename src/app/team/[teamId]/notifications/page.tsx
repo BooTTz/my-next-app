@@ -7,10 +7,11 @@ import { Badge } from "@/components/ui/badge";
 import { MOCK_NOTIFICATIONS } from "@/lib/mock-data";
 import {
   Bell, AlertTriangle, FileText, CheckCircle2, Clock,
-  XCircle, Send, MailOpen,
+  XCircle, Send, MailOpen, ArrowLeft,
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import Link from "next/link";
 
 const iconMap: Record<string, React.ReactNode> = {
   plan_published: <Send className="size-4 text-status-info" />,
@@ -39,6 +40,16 @@ export default function NotificationsPage() {
 
   return (
     <div className="space-y-4">
+      <div className="flex items-center gap-4">
+        <Link
+          href="/workspace"
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ArrowLeft className="size-4" />
+          返回工作台
+        </Link>
+      </div>
+
       <PageHeader title="通知中心" description={`${unreadCount} 条未读消息`}>
         <Button variant="outline" size="sm" onClick={markAllRead}>
           <MailOpen className="size-3.5" /> 全部已读

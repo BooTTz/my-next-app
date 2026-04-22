@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { PageHeader, ListToolbar } from "@/components/shared/PageHeader";
 import { TaskStatusBadge } from "@/components/shared/StatusBadge";
@@ -12,13 +13,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { MOCK_TASKS } from "@/lib/mock-data";
 import { CONCLUSION_MAP } from "@/lib/types";
-import { Eye, MoreHorizontal } from "lucide-react";
-import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Eye } from "lucide-react";
+import HoverActionMenu from "@/components/shared/HoverActionMenu";
 import { toast } from "sonner";
 
 export default function TasksListPage() {
+  const router = useRouter();
   const [search, setSearch] = useState("");
 
   const filteredTasks = MOCK_TASKS.filter(
@@ -119,24 +119,23 @@ export default function TasksListPage() {
                       )}
                     </TableCell>
                     <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger className="inline-flex items-center justify-center rounded-md size-6 hover:bg-muted transition-colors outline-none">
-                          <MoreHorizontal className="size-3.5" />
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem>
-                            <Link href={`/team/t1/tasks/${task.id}`} className="flex items-center">
-                              <Eye className="size-3.5 mr-2" /> 查看详情
-                            </Link>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => toast.info("接收任务")}>
-                            接收任务
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => toast.info("验收任务")}>
-                            验收任务
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      <HoverActionMenu
+                        actions={[
+                          {
+                            label: "查看详情",
+                            icon: <Eye className="h-4 w-4" />,
+                            onClick: () => router.push(`/team/t1/tasks/${task.id}`),
+                          },
+                          {
+                            label: "接收任务",
+                            onClick: () => toast.info("接收任务"),
+                          },
+                          {
+                            label: "验收任务",
+                            onClick: () => toast.info("验收任务"),
+                          },
+                        ]}
+                      />
                     </TableCell>
                   </TableRow>
                 ))}

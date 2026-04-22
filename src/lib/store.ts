@@ -3,7 +3,7 @@
  * v1.1.0 - 新增工作组层级，移除角色切换
  * ======================================== */
 import { create } from "zustand";
-import type { User, Team, UserType, Workspace } from "./types";
+import type { User, Team, UserType, Workspace, Organization, BreadcrumbItem } from "./types";
 import { MOCK_USERS, MOCK_TEAMS, MOCK_WORKSPACES, MOCK_TEAM_WORKSPACES } from "./mock-data";
 
 interface AppState {
@@ -19,6 +19,10 @@ interface AppState {
   workspaces: Workspace[];
   /** 用户加入的所有团队 */
   teams: Team[];
+  /** 当前组织 */
+  currentOrganization: Organization | null;
+  /** 面包屑 */
+  breadcrumbs: BreadcrumbItem[];
   /** 侧边栏是否折叠 */
   sidebarCollapsed: boolean;
   /** 登录 */
@@ -29,6 +33,10 @@ interface AppState {
   switchTeam: (team: Team) => void;
   /** 切换工作组 */
   switchWorkspace: (workspace: Workspace) => void;
+  /** 设置当前组织 */
+  setCurrentOrganization: (org: Organization | null) => void;
+  /** 设置面包屑 */
+  setBreadcrumbs: (items: BreadcrumbItem[]) => void;
   /** 切换侧边栏 */
   toggleSidebar: () => void;
   /** 获取当前工作组内的团队列表 */
@@ -71,6 +79,16 @@ function getUserDefaultTeam(userId: string): Team | null {
   return MOCK_TEAMS.find((t) => t.id === userTeamId) || null;
 }
 
+export const isSuperAdmin = () => {
+  const user = useAppStore.getState().currentUser;
+  return user?.platformRole === "super_admin";
+};
+
+export const isOrgAdmin = () => {
+  const user = useAppStore.getState().currentUser;
+  return user?.platformRole === "org_admin";
+};
+
 export const useAppStore = create<AppState>((set, get) => {
   const defaultUser = MOCK_USERS[0];
   const defaultTeam = getUserDefaultTeam(defaultUser.id);
@@ -83,6 +101,8 @@ export const useAppStore = create<AppState>((set, get) => {
     currentWorkspace: defaultWorkspaces[0] || null,
     workspaces: defaultWorkspaces,
     teams: MOCK_TEAMS,
+    currentOrganization: defaultTeam ? { ...defaultTeam } as Organization : null,
+    breadcrumbs: [],
     sidebarCollapsed: false,
     login: (user) => {
       const userWorkspaces = getUserWorkspaces(user.id);
@@ -95,12 +115,21 @@ export const useAppStore = create<AppState>((set, get) => {
         currentWorkspace: userWorkspaces[0] || null,
       });
     },
-    logout: () => set({ currentUser: null, currentTeam: null, currentWorkspace: null }),
+    logout: () => set({
+      currentUser: null,
+      currentTeam: null,
+      currentWorkspace: null,
+      currentOrganization: null,
+      breadcrumbs: [],
+    }),
     switchTeam: (team) => set({
       currentTeam: team,
       currentUserType: getUserTypeFromTeam(team),
+      currentOrganization: team as Organization,
     }),
     switchWorkspace: (workspace) => set({ currentWorkspace: workspace }),
+    setCurrentOrganization: (org) => set({ currentOrganization: org }),
+    setBreadcrumbs: (items) => set({ breadcrumbs: items }),
     toggleSidebar: () => set((s) => ({ sidebarCollapsed: !s.sidebarCollapsed })),
     getTeamsInWorkspace: (workspaceId: string) => {
       const teamIds = MOCK_TEAM_WORKSPACES

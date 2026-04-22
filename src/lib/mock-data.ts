@@ -5,18 +5,33 @@ import type {
   User, Team, TeamMember, Enterprise, InspectionPlan,
   InspectionTask, Hazard, InspectionReport, Notification,
   Workspace, RegionNode, TeamWorkspace, WorkspaceAdmin,
+  Organization, Certificate, OrganizationStats,
 } from "./types";
 
 // ============ 用户数据 ============
 export const MOCK_USERS: User[] = [
-  { id: "u1", username: "liwei", realName: "李伟", phone: "13800001001", status: "active", createdAt: "2024-06-01", lastLoginAt: "2025-04-15", avatar: "" },
-  { id: "u2", username: "zhangmin", realName: "张敏", phone: "13800001002", status: "active", createdAt: "2024-06-05", lastLoginAt: "2025-04-15", certNo: "AQ-2024-0021" },
-  { id: "u3", username: "wangqiang", realName: "王强", phone: "13800001003", status: "active", createdAt: "2024-07-10", lastLoginAt: "2025-04-14", certNo: "AQ-2024-0035" },
-  { id: "u4", username: "chenjie", realName: "陈杰", phone: "13800001004", status: "active", createdAt: "2024-08-01", lastLoginAt: "2025-04-13" },
-  { id: "u5", username: "zhaoli", realName: "赵丽", phone: "13800001005", status: "active", createdAt: "2024-08-15", lastLoginAt: "2025-04-12" },
-  { id: "u6", username: "sunhao", realName: "孙浩", phone: "13800001006", status: "active", createdAt: "2024-09-01", lastLoginAt: "2025-04-10", certNo: "AQ-2024-0048" },
-  { id: "u7", username: "zhouxin", realName: "周鑫", phone: "13800001007", status: "active", createdAt: "2024-09-10", lastLoginAt: "2025-04-11" },
-  { id: "u8", username: "wuming", realName: "吴明", phone: "13800001008", status: "active", createdAt: "2024-10-01", lastLoginAt: "2025-04-09" },
+  { id: "u1", username: "liwei", realName: "李伟", phone: "13800001001", status: "active", createdAt: "2024-06-01", lastLoginAt: "2025-04-15", avatar: "", platformRole: "org_admin", paidTier: "premium", gender: "male", cityCode: "330100", cityName: "浙江省杭州市" },
+  { id: "u2", username: "zhangmin", realName: "张敏", phone: "13800001002", status: "active", createdAt: "2024-06-05", lastLoginAt: "2025-04-15", certNo: "AQ-2024-0021", platformRole: "user", paidTier: "standard", gender: "female" },
+  { id: "u3", username: "wangqiang", realName: "王强", phone: "13800001003", status: "active", createdAt: "2024-07-10", lastLoginAt: "2025-04-14", certNo: "AQ-2024-0035", platformRole: "user", paidTier: "standard", gender: "male" },
+  { id: "u4", username: "chenjie", realName: "陈杰", phone: "13800001004", status: "active", createdAt: "2024-08-01", lastLoginAt: "2025-04-13", platformRole: "user", paidTier: "free", gender: "male", avatar: "" },
+  { id: "u5", username: "zhaoli", realName: "赵丽", phone: "13800001005", status: "active", createdAt: "2024-08-15", lastLoginAt: "2025-04-12", platformRole: "user", paidTier: "free", gender: "female" },
+  { id: "u6", username: "sunhao", realName: "孙浩", phone: "13800001006", status: "active", createdAt: "2024-09-01", lastLoginAt: "2025-04-10", certNo: "AQ-2024-0048", platformRole: "user", gender: "male" },
+  { id: "u7", username: "zhouxin", realName: "周鑫", phone: "13800001007", status: "active", createdAt: "2024-09-10", lastLoginAt: "2025-04-11", platformRole: "user", gender: "unknown" },
+  { id: "u8", username: "wuming", realName: "吴明", phone: "13800001008", status: "active", createdAt: "2024-10-01", lastLoginAt: "2025-04-09", platformRole: "user" },
+  {
+    id: "user-superadmin",
+    username: "superadmin",
+    realName: "平台管理员",
+    email: "admin@platform.com",
+    phone: "13900000000",
+    status: "active",
+    platformRole: "super_admin",
+    paidTier: "premium",
+    gender: "male",
+    avatar: "",
+    createdAt: "2024-01-01T00:00:00Z",
+    lastLoginAt: "2025-04-20T10:00:00Z",
+  },
 ];
 
 // ============ 工作组数据 ============
@@ -150,4 +165,99 @@ export const MOCK_NOTIFICATIONS: Notification[] = [
   { id: "n4", teamId: "t1", userId: "u4", type: "hazard_found", title: "检查发现隐患", content: "检查发现5条隐患，请尽快整改", isRead: true, relatedId: "tk4", createdAt: "2025-03-15 16:00:00" },
   { id: "n5", teamId: "t1", userId: "u2", type: "task_overdue", title: "任务即将逾期", content: "任务RW-2025-005将于3天后到期，请关注", isRead: true, relatedId: "tk5", createdAt: "2025-03-22 08:00:00" },
   { id: "n6", teamId: "t1", userId: "u1", type: "hazard_closed", title: "隐患已销号", content: "隐患YH-2025-001已通过复查并销号", isRead: true, relatedId: "h1", createdAt: "2025-02-28 14:00:00" },
+];
+
+// ============ 组织数据 ============
+export const MOCK_ORGANIZATIONS: Organization[] = MOCK_TEAMS.map((team, index) => ({
+  ...team,
+  systemLogo: "",
+  systemName: team.name + "安全管理系统",
+  shortName: team.name.substring(0, 4),
+  contactPerson: ["张三", "李四", "王五", "赵六", "钱七"][index % 5],
+  contactPhone: `138000${String(10000 + index).slice(-5)}`,
+  orgAdminUserId: team.creatorId,
+  locationCode: "330100",
+  locationName: "浙江省杭州市",
+}));
+
+// ============ 证书数据 ============
+export const MOCK_CERTIFICATES: Certificate[] = [
+  {
+    id: "cert-1",
+    orgId: MOCK_TEAMS[1]?.id || "team-2",
+    seqNo: 1,
+    name: "安全生产许可证",
+    issuingAuthority: "应急管理部",
+    validStartDate: "2024-01-01",
+    validEndDate: "2027-01-01",
+    photos: [],
+  },
+  {
+    id: "cert-2",
+    orgId: MOCK_TEAMS[1]?.id || "team-2",
+    seqNo: 2,
+    name: "安全评价资质",
+    issuingAuthority: "省应急管理厅",
+    validStartDate: "2024-06-01",
+    validEndDate: "2026-06-01",
+    photos: [],
+  },
+];
+
+// ============ 组织统计数据 ============
+export const MOCK_ORGANIZATION_STATS: OrganizationStats[] = [
+  {
+    orgId: MOCK_TEAMS[0]?.id || "t1",
+    supervisorCount: 2,
+    inspectorCount: 3,
+    enterpriseCount: 5,
+    workspaceCount: 2,
+    inProgressPlanCount: 3,
+    rectifyingEnterpriseCount: 2,
+    inspectingInspectorCount: 2,
+    healthyEnterpriseCount: 3,
+    inProgressTaskCount: 0,
+    pendingRectificationEnterpriseCount: 0,
+    pendingRectificationHazardCount: 0,
+    involvedTaskCount: 0,
+    pendingHazardCount: 0,
+  },
+  {
+    orgId: MOCK_TEAMS[1]?.id || "t2",
+    supervisorCount: 0,
+    inspectorCount: 3,
+    enterpriseCount: 0,
+    workspaceCount: 1,
+    inProgressPlanCount: 0,
+    rectifyingEnterpriseCount: 0,
+    inspectingInspectorCount: 0,
+    healthyEnterpriseCount: 0,
+    inProgressTaskCount: 4,
+    recentInspectedEnterprise: {
+      id: "e1",
+      name: "博兴县鑫盛金属制品有限公司",
+      inspectedAt: "2025-02-10",
+    },
+    pendingRectificationEnterpriseCount: 1,
+    pendingRectificationHazardCount: 2,
+    involvedTaskCount: 0,
+    pendingHazardCount: 0,
+  },
+  {
+    orgId: MOCK_TEAMS[2]?.id || "t3",
+    supervisorCount: 0,
+    inspectorCount: 0,
+    enterpriseCount: 0,
+    workspaceCount: 2,
+    inProgressPlanCount: 0,
+    rectifyingEnterpriseCount: 0,
+    inspectingInspectorCount: 0,
+    healthyEnterpriseCount: 0,
+    inProgressTaskCount: 0,
+    pendingRectificationEnterpriseCount: 0,
+    pendingRectificationHazardCount: 0,
+    involvedTaskCount: 3,
+    recentTaskName: "2025年度工贸企业日常安全检查",
+    pendingHazardCount: 5,
+  },
 ];

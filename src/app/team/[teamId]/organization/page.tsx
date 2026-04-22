@@ -4,7 +4,8 @@ import { PageHeader } from "@/components/shared/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Users, Building2, ChevronRight, Plus, FolderTree } from "lucide-react";
+import { Users, Building2, ChevronRight, Plus, FolderTree, ArrowLeft } from "lucide-react";
+import Link from "next/link";
 import { toast } from "sonner";
 
 interface TreeNode {
@@ -15,7 +16,7 @@ interface TreeNode {
   children?: TreeNode[];
 }
 
-const ORG_TREE: TreeNode[] = [
+  const ORG_TREE: TreeNode[] = [
   {
     id: "n1",
     name: "博兴县2025年度安全检查工作组",
@@ -88,7 +89,17 @@ function TreeItem({ node, level = 0 }: { node: TreeNode; level?: number }) {
 export default function OrganizationPage() {
   return (
     <div className="space-y-4">
-      <PageHeader title="组织架构" description="团队组织架构管理">
+      <div className="flex items-center gap-4">
+        <Link
+          href="/workspace"
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ArrowLeft className="size-4" />
+          返回工作台
+        </Link>
+      </div>
+
+      <PageHeader title="组织架构" description="管理内部组织架构与成员分组">
         <Button size="sm" onClick={() => toast.info("新建节点功能")}>
           <Plus className="size-3.5" /> 新建节点
         </Button>

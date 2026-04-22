@@ -6,8 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MOCK_HAZARDS, MOCK_TASKS, MOCK_ENTERPRISES } from "@/lib/mock-data";
 import {
   FileCheck, AlertTriangle, CheckCircle2, Building2,
-  TrendingUp, Shield,
+  TrendingUp, Shield, ArrowLeft,
 } from "lucide-react";
+import Link from "next/link";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend, LineChart, Line, RadarChart, Radar,
@@ -57,6 +58,16 @@ export default function StatisticsPage() {
 
   return (
     <div className="space-y-6">
+      <div className="flex items-center gap-4">
+        <Link
+          href="/workspace"
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ArrowLeft className="size-4" />
+          返回工作台
+        </Link>
+      </div>
+
       <PageHeader title="数据统计" description="综合数据分析与统计报表" />
 
       {/* 统计卡片 */}

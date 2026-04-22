@@ -4,6 +4,15 @@
 
 // ============ 枚举类型 ============
 
+// 平台角色
+export type PlatformRole = "super_admin" | "org_admin" | "user";
+
+// 付费等级
+export type PaidTier = "free" | "standard" | "premium";
+
+// 性别
+export type Gender = "male" | "female" | "unknown";
+
 /** 用户账号状态 */
 export type UserStatus = "active" | "disabled" | "pending";
 
@@ -127,6 +136,12 @@ export interface User {
   status: UserStatus;
   createdAt: string;
   lastLoginAt?: string;
+  platformRole: PlatformRole;
+  paidTier?: PaidTier;
+  gender?: Gender;
+  birthDate?: string;
+  cityCode?: string;
+  cityName?: string;
 }
 
 /** 工作组角色 */
@@ -205,6 +220,77 @@ export interface Team {
   subIndustryField?: string;
   /** 企业规模（履行方） */
   scale?: EnterpriseScale;
+}
+
+/** 证书 */
+export interface Certificate {
+  id: string;
+  orgId: string;
+  seqNo: number;
+  name: string;
+  issuingAuthority: string;
+  validStartDate: string;
+  validEndDate: string;
+  photos?: string[];
+}
+
+/** 组织（Team 超集） */
+export interface Organization extends Team {
+  systemLogo?: string;
+  systemName?: string;
+  shortName?: string;
+  locationCode?: string;
+  locationName?: string;
+  contactPerson?: string;
+  contactPhone?: string;
+  orgAdminUserId?: string;
+  creditCode?: string;
+  detailedAddress?: string;
+  longitude?: number;
+  latitude?: number;
+  industry?: string;
+  subIndustry?: string;
+  companyIntro?: string;
+  businessScope?: string;
+  certificates?: Certificate[];
+  highestEducation?: string;
+  safetyWorkYears?: number;
+  mainServiceItems?: string;
+  mainServiceFields?: string;
+  supervisoryScope?: string;
+}
+
+/** 组织统计 */
+export interface OrganizationStats {
+  orgId: string;
+  supervisorCount: number;
+  inspectorCount: number;
+  enterpriseCount: number;
+  workspaceCount: number;
+  // 监管方视角
+  inProgressPlanCount: number;
+  rectifyingEnterpriseCount: number;
+  inspectingInspectorCount: number;
+  healthyEnterpriseCount: number;
+  // 服务方视角
+  inProgressTaskCount: number;
+  recentInspectedEnterprise?: {
+    id: string;
+    name: string;
+    inspectedAt: string;
+  };
+  pendingRectificationEnterpriseCount: number;
+  pendingRectificationHazardCount: number;
+  // 履行方视角
+  involvedTaskCount: number;
+  recentTaskName?: string;
+  pendingHazardCount: number;
+}
+
+/** 面包屑 */
+export interface BreadcrumbItem {
+  label: string;
+  href?: string;
 }
 
 /** 团队成员 */

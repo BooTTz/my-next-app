@@ -25,18 +25,18 @@ export default function TeamDetailPage() {
   if (!currentTeam) {
     return (
       <div className="flex items-center justify-center h-64">
-        <p className="text-muted-foreground">请先选择一个团队</p>
+        <p className="text-muted-foreground">请先选择一个组织</p>
       </div>
     );
   }
 
-  // 获取当前团队的成员
+  // 获取当前组织的成员
   const teamMembers = MOCK_MEMBERS.filter((m) => m.teamId === teamId);
-  // 获取当前团队的任务
+  // 获取当前组织的任务
   const teamTasks = MOCK_TASKS.filter((t) => t.teamId === teamId);
-  // 获取当前团队的隐患
+  // 获取当前组织的隐患
   const teamHazards = MOCK_HAZARDS.filter((h) => h.teamId === teamId);
-  // 获取当前团队的报告
+  // 获取当前组织的报告
   const teamReports = MOCK_REPORTS.filter((r) => r.teamId === teamId);
 
   // 统计
@@ -100,13 +100,13 @@ export default function TeamDetailPage() {
             </Link>
             <Button variant="outline" size="sm">
               <Settings className="size-3.5 mr-1.5" />
-              团队设置
+              组织设置
             </Button>
           </div>
         )}
       </div>
 
-      {/* 团队信息卡片 */}
+      {/* 组织信息卡片 */}
       <div className="grid grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-4 flex items-center gap-3">
@@ -190,7 +190,7 @@ export default function TeamDetailPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Building2 className="size-4 text-muted-foreground" />
-                  <span className="text-sm">团队状态：</span>
+                  <span className="text-sm">组织状态：</span>
                   <Badge className={statusColors[currentTeam.status]} variant="secondary">
                     {currentTeam.status === "active" ? "活跃" : "已归档"}
                   </Badge>
@@ -327,7 +327,7 @@ export default function TeamDetailPage() {
             </CardHeader>
             <CardContent>
               <div className="border rounded-lg p-4">
-                {/* 根节点 - 团队名称 */}
+                {/* 根节点 - 组织名称 */}
                 <div className="flex flex-col items-center mb-4">
                   <div className="px-4 py-2 rounded-lg bg-primary/10 text-primary font-medium">
                     {currentTeam.name}

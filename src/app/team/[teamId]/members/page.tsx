@@ -11,12 +11,10 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { useAppStore } from "@/lib/store";
-import { MOCK_MEMBERS, MOCK_TEAMS } from "@/lib/mock-data";
+import { MOCK_MEMBERS } from "@/lib/mock-data";
 import { USER_TYPE_MAP } from "@/lib/types";
-import { UserPlus, MoreHorizontal, Users, Building2, MapPin } from "lucide-react";
-import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { UserPlus, Users, Building2, MapPin, ArrowLeft } from "lucide-react";
+import HoverActionMenu from "@/components/shared/HoverActionMenu";
 import { toast } from "sonner";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -29,12 +27,12 @@ export default function MembersPage() {
   if (!currentTeam) {
     return (
       <div className="flex items-center justify-center h-64">
-        <p className="text-muted-foreground">请先选择一个团队</p>
+        <p className="text-muted-foreground">请先选择一个组织</p>
       </div>
     );
   }
 
-  // 获取当前团队的成员
+  // 获取当前组织的成员
   const teamMembers = MOCK_MEMBERS.filter((m) => m.teamId === currentTeam.id);
 
   const filtered = teamMembers.filter((m) => {
@@ -61,16 +59,26 @@ export default function MembersPage() {
 
   return (
     <div className="space-y-4">
+      <div className="flex items-center gap-4">
+        <Link
+          href={`/team/${currentTeam.id}`}
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ArrowLeft className="size-4" />
+          返回组织详情
+        </Link>
+      </div>
+
       <PageHeader 
         title={`${currentTeam.name} - 成员管理`} 
-        description="管理团队内的成员"
+        description="管理组织内的成员"
       >
         <Button size="sm" onClick={() => toast.info("邀请成员功能")}>
           <UserPlus className="size-3.5" /> 邀请成员
         </Button>
       </PageHeader>
 
-      {/* 团队信息卡片 */}
+      {/* 组织信息卡片 */}
       <div className="grid grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-4 flex items-center gap-3">
@@ -78,7 +86,7 @@ export default function MembersPage() {
               <Building2 className="size-5 text-primary" />
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">团队名称</p>
+              <p className="text-xs text-muted-foreground">组织名称</p>
               <p className="font-semibold truncate">{currentTeam.name}</p>
             </div>
           </CardContent>
@@ -89,7 +97,7 @@ export default function MembersPage() {
               <Users className="size-5" />
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">团队类型</p>
+              <p className="text-xs text-muted-foreground">组织类型</p>
               <Badge className={typeColors[currentTeam.teamType]}>{USER_TYPE_MAP[currentTeam.teamType]}</Badge>
             </div>
           </CardContent>
@@ -195,16 +203,23 @@ export default function MembersPage() {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger className="inline-flex items-center justify-center rounded-md size-6 hover:bg-muted transition-colors outline-none">
-                              <MoreHorizontal className="size-3.5" />
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem>查看详情</DropdownMenuItem>
-                              <DropdownMenuItem>修改角色</DropdownMenuItem>
-                              <DropdownMenuItem className="text-red-500">移除成员</DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                          <HoverActionMenu
+                            actions={[
+                              {
+                                label: "查看详情",
+                                onClick: () => toast.info("查看详情"),
+                              },
+                              {
+                                label: "修改角色",
+                                onClick: () => toast.info("修改角色"),
+                              },
+                              {
+                                label: "移除成员",
+                                onClick: () => toast.error("移除成员"),
+                                variant: "destructive",
+                              },
+                            ]}
+                          />
                         </TableCell>
                       </TableRow>
                     ))}

@@ -1,5 +1,48 @@
-import { redirect } from "next/navigation";
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAppStore } from "@/lib/store";
+import { MOCK_ORGANIZATIONS } from "@/lib/mock-data";
+import { useHydrated } from "@/hooks/useHydrated";
 
 export default function HomePage() {
-  redirect("/login");
+  const router = useRouter();
+  const { currentUser } = useAppStore();
+  const hydrated = useHydrated();
+
+  useEffect(() => {
+    if (!hydrated) return;
+
+    if (!currentUser) {
+      router.replace("/login");
+      return;
+    }
+
+    // 超级管理员 → /admin/users
+    if (currentUser.platformRole === "super_admin") {
+      router.replace("/admin/users");
+      return;
+    }
+
+    // 查找用户关联的组织
+    const userOrgs = MOCK_ORGANIZATIONS.filter(
+      (org) => org.orgAdminUserId === currentUser.id || org.creatorId === currentUser.id
+    );
+
+    // 已加入组织 → /workspace
+    if (userOrgs.length > 0) {
+      router.replace("/workspace");
+      return;
+    }
+
+    // 未加入任何组织 → /profile
+    router.replace("/profile");
+  }, [hydrated, currentUser, router]);
+
+  return (
+    <div className="flex min-h-screen items-center justify-center">
+      <div className="size-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+    </div>
+  );
 }

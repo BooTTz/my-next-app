@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { PageHeader, ListToolbar } from "@/components/shared/PageHeader";
 import { HazardLevelBadge, HazardStatusBadge } from "@/components/shared/StatusBadge";
@@ -13,13 +14,12 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MOCK_HAZARDS } from "@/lib/mock-data";
 import { HAZARD_CATEGORY_MAP } from "@/lib/types";
-import { Eye, MoreHorizontal, AlertTriangle } from "lucide-react";
-import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Eye, AlertTriangle } from "lucide-react";
+import HoverActionMenu from "@/components/shared/HoverActionMenu";
 import { toast } from "sonner";
 
 export default function HazardsListPage() {
+  const router = useRouter();
   const [search, setSearch] = useState("");
   const [tab, setTab] = useState("all");
 
@@ -41,7 +41,7 @@ export default function HazardsListPage() {
 
   return (
     <div className="space-y-4">
-      <PageHeader title="隐患管理" description="全团队隐患汇总与跟踪">
+      <PageHeader title="隐患管理" description="全组织隐患汇总与跟踪">
         <div className="flex items-center gap-3 text-sm">
           <span className="flex items-center gap-1.5">
             <AlertTriangle className="size-3.5 text-status-danger" />
@@ -121,18 +121,15 @@ export default function HazardsListPage() {
                         <TableCell className="text-xs">{h.deadline}</TableCell>
                         <TableCell className="text-xs">{h.discoveredByName}</TableCell>
                         <TableCell className="text-right">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger className="inline-flex items-center justify-center rounded-md size-6 hover:bg-muted transition-colors outline-none">
-                              <MoreHorizontal className="size-3.5" />
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem>
-                                <Link href={`/team/t1/hazards/${h.id}`} className="flex items-center">
-                                  <Eye className="size-3.5 mr-2" /> 查看详情
-                                </Link>
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                          <HoverActionMenu
+                            actions={[
+                              {
+                                label: "查看详情",
+                                icon: <Eye className="h-4 w-4" />,
+                                onClick: () => router.push(`/team/t1/hazards/${h.id}`),
+                              },
+                            ]}
+                          />
                         </TableCell>
                       </TableRow>
                     ))}

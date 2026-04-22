@@ -9,8 +9,9 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Shield, Phone, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 import { useAppStore } from "@/lib/store";
-import { MOCK_USERS } from "@/lib/mock-data";
+import { MOCK_USERS, MOCK_ORGANIZATIONS } from "@/lib/mock-data";
 import { useHydrated } from "@/hooks/useHydrated";
+import type { User } from "@/lib/types";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -20,11 +21,36 @@ export default function LoginPage() {
   const [password, setPassword] = useState("123456");
   const hydrated = useHydrated();
 
+  // 登录成功后根据角色跳转
+  const handleLoginSuccess = (user: User) => {
+    login(user);
+    // 1. 超级管理员 → /admin/users
+    if (user.platformRole === "super_admin") {
+      router.push("/admin/users");
+      return;
+    }
+    // 2. 查找用户关联的组织
+    const userOrgs = MOCK_ORGANIZATIONS.filter(
+      (org) => org.orgAdminUserId === user.id || org.creatorId === user.id
+    );
+    // 3. 已加入组织 → /workspace
+    if (userOrgs.length > 0) {
+      router.push("/workspace");
+      return;
+    }
+    // 4. 未加入任何组织 → /profile
+    router.push("/profile");
+  };
+
   const handleLogin = () => {
-    const user = MOCK_USERS.find((u) => u.phone === phone);
+    // 支持手机号登录
+    let user = MOCK_USERS.find((u) => u.phone === phone);
+    // 也支持用 username 登录（演示用）
+    if (!user) {
+      user = MOCK_USERS.find((u) => u.username === phone);
+    }
     if (user) {
-      login(user);
-      router.push("/team/t1/dashboard");
+      handleLoginSuccess(user);
     }
   };
 
@@ -190,15 +216,17 @@ export default function LoginPage() {
                 { name: "李伟 - 监管方", phone: "13800001001" },
                 { name: "张敏 - 服务方", phone: "13800001002" },
                 { name: "陈杰 - 履行方", phone: "13800001004" },
+                { name: "平台管理员", phone: "superadmin" },
               ].map((demo) => (
                 <button
                   key={demo.phone}
                   onClick={() => {
                     setPhone(demo.phone);
-                    const user = MOCK_USERS.find((u) => u.phone === demo.phone);
+                    const user = MOCK_USERS.find(
+                      (u) => u.phone === demo.phone || u.username === demo.phone
+                    );
                     if (user) {
-                      login(user);
-                      router.push("/team/t1/dashboard");
+                      handleLoginSuccess(user);
                     }
                   }}
                   className="flex w-full items-center justify-between rounded-md px-3 py-2 text-sm hover:bg-muted transition-colors"

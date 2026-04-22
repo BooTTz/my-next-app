@@ -40,7 +40,7 @@ export default function WorkspacePage() {
 
   const handleEnterWorkspace = (workspace: typeof userWorkspaces[0]) => {
     switchWorkspace(workspace);
-    // 根据用户类型自动选择对应的团队
+    // 根据用户类型自动选择对应的组织
     const targetTeam = MOCK_TEAMS.find(t => t.teamType === (demoAccount?.userType || "supervisor"));
     if (targetTeam) {
       switchTeam(targetTeam);
