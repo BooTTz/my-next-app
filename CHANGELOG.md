@@ -1,5 +1,35 @@
 # 版本更新记录
 
+## v1.1.2 (2026-04-22)
+
+**标签**: `v1.1.2`  
+**对应提交**: `a1db13c`
+**GitHub**: https://github.com/BooTTz/my-next-app/releases/tag/v1.1.2
+
+### 包含内容
+- **管理后台模块**：新增 `/admin` 页面，包含用户管理、组织管理功能
+- **组织管理模块**：新增 `/organization/[orgId]` 页面，支持组织详情查看和设置
+- **个人中心模块**：新增 `/profile` 页面
+- **面包屑导航系统**：新增 PageBreadcrumb 组件和 useBreadcrumbs hook
+- **底部导航栏**：新增 BottomBar 组件
+- **悬停操作菜单**：新增 HoverActionMenu 组件
+- **组织卡片组件**：新增 OrganizationCard 组件
+- **新增 UI 组件**：breadcrumb、skeleton、switch
+- **工作组页面增强**：完善各子页面功能
+- **Mock 数据扩展**：新增组织相关数据
+- **版本号更新**：应用版本号更新至 v1.1.2
+
+### 如何恢复到此版本
+```bash
+# 方式1：创建新分支恢复（推荐）
+git checkout -b restore-v1.1.2 v1.1.2
+
+# 方式2：直接重置（慎用，会丢失之后的提交）
+git reset --hard v1.1.2
+```
+
+---
+
 ## v1.0.5 (2026-04-21)
 
 **标签**: `v1.0.5`  
