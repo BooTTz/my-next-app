@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useRouter } from "next/navigation";
 import { PageHeader, ListToolbar } from "@/components/shared/PageHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -24,9 +23,18 @@ import { MOCK_USERS } from "@/lib/mock-data";
 import type { User, PaidTier, UserStatus } from "@/lib/types";
 import {
   Eye, Edit, Trash2, MoreHorizontal, Plus, Ban, CheckCircle,
-  AlertTriangle, Search,
+  AlertTriangle, Search, Mail, Phone, Calendar, Shield,
 } from "lucide-react";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
+import { Separator } from "@/components/ui/separator";
+import {
+  DetailDialog,
+  DetailDialogContent,
+  DetailDialogHeader,
+  DetailDialogBody,
+  DetailDialogFooter,
+} from "@/components/shared/DetailDialog";
 
 const STATUS_OPTIONS: { value: UserStatus | "all"; label: string }[] = [
   { value: "all", label: "全部" },
@@ -110,10 +118,13 @@ function validateNewUser(form: NewUserForm): string | null {
 }
 
 export default function UsersListPage() {
-  const router = useRouter();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<UserStatus | "all">("all");
   const [tierFilter, setTierFilter] = useState<PaidTier | "all">("all");
+
+  // 详情弹窗
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [detailOpen, setDetailOpen] = useState(false);
 
   // 删除确认
   const [deleteTarget, setDeleteTarget] = useState<User | null>(null);
@@ -367,40 +378,18 @@ export default function UsersListPage() {
                       <UserStatusBadge status={user.status} />
                     </TableCell>
                     <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger
-                          className="inline-flex items-center justify-center rounded-md size-6 hover:bg-muted transition-colors outline-none"
-                          title="操作"
-                        >
-                          <MoreHorizontal className="size-3.5" />
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => router.push(`/admin/users/${user.id}`)}>
-                            <Eye className="size-3.5 mr-2" /> 查看详情
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => router.push(`/admin/users/${user.id}`)}>
-                            <Edit className="size-3.5 mr-2" /> 编辑
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleToggleStatus(user)}>
-                            {user.status === "active" ? (
-                              <>
-                                <Ban className="size-3.5 mr-2" /> 限制登录
-                              </>
-                            ) : (
-                              <>
-                                <CheckCircle className="size-3.5 mr-2" /> 解除限制
-                              </>
-                            )}
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            className="text-destructive focus:text-destructive"
-                            onClick={() => handleDelete(user)}
-                          >
-                            <Trash2 className="size-3.5 mr-2" /> 删除
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 px-2 text-muted-foreground hover:text-foreground"
+                        onClick={() => {
+                          setSelectedUser(user);
+                          setDetailOpen(true);
+                        }}
+                      >
+                        <Eye className="size-3.5" />
+                        <span className="ml-1">查看</span>
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -456,6 +445,114 @@ export default function UsersListPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* 用户详情弹窗 */}
+      {selectedUser && (
+        <DetailDialog open={detailOpen} onOpenChange={setDetailOpen}>
+          <DetailDialogContent className="max-w-[900px]">
+            <DetailDialogHeader
+              title="用户详情"
+              description={`账号：${selectedUser.username}`}
+            />
+            <DetailDialogBody scrollable>
+              <div className="space-y-6">
+                {/* 基本信息 */}
+                <div>
+                  <p className="text-sm font-medium mb-3">基本信息</p>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                      <Shield className="size-5 text-muted-foreground" />
+                      <div>
+                        <p className="text-xs text-muted-foreground">用户ID</p>
+                        <p className="text-sm font-mono">{selectedUser.id}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                      <Phone className="size-5 text-muted-foreground" />
+                      <div>
+                        <p className="text-xs text-muted-foreground">手机号</p>
+                        <p className="text-sm font-medium">{selectedUser.phone}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                      <Mail className="size-5 text-muted-foreground" />
+                      <div>
+                        <p className="text-xs text-muted-foreground">邮箱</p>
+                        <p className="text-sm">{selectedUser.email || "未设置"}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                      <Calendar className="size-5 text-muted-foreground" />
+                      <div>
+                        <p className="text-xs text-muted-foreground">注册时间</p>
+                        <p className="text-sm">{formatDate(selectedUser.createdAt)}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* 账号信息 */}
+                <div>
+                  <p className="text-sm font-medium mb-3">账号信息</p>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="space-y-1">
+                      <p className="text-xs text-muted-foreground">付费等级</p>
+                      <PaidTierBadge tier={selectedUser.paidTier} />
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-xs text-muted-foreground">账号状态</p>
+                      <UserStatusBadge status={selectedUser.status} />
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-xs text-muted-foreground">最后登录</p>
+                      <p className="text-sm">{formatDate(selectedUser.lastLoginAt || selectedUser.createdAt)}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-xs text-muted-foreground">平台角色</p>
+                      <Badge variant="outline">{selectedUser.platformRole === "super_admin" ? "超级管理员" : selectedUser.platformRole === "org_admin" ? "机构管理员" : "普通用户"}</Badge>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-xs text-muted-foreground">性别</p>
+                      <p className="text-sm">
+                        {selectedUser.gender === "male" ? "男" : selectedUser.gender === "female" ? "女" : "未知"}
+                      </p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-xs text-muted-foreground">所属城市</p>
+                      <p className="text-sm">{selectedUser.cityName || "-"}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {selectedUser.certNo && (
+                  <>
+                    <Separator />
+                    <div>
+                      <p className="text-sm font-medium mb-3">资质信息</p>
+                      <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                        <Shield className="size-5 text-muted-foreground" />
+                        <div>
+                          <p className="text-xs text-muted-foreground">资质编号</p>
+                          <p className="text-sm font-mono">{selectedUser.certNo}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            </DetailDialogBody>
+            <DetailDialogFooter>
+              <Button variant="outline" onClick={() => handleToggleStatus(selectedUser)}>
+                {selectedUser.status === "active" ? "限制登录" : "解除限制"}
+              </Button>
+              <Button variant="destructive" onClick={() => handleDelete(selectedUser)}>删除</Button>
+              <Button variant="outline" onClick={() => setDetailOpen(false)}>关闭</Button>
+            </DetailDialogFooter>
+          </DetailDialogContent>
+        </DetailDialog>
+      )}
     </div>
   );
 }

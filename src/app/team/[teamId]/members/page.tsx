@@ -13,16 +13,25 @@ import {
 import { useAppStore } from "@/lib/store";
 import { MOCK_MEMBERS } from "@/lib/mock-data";
 import { USER_TYPE_MAP } from "@/lib/types";
-import { UserPlus, Users, Building2, MapPin, ArrowLeft } from "lucide-react";
-import HoverActionMenu from "@/components/shared/HoverActionMenu";
+import { UserPlus, Users, Building2, MapPin, ArrowLeft, Eye, Shield, Mail, Phone } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { Separator } from "@/components/ui/separator";
+import {
+  DetailDialog,
+  DetailDialogContent,
+  DetailDialogHeader,
+  DetailDialogBody,
+  DetailDialogFooter,
+} from "@/components/shared/DetailDialog";
 
 export default function MembersPage() {
   const { currentTeam } = useAppStore();
   const [search, setSearch] = useState("");
   const [tab, setTab] = useState("all");
+  const [selectedMember, setSelectedMember] = useState<typeof MOCK_MEMBERS[0] | null>(null);
+  const [detailOpen, setDetailOpen] = useState(false);
 
   if (!currentTeam) {
     return (
@@ -203,23 +212,18 @@ export default function MembersPage() {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right">
-                          <HoverActionMenu
-                            actions={[
-                              {
-                                label: "查看详情",
-                                onClick: () => toast.info("查看详情"),
-                              },
-                              {
-                                label: "修改角色",
-                                onClick: () => toast.info("修改角色"),
-                              },
-                              {
-                                label: "移除成员",
-                                onClick: () => toast.error("移除成员"),
-                                variant: "destructive",
-                              },
-                            ]}
-                          />
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 px-2 text-muted-foreground hover:text-foreground"
+                            onClick={() => {
+                              setSelectedMember(member);
+                              setDetailOpen(true);
+                            }}
+                          >
+                            <Eye className="size-3.5" />
+                            <span className="ml-1">查看</span>
+                          </Button>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -230,6 +234,79 @@ export default function MembersPage() {
           </Tabs>
         </CardContent>
       </Card>
+
+      {/* 成员详情弹窗 */}
+      {selectedMember && (
+        <DetailDialog open={detailOpen} onOpenChange={setDetailOpen}>
+          <DetailDialogContent className="max-w-[900px]">
+            <DetailDialogHeader
+              title="成员详情"
+              description={selectedMember.user?.realName}
+            />
+            <DetailDialogBody scrollable>
+              <div className="flex items-start gap-6">
+                {/* 头像和基本信息 */}
+                <div className="flex flex-col items-center gap-4 min-w-[120px]">
+                  <Avatar className="size-20">
+                    <AvatarFallback className="bg-primary/10 text-primary text-2xl">
+                      {selectedMember.user?.realName?.charAt(0) || "?"}
+                    </AvatarFallback>
+                  </Avatar>
+                  <Badge className={cn(
+                    "px-3 py-1",
+                    userTypeColor[selectedMember.userType]
+                  )}>
+                    {USER_TYPE_MAP[selectedMember.userType]}
+                  </Badge>
+                </div>
+
+                {/* 详细信息 */}
+                <div className="flex-1 space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex items-center gap-2 text-sm">
+                      <Shield className="size-4 text-muted-foreground" />
+                      <span className="text-muted-foreground">角色：</span>
+                      <span className="font-medium">{selectedMember.roleName}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Phone className="size-4 text-muted-foreground" />
+                      <span className="text-muted-foreground">手机：</span>
+                      <span className="font-medium">{selectedMember.user?.phone || "未设置"}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Mail className="size-4 text-muted-foreground" />
+                      <span className="text-muted-foreground">邮箱：</span>
+                      <span className="font-medium">{selectedMember.user?.email || "未设置"}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Users className="size-4 text-muted-foreground" />
+                      <span className="text-muted-foreground">加入时间：</span>
+                      <span className="font-medium">{selectedMember.joinedAt}</span>
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium">附加信息</p>
+                    <div className="grid grid-cols-2 gap-3 text-sm">
+                      <div>
+                        <p className="text-muted-foreground">资质编号</p>
+                        <p className="font-mono">{selectedMember.user?.certNo || "-"}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </DetailDialogBody>
+            <DetailDialogFooter>
+              <Button variant="outline" onClick={() => toast.info("修改角色")}>修改角色</Button>
+              <Button variant="destructive" onClick={() => toast.error("已移除成员")}>移除成员</Button>
+              <Button variant="outline" onClick={() => setDetailOpen(false)}>关闭</Button>
+            </DetailDialogFooter>
+          </DetailDialogContent>
+        </DetailDialog>
+      )}
     </div>
   );
 }

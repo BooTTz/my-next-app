@@ -23,9 +23,18 @@ import { MOCK_ORGANIZATIONS } from "@/lib/mock-data";
 import type { Organization, UserType } from "@/lib/types";
 import {
   Eye, Edit, Trash2, MoreHorizontal, Plus, Ban, CheckCircle,
-  AlertTriangle, Search, XCircle,
+  AlertTriangle, Search, XCircle, Building2, User, Phone, Mail, MapPin,
 } from "lucide-react";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
+import { Separator } from "@/components/ui/separator";
+import {
+  DetailDialog,
+  DetailDialogContent,
+  DetailDialogHeader,
+  DetailDialogBody,
+  DetailDialogFooter,
+} from "@/components/shared/DetailDialog";
 
 type OrgStatus = "active" | "inactive" | "archived";
 type OrgStatusFilter = OrgStatus | "all";
@@ -108,6 +117,10 @@ export default function OrganizationsListPage() {
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState<OrgTypeFilter>("all");
   const [statusFilter, setStatusFilter] = useState<OrgStatusFilter>("all");
+
+  // 详情弹窗
+  const [selectedOrg, setSelectedOrg] = useState<Organization | null>(null);
+  const [detailOpen, setDetailOpen] = useState(false);
 
   const { statuses, toggle, archive } = useOrgStatuses(MOCK_ORGANIZATIONS);
 
@@ -268,50 +281,18 @@ export default function OrganizationsListPage() {
                         {formatDate(org.createdAt)}
                       </TableCell>
                       <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger
-                            className="inline-flex items-center justify-center rounded-md size-6 hover:bg-muted transition-colors outline-none"
-                            title="操作"
-                          >
-                            <MoreHorizontal className="size-3.5" />
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem
-                              onClick={() => router.push(`/admin/organizations/${org.id}`)}
-                            >
-                              <Eye className="size-3.5 mr-2" /> 查看详情
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => router.push(`/admin/organizations/${org.id}`)}
-                            >
-                              <Edit className="size-3.5 mr-2" /> 编辑
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleToggleStatus(org)}>
-                              {orgStatus === "active" ? (
-                                <>
-                                  <Ban className="size-3.5 mr-2" /> 停用
-                                </>
-                              ) : (
-                                <>
-                                  <CheckCircle className="size-3.5 mr-2" /> 启用
-                                </>
-                              )}
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                              className="text-destructive focus:text-destructive"
-                              onClick={() => handleDelete(org)}
-                            >
-                              <Trash2 className="size-3.5 mr-2" /> 删除
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              className="text-destructive focus:text-destructive"
-                              onClick={() => handleArchive(org)}
-                            >
-                              <XCircle className="size-3.5 mr-2" /> 注销
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 px-2 text-muted-foreground hover:text-foreground"
+                          onClick={() => {
+                            setSelectedOrg(org);
+                            setDetailOpen(true);
+                          }}
+                        >
+                          <Eye className="size-3.5" />
+                          <span className="ml-1">查看</span>
+                        </Button>
                       </TableCell>
                     </TableRow>
                   );
@@ -419,6 +400,85 @@ export default function OrganizationsListPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* 组织详情弹窗 */}
+      {selectedOrg && (
+        <DetailDialog open={detailOpen} onOpenChange={setDetailOpen}>
+          <DetailDialogContent className="max-w-[900px]">
+            <DetailDialogHeader
+              title="组织详情"
+              description={selectedOrg.name}
+            />
+            <DetailDialogBody scrollable>
+              <div className="space-y-6">
+                {/* 基本信息 */}
+                <div>
+                  <p className="text-sm font-medium mb-3">基本信息</p>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                      <Building2 className="size-5 text-muted-foreground" />
+                      <div>
+                        <p className="text-xs text-muted-foreground">系统名称</p>
+                        <p className="text-sm font-medium">{selectedOrg.systemName || "-"}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                      <Building2 className="size-5 text-muted-foreground" />
+                      <div>
+                        <p className="text-xs text-muted-foreground">组织简称</p>
+                        <p className="text-sm">{selectedOrg.shortName || "-"}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                      <User className="size-5 text-muted-foreground" />
+                      <div>
+                        <p className="text-xs text-muted-foreground">主要联系人</p>
+                        <p className="text-sm">{selectedOrg.contactPerson || "-"}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                      <Phone className="size-5 text-muted-foreground" />
+                      <div>
+                        <p className="text-xs text-muted-foreground">联系电话</p>
+                        <p className="text-sm">{selectedOrg.contactPhone || "-"}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* 组织信息 */}
+                <div>
+                  <p className="text-sm font-medium mb-3">组织信息</p>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="space-y-1">
+                      <p className="text-xs text-muted-foreground">组织类型</p>
+                      <OrgTypeBadge type={selectedOrg.teamType} />
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-xs text-muted-foreground">状态</p>
+                      <OrgStatusBadge status={statuses[selectedOrg.id] || "active"} />
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-xs text-muted-foreground">创建时间</p>
+                      <p className="text-sm">{formatDate(selectedOrg.createdAt)}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </DetailDialogBody>
+            <DetailDialogFooter>
+              <Button variant="outline" onClick={() => toast.info("编辑组织")}>编辑</Button>
+              <Button variant="outline" onClick={() => toggle(selectedOrg.id)}>
+                {statuses[selectedOrg.id] === "active" ? "停用" : "启用"}
+              </Button>
+              <Button variant="destructive" onClick={() => handleDelete(selectedOrg)}>删除</Button>
+              <Button variant="outline" onClick={() => setDetailOpen(false)}>关闭</Button>
+            </DetailDialogFooter>
+          </DetailDialogContent>
+        </DetailDialog>
+      )}
     </div>
   );
 }

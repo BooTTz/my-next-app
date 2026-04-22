@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { PageHeader, ListToolbar } from "@/components/shared/PageHeader";
 import { HazardLevelBadge, HazardStatusBadge } from "@/components/shared/StatusBadge";
@@ -14,14 +13,23 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MOCK_HAZARDS } from "@/lib/mock-data";
 import { HAZARD_CATEGORY_MAP } from "@/lib/types";
-import { Eye, AlertTriangle } from "lucide-react";
-import HoverActionMenu from "@/components/shared/HoverActionMenu";
+import { Eye, AlertTriangle, MapPin, User, Calendar, Camera } from "lucide-react";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
+import { Separator } from "@/components/ui/separator";
+import {
+  DetailDialog,
+  DetailDialogContent,
+  DetailDialogHeader,
+  DetailDialogBody,
+  DetailDialogFooter,
+} from "@/components/shared/DetailDialog";
 
 export default function HazardsListPage() {
-  const router = useRouter();
   const [search, setSearch] = useState("");
   const [tab, setTab] = useState("all");
+  const [selectedHazard, setSelectedHazard] = useState<typeof MOCK_HAZARDS[0] | null>(null);
+  const [detailOpen, setDetailOpen] = useState(false);
 
   const filtered = MOCK_HAZARDS.filter((h) => {
     const matchSearch =
@@ -121,15 +129,18 @@ export default function HazardsListPage() {
                         <TableCell className="text-xs">{h.deadline}</TableCell>
                         <TableCell className="text-xs">{h.discoveredByName}</TableCell>
                         <TableCell className="text-right">
-                          <HoverActionMenu
-                            actions={[
-                              {
-                                label: "查看详情",
-                                icon: <Eye className="h-4 w-4" />,
-                                onClick: () => router.push(`/team/t1/hazards/${h.id}`),
-                              },
-                            ]}
-                          />
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 px-2 text-muted-foreground hover:text-foreground"
+                            onClick={() => {
+                              setSelectedHazard(h);
+                              setDetailOpen(true);
+                            }}
+                          >
+                            <Eye className="size-3.5" />
+                            <span className="ml-1">查看</span>
+                          </Button>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -149,6 +160,159 @@ export default function HazardsListPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* 隐患详情弹窗 */}
+      {selectedHazard && (
+        <DetailDialog open={detailOpen} onOpenChange={setDetailOpen}>
+          <DetailDialogContent className="max-w-[1000px]">
+            <DetailDialogHeader
+              title="隐患详情"
+              description={`编号：${selectedHazard.hazardNo}`}
+            />
+            <DetailDialogBody scrollable>
+              <div className="grid grid-cols-3 gap-6">
+                {/* 主要信息 */}
+                <div className="col-span-2 space-y-4">
+                  <Card>
+                    <CardContent className="p-5">
+                      <div className="flex items-start justify-between mb-4">
+                        <div>
+                          <div className="flex items-center gap-2 mb-2">
+                            <HazardLevelBadge level={selectedHazard.level} />
+                            <HazardStatusBadge status={selectedHazard.status} />
+                          </div>
+                          <h3 className="text-base font-semibold">{selectedHazard.description}</h3>
+                        </div>
+                      </div>
+
+                      <Separator className="mb-4" />
+
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <p className="text-muted-foreground mb-1">隐患类别</p>
+                          <p>{HAZARD_CATEGORY_MAP[selectedHazard.category]} &gt; {selectedHazard.subCategoryName}</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground mb-1">所在位置</p>
+                          <p className="flex items-center gap-1.5">
+                            <MapPin className="size-3.5 text-muted-foreground" />
+                            {selectedHazard.location}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground mb-1">所属企业</p>
+                          <p>{selectedHazard.enterpriseName}</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground mb-1">发现人</p>
+                          <p className="flex items-center gap-1.5">
+                            <User className="size-3.5 text-muted-foreground" />
+                            {selectedHazard.discoveredByName}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground mb-1">发现时间</p>
+                          <p className="flex items-center gap-1.5">
+                            <Calendar className="size-3.5 text-muted-foreground" />
+                            {selectedHazard.discoveredAt}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground mb-1">整改期限</p>
+                          <p className={cn(
+                            "flex items-center gap-1.5 font-medium",
+                            selectedHazard.status !== "closed" && "text-status-warning"
+                          )}>
+                            <Calendar className="size-3.5" />
+                            {selectedHazard.deadline}
+                          </p>
+                        </div>
+                      </div>
+
+                      {selectedHazard.legalBasis && (
+                        <>
+                          <Separator className="my-4" />
+                          <div className="text-sm">
+                            <p className="text-muted-foreground mb-1">违反法规</p>
+                            <p>{selectedHazard.legalBasis}</p>
+                          </div>
+                        </>
+                      )}
+
+                      <Separator className="my-4" />
+
+                      <div className="text-sm">
+                        <p className="text-muted-foreground mb-1">整改建议</p>
+                        <p className="bg-muted/50 rounded-md p-3">{selectedHazard.suggestion}</p>
+                      </div>
+
+                      {/* 现场照片 */}
+                      <div className="mt-4">
+                        <p className="text-sm text-muted-foreground mb-2">现场照片</p>
+                        <div className="grid grid-cols-3 gap-2">
+                          {selectedHazard.photos.map((_, i) => (
+                            <div key={i} className="aspect-video rounded-md bg-muted flex items-center justify-center border">
+                              <Camera className="size-6 text-muted-foreground/50" />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* 侧边信息 */}
+                <div className="space-y-4">
+                  {/* 状态流转 */}
+                  <Card>
+                    <CardContent className="pt-4">
+                      <p className="text-sm font-medium mb-3">状态流转</p>
+                      <div className="relative space-y-3 pl-5">
+                        <div className="absolute left-[7px] top-1 bottom-1 w-px bg-border" />
+                        {[
+                          { status: "已发现", time: selectedHazard.discoveredAt, active: true },
+                          { status: "已通知", time: selectedHazard.status !== "discovered" ? selectedHazard.discoveredAt : undefined },
+                          { status: "整改中", time: selectedHazard.status === "rectifying" ? "进行中" : undefined },
+                          { status: "已提交整改", time: selectedHazard.status === "submitted" ? "待复查" : undefined },
+                          { status: "已销号", time: selectedHazard.status === "closed" ? "完成" : undefined },
+                        ].map((step, i) => (
+                          <div key={i} className="relative flex items-start gap-2">
+                            <div className={cn(
+                              "absolute -left-3.5 top-1 size-2 rounded-full border-2 border-background",
+                              step.time ? "bg-status-success" : "bg-muted"
+                            )} />
+                            <div>
+                              <p className={cn("text-xs font-medium", !step.time && "text-muted-foreground")}>
+                                {step.status}
+                              </p>
+                              {step.time && (
+                                <p className="text-[10px] text-muted-foreground">{step.time}</p>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* 整改责任 */}
+                  <Card>
+                    <CardContent className="pt-4 space-y-3">
+                      <div>
+                        <p className="text-xs text-muted-foreground mb-0.5">整改责任人</p>
+                        <p className="text-sm font-medium">{selectedHazard.responsiblePerson || "未指定"}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </DetailDialogBody>
+            <DetailDialogFooter>
+              <Button variant="outline" onClick={() => setDetailOpen(false)}>关闭</Button>
+            </DetailDialogFooter>
+          </DetailDialogContent>
+        </DetailDialog>
+      )}
     </div>
   );
 }
