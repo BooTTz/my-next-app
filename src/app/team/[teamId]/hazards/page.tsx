@@ -52,7 +52,7 @@ export default function HazardsListPage() {
 
   return (
     <div className="space-y-4">
-      <PageHeader title="隐患管理" description="全组织隐患汇总与跟踪">
+      <PageHeader title="隐患管理">
         <div className="flex items-center gap-3 text-sm">
           <span className="flex items-center gap-1.5">
             <AlertTriangle className="size-3.5 text-status-danger" />

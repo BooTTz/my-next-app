@@ -107,7 +107,7 @@ export default function TeamDetailPage() {
       </div>
 
       {/* 组织信息卡片 */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         <Card>
           <CardContent className="p-4 flex items-center gap-3">
             <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10">

@@ -59,6 +59,19 @@
   --color-success-foreground: var(--success-foreground);
   --color-info: var(--info);
   --color-info-foreground: var(--info-foreground);
+  /* 角色颜色 */
+  --color-role-supervisor: var(--color-role-supervisor);
+  --color-role-supervisor-foreground: var(--color-role-supervisor-foreground);
+  --color-role-supervisor-bg: var(--color-role-supervisor-bg);
+  --color-role-supervisor-bg-subtle: var(--color-role-supervisor-bg-subtle);
+  --color-role-inspector: var(--color-role-inspector);
+  --color-role-inspector-foreground: var(--color-role-inspector-foreground);
+  --color-role-inspector-bg: var(--color-role-inspector-bg);
+  --color-role-inspector-bg-subtle: var(--color-role-inspector-bg-subtle);
+  --color-role-enterprise: var(--color-role-enterprise);
+  --color-role-enterprise-foreground: var(--color-role-enterprise-foreground);
+  --color-role-enterprise-bg: var(--color-role-enterprise-bg);
+  --color-role-enterprise-bg-subtle: var(--color-role-enterprise-bg-subtle);
 }
 
 :root {
@@ -113,6 +126,34 @@
   --success-foreground: oklch(0.20 0.05 150);
   --info: oklch(0.62 0.19 260);
   --info-foreground: oklch(0.98 0.002 250);
+  /* ========== 平台角色颜色系统 ========== */
+  /* 监管部门 - 蓝色系 */
+  --color-role-supervisor: #3B82F6;
+  --color-role-supervisor-foreground: #1D4ED8;
+  --color-role-supervisor-bg: oklch(0.55 0.15 250);
+  --color-role-supervisor-bg-subtle: oklch(0.93 0.03 250);
+  /* 服务机构 - 绿色系 */
+  --color-role-inspector: #22C55E;
+  --color-role-inspector-foreground: #15803D;
+  --color-role-inspector-bg: oklch(0.55 0.15 150);
+  --color-role-inspector-bg-subtle: oklch(0.93 0.03 150);
+  /* 企业单位 - 橙色系 */
+  --color-role-enterprise: #F59E0B;
+  --color-role-enterprise-foreground: #B45309;
+  --color-role-enterprise-bg: oklch(0.55 0.15 70);
+  --color-role-enterprise-bg-subtle: oklch(0.93 0.03 70);
+  /* ========== 平台图标颜色系统 ========== */
+  --color-icon-primary: var(--primary);
+  --color-icon-muted: var(--muted-foreground);
+  --color-icon-subtle: var(--muted-foreground);
+  /* ========== 平台交互反馈色 ========== */
+  --color-link: var(--primary);
+  --color-link-hover: oklch(0.25 0.06 250);
+  /* ========== 平台间距系统 ========== */
+  --spacing-icon-xs: 0.625rem;  /* 10px - 小辅助图标 */
+  --spacing-icon-sm: 0.75rem;   /* 12px - 辅助图标 */
+  --spacing-icon-md: 0.875rem;  /* 14px - 主要图标 */
+  --spacing-icon-lg: 1rem;      /* 16px - 大图标 */
 }
 
 /* 深色主题 */
@@ -158,8 +199,24 @@
   --warning-foreground: oklch(0.98 0.002 250);
   --success: oklch(0.65 0.19 150);
   --success-foreground: oklch(0.98 0.002 250);
-  --info: oklch(0.60 0.19 260);
+  --info: oklch(0.62 0.19 260);
   --info-foreground: oklch(0.98 0.002 250);
+  /* ========== 深色模式角色颜色 ========== */
+  /* 监管部门 - 深色模式 */
+  --color-role-supervisor: #60A5FA;
+  --color-role-supervisor-foreground: #93C5FD;
+  --color-role-supervisor-bg: oklch(0.45 0.12 250);
+  --color-role-supervisor-bg-subtle: oklch(0.22 0.06 250);
+  /* 服务机构 - 深色模式 */
+  --color-role-inspector: #4ADE80;
+  --color-role-inspector-foreground: #86EFAC;
+  --color-role-inspector-bg: oklch(0.45 0.12 150);
+  --color-role-inspector-bg-subtle: oklch(0.22 0.06 150);
+  /* 企业单位 - 深色模式 */
+  --color-role-enterprise: #FBBF24;
+  --color-role-enterprise-foreground: #FCD34D;
+  --color-role-enterprise-bg: oklch(0.45 0.12 70);
+  --color-role-enterprise-bg-subtle: oklch(0.22 0.06 70);
 }
 
 @layer base {
@@ -229,12 +286,72 @@
 
 /* 现代 SaaS 风格增强 */
 @layer utilities {
-  /* 卡片悬浮效果 */
+  /* 卡片悬浮效果 - 统一使用此工具类 */
   .card-hover {
-    @apply transition-all duration-200;
+    @apply transition-all duration-200 cursor-pointer;
   }
   .card-hover:hover {
-    @apply shadow-md -translate-y-0.5;
+    @apply shadow-md -translate-y-0.5 border-primary/30;
+  }
+
+  /* 按钮点击效果 */
+  .btn-press:active {
+    @apply scale-[0.98];
+  }
+
+  /* 搜索框统一样式 */
+  .input-search {
+    @apply pl-9 h-9 text-sm transition-shadow;
+  }
+  .input-search:focus {
+    @apply ring-2 ring-primary/20 border-primary/50 shadow-sm;
+  }
+
+  /* 页面内容容器 - 最大宽度限制 */
+  .page-container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  .page-container-narrow {
+    @apply max-w-5xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* 角色标签样式 */
+  .role-badge-supervisor {
+    @apply bg-role-supervisor-bg-subtle text-role-supervisor-foreground;
+  }
+  .role-badge-inspector {
+    @apply bg-role-inspector-bg-subtle text-role-inspector-foreground;
+  }
+  .role-badge-enterprise {
+    @apply bg-role-enterprise-bg-subtle text-role-enterprise-foreground;
+  }
+
+  /* 角色图标样式 */
+  .icon-supervisor {
+    @apply text-role-supervisor;
+  }
+  .icon-inspector {
+    @apply text-role-inspector;
+  }
+  .icon-enterprise {
+    @apply text-role-enterprise;
+  }
+  .icon-muted {
+    @apply text-muted-foreground;
+  }
+
+  /* 响应式网格辅助 */
+  .grid-stats {
+    @apply grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4;
+  }
+  .grid-cards {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4;
+  }
+  .grid-cards-2 {
+    @apply grid grid-cols-1 md:grid-cols-2 gap-4;
+  }
+  .grid-cards-4 {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4;
   }
 
   /* 按钮点击效果 */

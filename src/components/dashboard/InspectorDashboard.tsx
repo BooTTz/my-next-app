@@ -1,6 +1,7 @@
 "use client";
 
 import StatCard from "@/components/shared/StatCard";
+import EmptyState from "@/components/shared/EmptyState";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -8,7 +9,7 @@ import { TaskStatusBadge } from "@/components/shared/StatusBadge";
 import { MOCK_TASKS, MOCK_HAZARDS } from "@/lib/mock-data";
 import {
   FileCheck, AlertTriangle, FileText, Eye,
-  Calendar, Users, Clock,
+  Calendar, ClipboardList, Clock,
 } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -34,17 +35,17 @@ export default function InspectorDashboard() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="服务机构工作台" description="检查任务执行与管理" />
+      <PageHeader title="服务机构工作台" />
 
       {/* 统计卡片 */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid-stats">
         <StatCard title="待接收任务" value={pendingAccept} icon={<FileCheck className="size-5" />} variant="warning" />
         <StatCard title="检查中任务" value={inspecting} icon={<Eye className="size-5" />} variant="primary" />
         <StatCard title="待提交报告" value={reportPending} icon={<FileText className="size-5" />} variant="danger" />
         <StatCard title="待复查隐患" value={reviewPending} icon={<AlertTriangle className="size-5" />} variant="warning" />
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* 任务日历视图简化版 */}
         <Card className="col-span-2">
           <CardHeader className="pb-2">
@@ -94,7 +95,7 @@ export default function InspectorDashboard() {
                     </div>
                   ))}
                   {myTasks.filter((t) => ["assigned", "accepted"].includes(t.status)).length === 0 && (
-                    <p className="text-sm text-muted-foreground text-center py-8">暂无待处理任务</p>
+                    <EmptyState variant="task" title="暂无待处理任务" description="当前没有待处理的任务" className="py-6" />
                   )}
                 </div>
               </TabsContent>
@@ -147,7 +148,7 @@ export default function InspectorDashboard() {
                     <XAxis dataKey="name" fontSize={12} />
                     <YAxis fontSize={12} />
                     <Tooltip />
-                    <Bar dataKey="任务数" fill="#1E3A5F" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="任务数" fill="var(--color-role-inspector)" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -173,7 +174,7 @@ export default function InspectorDashboard() {
                     </p>
                   </div>
                 )) : (
-                  <p className="text-sm text-muted-foreground text-center py-4">暂无近期到期任务</p>
+                  <EmptyState variant="task" title="暂无近期到期任务" description="当前没有即将到期的任务" className="py-4" />
                 )}
               </div>
             </CardContent>

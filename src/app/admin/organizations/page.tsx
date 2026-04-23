@@ -184,7 +184,7 @@ export default function OrganizationsListPage() {
 
   return (
     <div className="space-y-4">
-      <PageHeader title="组织管理" description="管理平台所有组织">
+      <PageHeader title="组织管理">
         <Button size="sm" onClick={() => router.push("/admin/organizations/new")}>
           <Plus className="size-3.5 mr-1.5" />
           新建组织

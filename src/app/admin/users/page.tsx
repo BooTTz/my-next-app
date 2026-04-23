@@ -193,7 +193,7 @@ export default function UsersListPage() {
 
   return (
     <div className="space-y-4">
-      <PageHeader title="用户管理" description="管理平台所有注册用户">
+      <PageHeader title="用户管理">
         <Dialog open={createOpen} onOpenChange={setCreateOpen}>
           <DialogTrigger
             render={

@@ -27,7 +27,7 @@ export default function ReportsListPage() {
 
   return (
     <div className="space-y-4">
-      <PageHeader title="检查报告管理" description="查看和管理所有检查报告" />
+      <PageHeader title="检查报告管理" />
 
       <Card>
         <CardContent className="p-4">

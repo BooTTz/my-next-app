@@ -99,7 +99,7 @@ export default function OrganizationPage() {
         </Link>
       </div>
 
-      <PageHeader title="组织架构" description="管理内部组织架构与成员分组">
+      <PageHeader title="组织架构">
         <Button size="sm" onClick={() => toast.info("新建节点功能")}>
           <Plus className="size-3.5" /> 新建节点
         </Button>

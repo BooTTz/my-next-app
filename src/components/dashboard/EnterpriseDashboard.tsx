@@ -1,6 +1,7 @@
 "use client";
 
 import StatCard from "@/components/shared/StatCard";
+import EmptyState from "@/components/shared/EmptyState";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -8,7 +9,7 @@ import { HazardStatusBadge, HazardLevelBadge } from "@/components/shared/StatusB
 import { MOCK_TASKS, MOCK_HAZARDS } from "@/lib/mock-data";
 import {
   FileCheck, AlertTriangle, CheckCircle2, TrendingUp,
-  Shield, Clock, ArrowRight,
+  Shield, Clock, ArrowRight, ClipboardList,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -31,17 +32,17 @@ export default function EnterpriseDashboard() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="企业工作台" description="企业安全状况概览与隐患整改管理" />
+      <PageHeader title="企业工作台" />
 
       {/* 统计卡片 */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid-stats">
         <StatCard title="累计检查次数" value={totalChecks} icon={<FileCheck className="size-5" />} variant="primary" />
         <StatCard title="待整改隐患" value={pendingRect} icon={<AlertTriangle className="size-5" />} variant="danger" />
         <StatCard title="已整改数" value={closedCount} icon={<CheckCircle2 className="size-5" />} variant="success" />
         <StatCard title="整改完成率" value={`${rectRate}%`} icon={<TrendingUp className="size-5" />} variant="primary" />
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* 安全等级 */}
         <Card>
           <CardHeader className="pb-2">
@@ -96,7 +97,7 @@ export default function EnterpriseDashboard() {
                   );
                 })
               ) : (
-                <p className="text-sm text-muted-foreground text-center py-8">暂无待整改隐患</p>
+                <EmptyState variant="hazard" title="暂无待整改隐患" description="当前没有需要整改的隐患" className="py-6" />
               )}
             </div>
           </CardContent>
@@ -157,7 +158,7 @@ export default function EnterpriseDashboard() {
                 </Link>
               ))}
               {myHazards.filter((h) => ["notified", "rectifying", "review_failed"].includes(h.status)).length === 0 && (
-                <p className="text-sm text-muted-foreground text-center py-8">暂无待处理事项</p>
+                <EmptyState variant="notification" title="暂无待处理事项" description="当前没有需要处理的事项" className="py-6" />
               )}
             </div>
           </CardContent>

@@ -1,6 +1,7 @@
 "use client";
 
 import StatCard from "@/components/shared/StatCard";
+import EmptyState from "@/components/shared/EmptyState";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -9,14 +10,14 @@ import { TASK_STATUS_MAP, HAZARD_LEVEL_MAP, HAZARD_STATUS_MAP } from "@/lib/type
 import { TaskStatusBadge, HazardLevelBadge } from "@/components/shared/StatusBadge";
 import {
   ClipboardList, FileCheck, AlertTriangle, CheckCircle2,
-  Shield, TrendingUp, Building2, Clock,
+  Shield, TrendingUp, Building2, Clock, Bell,
 } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   LineChart, Line, PieChart, Pie, Cell, Legend,
 } from "recharts";
 
-const CHART_COLORS = ["#1E3A5F", "#3B82F6", "#22C55E", "#F59E0B", "#EF4444"];
+const CHART_COLORS = ["var(--color-role-supervisor)", "var(--color-role-inspector)", "var(--color-role-enterprise)", "var(--status-warning)", "var(--status-danger)"];
 
 export default function SupervisorDashboard() {
   const totalPlans = MOCK_PLANS.length;
@@ -64,10 +65,10 @@ export default function SupervisorDashboard() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="监管部门工作台" description="博兴县2025年度安全检查工作组 — 监管部门数据概览" />
+      <PageHeader title="监管部门工作台" />
 
       {/* 数据卡片 - 检查任务 */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid-stats">
         <StatCard title="检查计划总数" value={totalPlans} icon={<ClipboardList className="size-5" />} variant="primary" />
         <StatCard title="进行中任务" value={inProgressTasks} icon={<FileCheck className="size-5" />} variant="warning" trend={{ value: 12, label: "较上月" }} />
         <StatCard title="已完成任务" value={completedTasks} icon={<CheckCircle2 className="size-5" />} variant="success" />
@@ -75,7 +76,7 @@ export default function SupervisorDashboard() {
       </div>
 
       {/* 隐患概览卡片 */}
-      <div className="grid grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 md:gap-4">
         <StatCard title="隐患总数" value={totalHazards} icon={<AlertTriangle className="size-5" />} />
         <StatCard title="一般隐患" value={generalHazards} icon={<Shield className="size-5" />} variant="warning" />
         <StatCard title="重大隐患" value={majorHazards} icon={<AlertTriangle className="size-5" />} variant="danger" />
@@ -99,8 +100,8 @@ export default function SupervisorDashboard() {
                   <YAxis type="category" dataKey="name" fontSize={11} width={100} />
                   <Tooltip />
                   <Legend iconSize={10} wrapperStyle={{ fontSize: 12 }} />
-                  <Bar dataKey="已完成" stackId="a" fill="#22C55E" radius={[0, 0, 0, 0]} />
-                  <Bar dataKey="进行中" stackId="a" fill="#3B82F6" radius={[0, 4, 4, 0]} />
+                  <Bar dataKey="已完成" stackId="a" fill="var(--status-success)" radius={[0, 0, 0, 0]} />
+                  <Bar dataKey="进行中" stackId="a" fill="var(--color-role-supervisor)" radius={[0, 4, 4, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -121,8 +122,8 @@ export default function SupervisorDashboard() {
                   <YAxis fontSize={12} />
                   <Tooltip />
                   <Legend iconSize={10} wrapperStyle={{ fontSize: 12 }} />
-                  <Line type="monotone" dataKey="发现" stroke="#EF4444" strokeWidth={2} dot={{ r: 3 }} />
-                  <Line type="monotone" dataKey="整改" stroke="#22C55E" strokeWidth={2} dot={{ r: 3 }} />
+                  <Line type="monotone" dataKey="发现" stroke="var(--status-danger)" strokeWidth={2} dot={{ r: 3 }} />
+                  <Line type="monotone" dataKey="整改" stroke="var(--status-success)" strokeWidth={2} dot={{ r: 3 }} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -166,7 +167,7 @@ export default function SupervisorDashboard() {
                   <XAxis type="number" fontSize={12} />
                   <YAxis type="category" dataKey="name" fontSize={11} width={100} />
                   <Tooltip />
-                  <Bar dataKey="count" fill="#1E3A5F" radius={[0, 4, 4, 0]} />
+                  <Bar dataKey="count" fill="var(--color-role-supervisor)" radius={[0, 4, 4, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -187,16 +188,23 @@ export default function SupervisorDashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-2.5 max-h-[200px] overflow-y-auto">
-              {unreadNotifs.length > 0 ? unreadNotifs.map((n) => (
-                <div key={n.id} className="flex items-start gap-2 rounded-md border p-2.5">
-                  <AlertTriangle className="mt-0.5 size-3.5 shrink-0 text-status-warning" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium truncate">{n.title}</p>
-                    <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-2">{n.content}</p>
+              {unreadNotifs.length > 0 ? (
+                unreadNotifs.map((n) => (
+                  <div key={n.id} className="flex items-start gap-2 rounded-md border p-2.5">
+                    <AlertTriangle className="mt-0.5 size-3.5 shrink-0 text-status-warning" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium truncate">{n.title}</p>
+                      <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-2">{n.content}</p>
+                    </div>
                   </div>
-                </div>
-              )) : (
-                <p className="text-sm text-muted-foreground text-center py-8">暂无待办事项</p>
+                ))
+              ) : (
+                <EmptyState
+                  variant="notification"
+                  title="暂无待办"
+                  description="当前没有需要处理的事项"
+                  className="py-6"
+                />
               )}
             </div>
           </CardContent>

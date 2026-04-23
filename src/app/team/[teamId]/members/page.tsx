@@ -78,10 +78,7 @@ export default function MembersPage() {
         </Link>
       </div>
 
-      <PageHeader 
-        title={`${currentTeam.name} - 成员管理`} 
-        description="管理组织内的成员"
-      >
+      <PageHeader title={`${currentTeam.name} - 成员管理`}>
         <Button size="sm" onClick={() => toast.info("邀请成员功能")}>
           <UserPlus className="size-3.5" /> 邀请成员
         </Button>

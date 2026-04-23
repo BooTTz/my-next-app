@@ -28,7 +28,7 @@ export default function SettingsPage() {
         </Link>
       </div>
 
-      <PageHeader title="组织设置" description="管理组织基本信息和权限配置" />
+      <PageHeader title="组织设置" />
 
       <div className="grid grid-cols-3 gap-4">
         <div className="col-span-2 space-y-4">

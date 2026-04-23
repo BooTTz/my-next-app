@@ -50,7 +50,7 @@ export default function NotificationsPage() {
         </Link>
       </div>
 
-      <PageHeader title="通知中心" description={`${unreadCount} 条未读消息`}>
+      <PageHeader title="通知中心" badge={unreadCount}>
         <Button variant="outline" size="sm" onClick={markAllRead}>
           <MailOpen className="size-3.5" /> 全部已读
         </Button>

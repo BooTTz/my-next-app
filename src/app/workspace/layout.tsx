@@ -1,8 +1,8 @@
 "use client";
 
 import AppSidebar from "@/components/layout/AppSidebar";
-import TopBar from "@/components/layout/TopBar";
 import PageBreadcrumb from "@/components/layout/PageBreadcrumb";
+import { TopBarActions } from "@/components/layout/TopBar";
 import { useHydrated } from "@/hooks/useHydrated";
 import { useBreadcrumbs } from "@/hooks/useBreadcrumbs";
 
@@ -22,8 +22,11 @@ export default function WorkspaceLayout({ children }: { children: React.ReactNod
     <div className="flex h-screen overflow-hidden">
       <AppSidebar />
       <div className="flex flex-1 flex-col overflow-hidden">
-        <TopBar />
-        <PageBreadcrumb items={breadcrumbs} />
+        {/* 顶部区域：面包屑 + 页面标题 + 操作按钮 */}
+        <div className="flex items-center justify-between border-b bg-card px-4">
+          <PageBreadcrumb items={breadcrumbs} />
+          <TopBarActions />
+        </div>
         <main className="flex-1 overflow-y-auto bg-background p-6">
           <div className="animate-fade-in">{children}</div>
         </main>

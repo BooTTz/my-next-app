@@ -7,7 +7,7 @@ import { useAppStore } from "@/lib/store";
 import {
   LayoutDashboard, ClipboardList, FileCheck, AlertTriangle,
   FileText, BarChart3, Building2, Bell,
-  Wrench, ChevronDown, ChevronRight, Shield, Users,
+  Wrench, ChevronDown, ChevronRight, Shield,
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
@@ -154,9 +154,9 @@ export default function AppSidebar() {
   const supervisorCount = 1;
 
   return (
-    <aside className="flex h-screen w-56 flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border">
+    <aside className="flex h-screen w-48 flex-shrink-0 flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border">
       {/* 平台标识区 */}
-      <div className="flex flex-col border-b border-sidebar-border px-3 py-3 gap-2">
+      <div className="flex flex-col px-3 py-3 gap-2">
         <div className="flex items-center gap-2">
           <div className="flex size-8 items-center justify-center rounded-md bg-sidebar-primary">
             <Shield className="size-4 text-sidebar-primary-foreground" />
@@ -178,38 +178,41 @@ export default function AppSidebar() {
       </nav>
 
       {/* 底部信息 */}
-      <div className="border-t border-sidebar-border p-3 space-y-2">
-        {/* 工作组管理入口 - 可点击的组织类型统计组 */}
+      <div className="border-t border-sidebar-border px-3 py-2">
+        {/* 工作组统计入口 - 整体可点击 */}
         <Link
           href="/workspace/settings"
-          className="block rounded-md bg-sidebar-accent/30 hover:bg-sidebar-accent/50 px-2 py-1.5 transition-colors"
+          className="flex items-center gap-1.5 py-2 text-[11px] hover:bg-muted/50 rounded-md px-2 -mx-2 transition-colors"
         >
-          <div className="flex items-center gap-2">
-            <Users className="size-3.5 text-sidebar-foreground/70" />
-            <span className="inline-flex items-center gap-1.5 text-[11px] text-sidebar-foreground/60">
-              企业 <span className="font-medium text-primary">{workspaceStats.enterpriseCount}</span>
-            </span>
-            <span className="inline-flex items-center gap-1.5 text-[11px] text-sidebar-foreground/60">
-              机构 <span className="font-medium text-primary">{workspaceStats.serviceCount}</span>
-            </span>
-            <span className="inline-flex items-center gap-1.5 text-[11px] text-sidebar-foreground/60">
-              监管 <span className="font-medium text-primary">{supervisorCount}</span>
-            </span>
-          </div>
+          <span className="text-muted-foreground">企业</span>
+          <span className="font-semibold text-role-enterprise">{workspaceStats.enterpriseCount}</span>
+          <span className="text-border">|</span>
+          <span className="text-muted-foreground">机构</span>
+          <span className="font-semibold text-role-inspector">{workspaceStats.serviceCount}</span>
+          <span className="text-border">|</span>
+          <span className="text-muted-foreground">监管</span>
+          <span className="font-semibold text-role-supervisor">{supervisorCount}</span>
         </Link>
 
         {/* 我的组织入口 */}
         {orgId && (
-          <Link href={`/organization/${orgId}`}>
-            <Button variant="ghost" size="sm" className="h-7 w-full justify-start text-xs">
-              <Building2 className="size-3 mr-1.5" />
-              {currentOrganization?.name || currentTeam?.name || "我的组织"}
-            </Button>
+          <Link href={`/organization/${orgId}`} className="block mt-1">
+            <div className="flex items-center gap-2 py-2 text-sm hover:bg-muted/50 rounded-md px-2 -mx-2 transition-colors">
+              <Building2 className="size-4 text-muted-foreground" />
+              <span className="truncate">
+                {currentOrganization?.name || currentTeam?.name || "我的组织"}
+              </span>
+              <ChevronRight className="size-3.5 ml-auto text-muted-foreground" />
+            </div>
           </Link>
         )}
-        <p className="text-[10px] text-sidebar-foreground/40 text-center">
-          工贸三方监管平台 v1.1.1
-        </p>
+
+        {/* 平台版本信息 */}
+        <div className="pt-2">
+          <p className="text-[10px] text-muted-foreground/50">
+            工贸三方监管平台 v1.1.1
+          </p>
+        </div>
       </div>
     </aside>
   );

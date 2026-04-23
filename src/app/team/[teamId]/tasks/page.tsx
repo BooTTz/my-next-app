@@ -32,7 +32,7 @@ export default function TasksListPage() {
 
   return (
     <div className="space-y-4">
-      <PageHeader title="检查任务管理" description="查看和管理所有检查任务" />
+      <PageHeader title="检查任务管理" />
 
       <Card>
         <CardContent className="p-4">

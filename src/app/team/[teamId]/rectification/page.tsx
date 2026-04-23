@@ -23,7 +23,7 @@ export default function RectificationPage() {
 
   return (
     <div className="space-y-4">
-      <PageHeader title="隐患整改" description={`${myHazards.length} 条待处理隐患`} />
+      <PageHeader title="隐患整改" badge={myHazards.length} />
 
       <div className="space-y-3">
         {myHazards.length > 0 ? myHazards.map((h) => (

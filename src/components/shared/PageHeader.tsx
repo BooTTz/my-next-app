@@ -10,20 +10,22 @@ import type { ReactNode } from "react";
 
 interface PageHeaderProps {
   title: string;
-  description?: string;
+  badge?: string | number;
   children?: ReactNode;
   className?: string;
 }
 
-export function PageHeader({ title, description, children, className }: PageHeaderProps) {
+export function PageHeader({ title, badge, children, className }: PageHeaderProps) {
   return (
     <div className={cn("flex items-center justify-between", className)}>
-      <div>
-        <h1 className="text-xl font-semibold tracking-tight">{title}</h1>
-        {description && (
-          <p className="mt-1 text-sm text-muted-foreground">{description}</p>
+      <h1 className="text-base font-semibold tracking-tight flex items-center gap-2">
+        {title}
+        {badge !== undefined && (
+          <span className="text-sm font-medium text-muted-foreground">
+            ({typeof badge === 'number' ? `${badge} 条` : badge})
+          </span>
         )}
-      </div>
+      </h1>
       {children && <div className="flex items-center gap-2">{children}</div>}
     </div>
   );
@@ -66,7 +68,7 @@ export function ListToolbar({
           placeholder={searchPlaceholder}
           value={searchValue}
           onChange={(e) => onSearchChange?.(e.target.value)}
-          className="pl-8 h-8"
+          className="input-search"
         />
       </div>
       <div className="flex items-center gap-1.5">

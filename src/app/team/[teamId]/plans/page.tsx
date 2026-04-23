@@ -30,7 +30,7 @@ export default function PlansListPage() {
 
   return (
     <div className="space-y-4">
-      <PageHeader title="检查计划管理" description="管理和查看所有安全检查计划">
+      <PageHeader title="检查计划管理">
         <Link href={`/team/${teamId}/plans/new`}>
           <Button size="sm">新建检查计划</Button>
         </Link>

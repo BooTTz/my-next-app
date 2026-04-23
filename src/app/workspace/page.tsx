@@ -63,7 +63,7 @@ export default function WorkspacePage() {
       </div>
 
       {/* 我的工作组 */}
-      <div>
+      <div className="page-container-narrow">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-base font-semibold">我的工作组</h2>
           <div className="flex gap-2">
@@ -79,7 +79,7 @@ export default function WorkspacePage() {
           {userWorkspaces.map((workspace) => (
             <Card
               key={workspace.id}
-              className="cursor-pointer hover:shadow-md transition-all hover:border-primary/30"
+              className="card-hover"
               onClick={() => handleEnterWorkspace(workspace)}
             >
               <CardContent className="p-5">
@@ -112,7 +112,7 @@ export default function WorkspacePage() {
       </div>
 
       {/* 演示账号快速切换 */}
-      <div>
+      <div className="page-container-narrow">
         <h2 className="text-base font-semibold mb-3">快速切换角色（演示）</h2>
         <Card>
           <CardContent className="p-4">
@@ -146,7 +146,7 @@ export default function WorkspacePage() {
       </div>
 
       {/* 跨工作组待办 */}
-      <div>
+      <div className="page-container-narrow">
         <h2 className="text-base font-semibold mb-3">跨工作组待办汇总</h2>
         <Card>
           <CardContent className="p-4">

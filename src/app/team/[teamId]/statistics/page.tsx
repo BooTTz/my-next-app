@@ -68,7 +68,7 @@ export default function StatisticsPage() {
         </Link>
       </div>
 
-      <PageHeader title="数据统计" description="综合数据分析与统计报表" />
+      <PageHeader title="数据统计" />
 
       {/* 统计卡片 */}
       <div className="grid grid-cols-4 gap-4">

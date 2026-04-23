@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Shield, Phone, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
+import { Shield, Phone, Lock, Eye, EyeOff, ArrowRight, ClipboardCheck, Search, Wrench } from "lucide-react";
 import { useAppStore } from "@/lib/store";
 import { MOCK_USERS, MOCK_ORGANIZATIONS } from "@/lib/mock-data";
 import { useHydrated } from "@/hooks/useHydrated";
@@ -85,16 +85,24 @@ export default function LoginPage() {
           </p>
           <div className="grid grid-cols-3 gap-4 pt-4">
             {[
-              { label: "监管部门", desc: "计划发布与验收", icon: "📋" },
-              { label: "服务机构", desc: "现场检查与报告", icon: "🔍" },
-              { label: "企业单位", desc: "隐患整改与反馈", icon: "🔧" },
-            ].map((item) => (
-              <div key={item.label} className="rounded-lg bg-primary-foreground/5 p-4 backdrop-blur-sm border border-primary-foreground/10">
-                <div className="text-2xl mb-2">{item.icon}</div>
-                <p className="font-medium text-primary-foreground">{item.label}</p>
-                <p className="text-xs text-primary-foreground/60 mt-1">{item.desc}</p>
-              </div>
-            ))}
+              { label: "监管部门", desc: "计划发布与验收", icon: ClipboardCheck, color: "role-supervisor" },
+              { label: "服务机构", desc: "现场检查与报告", icon: Search, color: "role-inspector" },
+              { label: "企业单位", desc: "隐患整改与反馈", icon: Wrench, color: "role-enterprise" },
+            ].map((item) => {
+              const Icon = item.icon;
+              return (
+                <div
+                  key={item.label}
+                  className="rounded-lg bg-primary-foreground/5 p-4 backdrop-blur-sm border border-primary-foreground/10"
+                >
+                  <div className={`mb-2`}>
+                    <Icon className={`size-6 text-${item.color}`} />
+                  </div>
+                  <p className="font-medium text-primary-foreground">{item.label}</p>
+                  <p className="text-xs text-primary-foreground/60 mt-1">{item.desc}</p>
+                </div>
+              );
+            })}
           </div>
         </div>
 
