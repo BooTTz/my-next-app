@@ -471,6 +471,24 @@ export interface Notification {
   createdAt: string;
 }
 
+/** 用户待办类型 */
+export type TodoType = "task" | "hazard" | "report" | "rectification";
+
+/** 待办状态 */
+export type TodoStatus = "pending" | "completed";
+
+/** 用户待办 */
+export interface UserTodo {
+  id: string;
+  type: TodoType;
+  title: string;
+  description: string;
+  relatedId: string;
+  deadline?: string;
+  status: TodoStatus;
+  createdAt: string;
+}
+
 // ============ 辅助映射 ============
 
 export const WORKSPACE_STATUS_MAP: Record<WorkspaceStatus, string> = {
@@ -478,9 +496,9 @@ export const WORKSPACE_STATUS_MAP: Record<WorkspaceStatus, string> = {
 };
 
 export const USER_TYPE_MAP: Record<UserType, string> = {
-  supervisor: "监管方",
-  inspector: "服务方",
-  enterprise: "履行方",
+  supervisor: "监管部门",
+  inspector: "服务机构",
+  enterprise: "企业单位",
 };
 
 export const PLAN_TYPE_MAP: Record<PlanType, string> = {

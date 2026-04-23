@@ -20,8 +20,8 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-export default function TaskDetailPage({ params }: { params: Promise<{ taskId: string }> }) {
-  const { taskId } = use(params);
+export default function TaskDetailPage({ params }: { params: Promise<{ teamId: string; taskId: string }> }) {
+  const { teamId, taskId } = use(params);
   const task = MOCK_TASKS.find((t) => t.id === taskId) || MOCK_TASKS[0];
   const hazards = MOCK_HAZARDS.filter((h) => h.taskId === task.id);
   const closedCount = hazards.filter((h) => h.status === "closed").length;
@@ -31,7 +31,7 @@ export default function TaskDetailPage({ params }: { params: Promise<{ taskId: s
     <div className="space-y-4">
       <PageHeader title="检查任务详情">
         <div className="flex items-center gap-2">
-          <Link href="/team/t1/tasks">
+          <Link href="/team/${teamId}/tasks">
             <Button variant="outline" size="sm">
               <ArrowLeft className="size-3.5" /> 返回列表
             </Button>
@@ -102,7 +102,7 @@ export default function TaskDetailPage({ params }: { params: Promise<{ taskId: s
           <div className="grid grid-cols-4 gap-6 text-sm">
             <div>
               <p className="text-muted-foreground mb-1">所属计划</p>
-              <Link href={`/team/t1/plans/${task.planId}`} className="text-primary hover:underline text-xs">
+              <Link href={`/team/${teamId}/plans/${task.planId}`} className="text-primary hover:underline text-xs">
                 {task.planName?.substring(0, 15)}...
               </Link>
             </div>
@@ -172,7 +172,7 @@ export default function TaskDetailPage({ params }: { params: Promise<{ taskId: s
                       <TableCell><HazardStatusBadge status={h.status} /></TableCell>
                       <TableCell className="text-xs">{h.deadline}</TableCell>
                       <TableCell>
-                        <Link href={`/team/t1/hazards/${h.id}`}>
+                        <Link href={`/team/${teamId}/hazards/${h.id}`}>
                           <Button variant="ghost" size="icon-xs">
                             <FileText className="size-3.5" />
                           </Button>

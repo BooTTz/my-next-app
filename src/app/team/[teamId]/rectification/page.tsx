@@ -8,8 +8,11 @@ import { Progress } from "@/components/ui/progress";
 import { MOCK_HAZARDS } from "@/lib/mock-data";
 import { Wrench, Clock, ArrowRight, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 
 export default function RectificationPage() {
+  const params = useParams();
+  const teamId = params.teamId as string;
   const myHazards = MOCK_HAZARDS.filter((h) =>
     ["notified", "rectifying", "review_failed", "submitted"].includes(h.status)
   );
@@ -20,16 +23,6 @@ export default function RectificationPage() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-4">
-        <Link
-          href="/workspace"
-          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <ArrowLeft className="size-4" />
-          返回工作台
-        </Link>
-      </div>
-
       <PageHeader title="隐患整改" description={`${myHazards.length} 条待处理隐患`} />
 
       <div className="space-y-3">
@@ -56,7 +49,7 @@ export default function RectificationPage() {
                     <span className="text-xs text-muted-foreground">{progressMap[h.status] || 0}%</span>
                   </div>
                 </div>
-                <Link href={`/team/t1/hazards/${h.id}`}>
+                <Link href={`/team/${teamId}/hazards/${h.id}`}>
                   <Button variant="outline" size="sm">
                     {h.status === "review_failed" ? "重新整改" : "提交整改"}
                     <ArrowRight className="size-3.5" />

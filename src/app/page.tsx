@@ -19,7 +19,7 @@ export default function HomePage() {
       return;
     }
 
-    // 超级管理员 → /admin/users
+    // 超级管理员 → 用户管理
     if (currentUser.platformRole === "super_admin") {
       router.replace("/admin/users");
       return;
@@ -30,13 +30,13 @@ export default function HomePage() {
       (org) => org.orgAdminUserId === currentUser.id || org.creatorId === currentUser.id
     );
 
-    // 已加入组织 → /workspace
+    // 已加入组织 → 工作台（带组织上下文）
     if (userOrgs.length > 0) {
-      router.replace("/workspace");
+      router.replace(`/team/${userOrgs[0].id}/dashboard`);
       return;
     }
 
-    // 未加入任何组织 → /profile
+    // 未加入任何组织 → 个人中心
     router.replace("/profile");
   }, [hydrated, currentUser, router]);
 

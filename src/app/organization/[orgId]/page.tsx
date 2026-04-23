@@ -94,19 +94,19 @@ function getOrgWorkspaceJoinDate(orgId: string, workspaceId: string): string | u
 
 function buildSupervisorStats(stats: OrganizationStats): StatItemConfig[] {
   return [
-    { title: "服务方数量", icon: <Users className="size-5" />, value: stats.inspectorCount, color: "blue" },
-    { title: "履行方数量", icon: <Building2 className="size-5" />, value: stats.enterpriseCount, color: "amber" },
+    { title: "服务机构数量", icon: <Users className="size-5" />, value: stats.inspectorCount, color: "blue" },
+    { title: "企业单位数量", icon: <Building2 className="size-5" />, value: stats.enterpriseCount, color: "amber" },
     { title: "进行中计划数", icon: <ClipboardList className="size-5" />, value: stats.inProgressPlanCount, color: "green" },
     { title: "隐患整改中企业数", icon: <AlertTriangle className="size-5" />, value: stats.rectifyingEnterpriseCount, color: "red" },
-    { title: "检查中服务方数", icon: <Search className="size-5" />, value: stats.inspectingInspectorCount, color: "blue" },
+    { title: "检查中服务机构数", icon: <Search className="size-5" />, value: stats.inspectingInspectorCount, color: "blue" },
     { title: "运行良好企业数", icon: <CheckCircle className="size-5" />, value: stats.healthyEnterpriseCount, color: "green" },
   ];
 }
 
 function buildInspectorStats(stats: OrganizationStats): StatItemConfig[] {
   return [
-    { title: "监管方数量", icon: <Shield className="size-5" />, value: stats.supervisorCount, color: "blue" },
-    { title: "履行方数量", icon: <Building2 className="size-5" />, value: stats.enterpriseCount, color: "amber" },
+    { title: "监管部门数量", icon: <Shield className="size-5" />, value: stats.supervisorCount, color: "blue" },
+    { title: "企业单位数量", icon: <Building2 className="size-5" />, value: stats.enterpriseCount, color: "amber" },
     { title: "进行中计划数", icon: <ClipboardList className="size-5" />, value: stats.inProgressPlanCount, color: "green" },
     { title: "进行中任务数", icon: <ListChecks className="size-5" />, value: stats.inProgressTaskCount, color: "blue" },
     { title: "待整改企业数", icon: <AlertTriangle className="size-5" />, value: stats.pendingRectificationEnterpriseCount, color: "red" },
@@ -116,8 +116,8 @@ function buildInspectorStats(stats: OrganizationStats): StatItemConfig[] {
 
 function buildEnterpriseStats(stats: OrganizationStats): StatItemConfig[] {
   return [
-    { title: "监管方数量", icon: <Shield className="size-5" />, value: stats.supervisorCount, color: "blue" },
-    { title: "服务方数量", icon: <Users className="size-5" />, value: stats.inspectorCount, color: "green" },
+    { title: "监管部门数量", icon: <Shield className="size-5" />, value: stats.supervisorCount, color: "blue" },
+    { title: "服务机构数量", icon: <Users className="size-5" />, value: stats.inspectorCount, color: "green" },
     { title: "检查任务数", icon: <ListChecks className="size-5" />, value: stats.involvedTaskCount, color: "blue" },
     { title: "待整改隐患数", icon: <AlertTriangle className="size-5" />, value: stats.pendingHazardCount, color: "red" },
   ];
@@ -404,7 +404,7 @@ export default function OrganizationPage() {
                 <div className="space-y-1">
                   <p className="text-muted-foreground">尚未加入工作组</p>
                   <p className="text-xs text-muted-foreground">
-                    点击右上角"新增工作组"按钮创建或加入工作组
+                    点击右上角{`"新增工作组"`}按钮创建或加入工作组
                   </p>
                 </div>
                 <Button size="sm" onClick={() => setDialogOpen(true)}>

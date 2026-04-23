@@ -33,9 +33,9 @@ const SUB_INDUSTRIES = ["工贸", "化工", "其他"];
 const EDUCATIONS = ["高中", "大专", "本科", "硕士", "博士"];
 
 const ORG_TYPE_MAP: Record<UserType, string> = {
-  supervisor: "监管方",
-  inspector: "服务方",
-  enterprise: "履行方",
+  supervisor: "监管部门",
+  inspector: "服务机构",
+  enterprise: "企业单位",
 };
 
 // ─── 类型 ──────────────────────────────────────────────────────────────────────
@@ -107,9 +107,9 @@ const EMPTY_FORM: OrgForm = {
 
 function OrgTypeBadge({ type }: { type: UserType }) {
   const map: Record<UserType, { label: string; className: string }> = {
-    supervisor: { label: "监管方", className: "bg-blue-500/10 text-blue-600 border-blue-500/30" },
-    inspector: { label: "服务方", className: "bg-green-500/10 text-green-600 border-green-500/30" },
-    enterprise: { label: "履行方", className: "bg-amber-500/10 text-amber-600 border-amber-500/30" },
+    supervisor: { label: "监管部门", className: "bg-blue-500/10 text-blue-600 border-blue-500/30" },
+    inspector: { label: "服务机构", className: "bg-green-500/10 text-green-600 border-green-500/30" },
+    enterprise: { label: "企业单位", className: "bg-amber-500/10 text-amber-600 border-amber-500/30" },
   };
   const { label, className } = map[type];
   return <Badge variant="outline" className={className}>{label}</Badge>;
@@ -404,9 +404,9 @@ export default function OrgEditPage() {
                     <SelectValue placeholder="请选择组织类型" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="supervisor">监管方</SelectItem>
-                    <SelectItem value="inspector">服务方</SelectItem>
-                    <SelectItem value="enterprise">履行方</SelectItem>
+                    <SelectItem value="supervisor">监管部门</SelectItem>
+                    <SelectItem value="inspector">服务机构</SelectItem>
+                    <SelectItem value="enterprise">企业单位</SelectItem>
                   </SelectContent>
                 </Select>
               ) : (
@@ -460,7 +460,7 @@ export default function OrgEditPage() {
       {form.teamType === "supervisor" && (
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-base">监管方信息</CardTitle>
+            <CardTitle className="text-base">监管部门信息</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <FieldRow label="监管行业">
@@ -495,7 +495,7 @@ export default function OrgEditPage() {
         <>
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-base">服务方信息</CardTitle>
+              <CardTitle className="text-base">服务机构信息</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 gap-x-6 gap-y-4">
@@ -704,7 +704,7 @@ export default function OrgEditPage() {
                           colSpan={6}
                           className="text-center py-6 text-muted-foreground text-sm"
                         >
-                          暂无证书，点击"添加证书"新增
+                          暂无证书，点击{`"添加证书"`}新增
                         </TableCell>
                       </TableRow>
                     )}
@@ -719,7 +719,7 @@ export default function OrgEditPage() {
       {form.teamType === "enterprise" && (
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-base">履行方信息</CardTitle>
+            <CardTitle className="text-base">企业单位信息</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-x-6 gap-y-4">

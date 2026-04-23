@@ -85,9 +85,9 @@ export default function LoginPage() {
           </p>
           <div className="grid grid-cols-3 gap-4 pt-4">
             {[
-              { label: "监管方", desc: "计划发布与验收", icon: "📋" },
-              { label: "服务方", desc: "现场检查与报告", icon: "🔍" },
-              { label: "履行方", desc: "隐患整改与反馈", icon: "🔧" },
+              { label: "监管部门", desc: "计划发布与验收", icon: "📋" },
+              { label: "服务机构", desc: "现场检查与报告", icon: "🔍" },
+              { label: "企业单位", desc: "隐患整改与反馈", icon: "🔧" },
             ].map((item) => (
               <div key={item.label} className="rounded-lg bg-primary-foreground/5 p-4 backdrop-blur-sm border border-primary-foreground/10">
                 <div className="text-2xl mb-2">{item.icon}</div>
@@ -213,9 +213,9 @@ export default function LoginPage() {
             </CardHeader>
             <CardContent className="px-4 pb-4 space-y-1.5">
               {[
-                { name: "李伟 - 监管方", phone: "13800001001" },
-                { name: "张敏 - 服务方", phone: "13800001002" },
-                { name: "陈杰 - 履行方", phone: "13800001004" },
+                { name: "李伟 - 监管部门", phone: "13800001001" },
+                { name: "张敏 - 服务机构", phone: "13800001002" },
+                { name: "陈杰 - 企业单位", phone: "13800001004" },
                 { name: "平台管理员", phone: "superadmin" },
               ].map((demo) => (
                 <button

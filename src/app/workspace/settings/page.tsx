@@ -341,9 +341,9 @@ export default function WorkspaceSettingsPage() {
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="organization">组织信息</TabsTrigger>
-          <TabsTrigger value="supervisor">监管方 ({supervisorTeams.length})</TabsTrigger>
-          <TabsTrigger value="inspector">服务方 ({inspectorTeams.length})</TabsTrigger>
-          <TabsTrigger value="enterprise">履行方 ({enterpriseTeams.length})</TabsTrigger>
+          <TabsTrigger value="supervisor">监管部门 ({supervisorTeams.length})</TabsTrigger>
+          <TabsTrigger value="inspector">服务机构 ({inspectorTeams.length})</TabsTrigger>
+          <TabsTrigger value="enterprise">企业单位 ({enterpriseTeams.length})</TabsTrigger>
         </TabsList>
 
         {/* 组织信息 - 行政区划树 + 组织列表 */}
@@ -418,9 +418,9 @@ export default function WorkspaceSettingsPage() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">全部类型</SelectItem>
-                      <SelectItem value="supervisor">监管方</SelectItem>
-                      <SelectItem value="inspector">服务方</SelectItem>
-                      <SelectItem value="enterprise">履行方</SelectItem>
+                      <SelectItem value="supervisor">监管部门</SelectItem>
+                      <SelectItem value="inspector">服务机构</SelectItem>
+                      <SelectItem value="enterprise">企业单位</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -476,7 +476,7 @@ export default function WorkspaceSettingsPage() {
           </div>
         </TabsContent>
 
-        {/* 监管方列表 */}
+        {/* 监管部门列表 */}
         <TabsContent value="supervisor" className="mt-4">
           <Card>
             <CardContent className="p-4">
@@ -514,14 +514,14 @@ export default function WorkspaceSettingsPage() {
                   );
                 })}
                 {supervisorTeams.length === 0 && (
-                  <p className="text-center text-muted-foreground py-8">暂无监管方组织</p>
+                  <p className="text-center text-muted-foreground py-8">暂无监管部门组织</p>
                 )}
               </div>
             </CardContent>
           </Card>
         </TabsContent>
 
-        {/* 服务方列表 */}
+        {/* 服务机构列表 */}
         <TabsContent value="inspector" className="mt-4">
           <Card>
             <CardContent className="p-4">
@@ -562,14 +562,14 @@ export default function WorkspaceSettingsPage() {
                   );
                 })}
                 {inspectorTeams.length === 0 && (
-                  <p className="text-center text-muted-foreground py-8">暂无服务方组织</p>
+                  <p className="text-center text-muted-foreground py-8">暂无服务机构组织</p>
                 )}
               </div>
             </CardContent>
           </Card>
         </TabsContent>
 
-        {/* 履行方列表 */}
+        {/* 企业单位列表 */}
         <TabsContent value="enterprise" className="mt-4">
           <Card>
             <CardContent className="p-4">
@@ -610,7 +610,7 @@ export default function WorkspaceSettingsPage() {
                   );
                 })}
                 {enterpriseTeams.length === 0 && (
-                  <p className="text-center text-muted-foreground py-8">暂无履行方组织</p>
+                  <p className="text-center text-muted-foreground py-8">暂无企业单位组织</p>
                 )}
               </div>
             </CardContent>
@@ -696,9 +696,9 @@ export default function WorkspaceSettingsPage() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="supervisor">监管方</SelectItem>
-                  <SelectItem value="inspector">服务方</SelectItem>
-                  <SelectItem value="enterprise">履行方</SelectItem>
+                  <SelectItem value="supervisor">监管部门</SelectItem>
+                  <SelectItem value="inspector">服务机构</SelectItem>
+                  <SelectItem value="enterprise">企业单位</SelectItem>
                 </SelectContent>
               </Select>
             </div>

@@ -18,8 +18,8 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-export default function ReportPreviewPage({ params }: { params: Promise<{ reportId: string }> }) {
-  const { reportId } = use(params);
+export default function ReportPreviewPage({ params }: { params: Promise<{ teamId: string; reportId: string }> }) {
+  const { teamId, reportId } = use(params);
   const report = MOCK_REPORTS.find((r) => r.id === reportId) || MOCK_REPORTS[0];
   const task = MOCK_TASKS.find((t) => t.id === report.taskId);
   const enterprise = MOCK_ENTERPRISES.find((e) => e.id === task?.enterpriseId);
@@ -32,7 +32,7 @@ export default function ReportPreviewPage({ params }: { params: Promise<{ report
     <div className="space-y-4">
       <PageHeader title="检查报告预览">
         <div className="flex items-center gap-2">
-          <Link href="/team/t1/reports">
+          <Link href="/team/${teamId}/reports">
             <Button variant="outline" size="sm"><ArrowLeft className="size-3.5" /> 返回</Button>
           </Link>
           <Button variant="outline" size="sm" onClick={() => toast.info("导出PDF")}>

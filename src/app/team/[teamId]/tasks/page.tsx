@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { PageHeader, ListToolbar } from "@/components/shared/PageHeader";
 import { TaskStatusBadge } from "@/components/shared/StatusBadge";
@@ -19,6 +19,8 @@ import { toast } from "sonner";
 
 export default function TasksListPage() {
   const router = useRouter();
+  const params = useParams();
+  const teamId = params.teamId as string;
   const [search, setSearch] = useState("");
 
   const filteredTasks = MOCK_TASKS.filter(
@@ -65,7 +67,7 @@ export default function TasksListPage() {
                     <TableCell className="font-mono text-xs">{task.taskNo}</TableCell>
                     <TableCell>
                       <Link
-                        href={`/team/t1/tasks/${task.id}`}
+                        href={`/team/${teamId}/tasks/${task.id}`}
                         className="font-medium text-sm hover:text-primary transition-colors"
                       >
                         {task.enterpriseName}
@@ -124,7 +126,7 @@ export default function TasksListPage() {
                           {
                             label: "查看详情",
                             icon: <Eye className="h-4 w-4" />,
-                            onClick: () => router.push(`/team/t1/tasks/${task.id}`),
+                            onClick: () => router.push(`/team/${teamId}/tasks/${task.id}`),
                           },
                           {
                             label: "接收任务",

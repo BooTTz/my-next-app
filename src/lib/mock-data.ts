@@ -6,6 +6,7 @@ import type {
   InspectionTask, Hazard, InspectionReport, Notification,
   Workspace, RegionNode, TeamWorkspace, WorkspaceAdmin,
   Organization, Certificate, OrganizationStats,
+  UserTodo,
 } from "./types";
 
 // ============ 用户数据 ============
@@ -84,9 +85,9 @@ export const MOCK_TEAMS: Team[] = [
 
 // ============ 演示账号 ============
 export const DEMO_ACCOUNTS = [
-  { username: "demo_supervisor", password: "demo123", realName: "演示-监管方", userType: "supervisor" as const, userId: "u1" },
-  { username: "demo_inspector", password: "demo123", realName: "演示-服务方", userType: "inspector" as const, userId: "u2" },
-  { username: "demo_enterprise", password: "demo123", realName: "演示-履行方", userType: "enterprise" as const, userId: "u4" },
+  { username: "demo_supervisor", password: "demo123", realName: "演示-监管部门", userType: "supervisor" as const, userId: "u1" },
+  { username: "demo_inspector", password: "demo123", realName: "演示-服务机构", userType: "inspector" as const, userId: "u2" },
+  { username: "demo_enterprise", password: "demo123", realName: "演示-企业单位", userType: "enterprise" as const, userId: "u4" },
 ];
 
 // ============ 团队成员 ============
@@ -260,4 +261,14 @@ export const MOCK_ORGANIZATION_STATS: OrganizationStats[] = [
     recentTaskName: "2025年度工贸企业日常安全检查",
     pendingHazardCount: 5,
   },
+];
+
+// ============ 用户待办数据 ============
+export const MOCK_USER_TODOS: UserTodo[] = [
+  { id: "todo-1", type: "task", title: "检查任务待完成", description: "完成博兴县天成机械加工厂安全检查", relatedId: "tk3", deadline: "2026-04-28", status: "pending", createdAt: "2026-04-20" },
+  { id: "todo-2", type: "hazard", title: "重大隐患待整改", description: "数控车床安全防护罩缺失需立即整改", relatedId: "h3", deadline: "2026-04-26", status: "pending", createdAt: "2026-04-20" },
+  { id: "todo-3", type: "report", title: "检查报告待提交", description: "提交博兴县天成机械加工厂检查报告", relatedId: "r4", deadline: "2026-04-30", status: "pending", createdAt: "2026-04-19" },
+  { id: "todo-4", type: "rectification", title: "隐患整改待提交", description: "提交安全标识缺失隐患的整改材料", relatedId: "h4", deadline: "2026-04-27", status: "pending", createdAt: "2026-04-18" },
+  { id: "todo-5", type: "task", title: "检查任务待接收", description: "接收有限空间作业安全专项检查任务", relatedId: "tk7", deadline: "2026-04-25", status: "pending", createdAt: "2026-04-17" },
+  { id: "todo-6", type: "hazard", title: "应急演练待完成", description: "组织综合应急演练并提交记录", relatedId: "h8", deadline: "2026-05-05", status: "pending", createdAt: "2026-04-15" },
 ];

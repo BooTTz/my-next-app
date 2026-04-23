@@ -64,7 +64,7 @@ export default function SupervisorDashboard() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="监管工作台" description="博兴县2025年度安全检查工作组 — 监管方数据概览" />
+      <PageHeader title="监管部门工作台" description="博兴县2025年度安全检查工作组 — 监管部门数据概览" />
 
       {/* 数据卡片 - 检查任务 */}
       <div className="grid grid-cols-4 gap-4">

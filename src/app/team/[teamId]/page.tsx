@@ -337,11 +337,11 @@ export default function TeamDetailPage() {
 
                 {/* 按角色分组 */}
                 <div className="flex justify-center gap-8">
-                  {/* 监管方 */}
+                  {/* 监管部门 */}
                   {teamMembers.filter(m => m.userType === "supervisor").length > 0 && (
                     <div className="flex flex-col items-center">
                       <div className="px-3 py-1.5 rounded bg-blue-500/10 text-blue-600 text-xs font-medium mb-2">
-                        监管方 ({teamMembers.filter(m => m.userType === "supervisor").length})
+                        监管部门 ({teamMembers.filter(m => m.userType === "supervisor").length})
                       </div>
                       <div className="space-y-2">
                         {teamMembers.filter(m => m.userType === "supervisor").map((member) => (
@@ -358,11 +358,11 @@ export default function TeamDetailPage() {
                     </div>
                   )}
 
-                  {/* 服务方 */}
+                  {/* 服务机构 */}
                   {teamMembers.filter(m => m.userType === "inspector").length > 0 && (
                     <div className="flex flex-col items-center">
                       <div className="px-3 py-1.5 rounded bg-green-500/10 text-green-600 text-xs font-medium mb-2">
-                        服务方 ({teamMembers.filter(m => m.userType === "inspector").length})
+                        服务机构 ({teamMembers.filter(m => m.userType === "inspector").length})
                       </div>
                       <div className="space-y-2">
                         {teamMembers.filter(m => m.userType === "inspector").map((member) => (
@@ -379,11 +379,11 @@ export default function TeamDetailPage() {
                     </div>
                   )}
 
-                  {/* 履行方 */}
+                  {/* 企业单位 */}
                   {teamMembers.filter(m => m.userType === "enterprise").length > 0 && (
                     <div className="flex flex-col items-center">
                       <div className="px-3 py-1.5 rounded bg-amber-500/10 text-amber-600 text-xs font-medium mb-2">
-                        履行方 ({teamMembers.filter(m => m.userType === "enterprise").length})
+                        企业单位 ({teamMembers.filter(m => m.userType === "enterprise").length})
                       </div>
                       <div className="space-y-2">
                         {teamMembers.filter(m => m.userType === "enterprise").map((member) => (

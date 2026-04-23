@@ -211,7 +211,7 @@ function CertificateTable({
           </Table>
         </div>
       ) : (
-        <p className="text-sm text-muted-foreground">暂无证书，点击"添加证书"按钮新增</p>
+        <p className="text-sm text-muted-foreground">暂无证书，点击{`"添加证书"`}按钮新增</p>
       )}
     </div>
   );

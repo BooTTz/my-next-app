@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { PageHeader, ListToolbar } from "@/components/shared/PageHeader";
 import { PlanStatusBadge } from "@/components/shared/StatusBadge";
@@ -20,6 +20,8 @@ import { toast } from "sonner";
 
 export default function PlansListPage() {
   const router = useRouter();
+  const params = useParams();
+  const teamId = params.teamId as string;
   const [search, setSearch] = useState("");
 
   const filteredPlans = MOCK_PLANS.filter(
@@ -29,7 +31,7 @@ export default function PlansListPage() {
   return (
     <div className="space-y-4">
       <PageHeader title="检查计划管理" description="管理和查看所有安全检查计划">
-        <Link href="/team/t1/plans/new">
+        <Link href={`/team/${teamId}/plans/new`}>
           <Button size="sm">新建检查计划</Button>
         </Link>
       </PageHeader>
@@ -71,7 +73,7 @@ export default function PlansListPage() {
                       <TableCell className="font-mono text-xs">{plan.planNo}</TableCell>
                       <TableCell>
                         <Link
-                          href={`/team/t1/plans/${plan.id}`}
+                          href={`/team/${teamId}/plans/${plan.id}`}
                           className="font-medium text-sm hover:text-primary transition-colors line-clamp-1"
                         >
                           {plan.name}
@@ -108,7 +110,7 @@ export default function PlansListPage() {
                             {
                               label: "查看详情",
                               icon: <Eye className="h-4 w-4" />,
-                              onClick: () => router.push(`/team/t1/plans/${plan.id}`),
+                              onClick: () => router.push(`/team/${teamId}/plans/${plan.id}`),
                             },
                             {
                               label: "编辑",

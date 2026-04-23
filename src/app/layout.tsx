@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "工贸三方监管平台 — 安全生产协同管理",
-  description: "面向监管方、服务方、履行方的工贸企业安全生产检查与协同监管平台",
+  description: "面向监管部门、服务机构、企业单位的工贸企业安全生产检查与协同监管平台",
 };
 
 export default function RootLayout({

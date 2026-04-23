@@ -6,14 +6,10 @@ import { cn } from "@/lib/utils";
 import { useAppStore } from "@/lib/store";
 import {
   LayoutDashboard, ClipboardList, FileCheck, AlertTriangle,
-  FileText, BarChart3, Users, Building2, Settings, Bell,
-  Wrench, ChevronDown, ChevronRight, Shield, MapPin,
+  FileText, BarChart3, Building2, Bell,
+  Wrench, ChevronDown, ChevronRight, Shield, Users,
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
-import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem,
-  DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel,
-} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 
 interface NavItem {
@@ -142,64 +138,36 @@ function NavGroup({ item, pathname }: { item: NavItem; pathname: string }) {
 
 export default function AppSidebar() {
   const pathname = usePathname();
-  const { currentTeam, currentUserType, currentWorkspace, currentOrganization, workspaces, switchWorkspace } = useAppStore();
+  const { currentTeam, currentUserType, currentOrganization, currentWorkspace } = useAppStore();
 
   if (!currentTeam) return null;
 
   const navItems = getNavItems(currentTeam.id, currentUserType);
   const orgId = currentOrganization?.id || currentTeam?.id;
 
+  // 获取当前工作组的统计数据
+  const workspaceStats = currentWorkspace ? {
+    enterpriseCount: currentWorkspace.enterpriseCount || 0,
+    serviceCount: currentWorkspace.serviceCount || 0,
+  } : { enterpriseCount: 0, serviceCount: 0 };
+  // 监管方数量固定为1
+  const supervisorCount = 1;
+
   return (
     <aside className="flex h-screen w-56 flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border">
-      {/* 工作组选择区 */}
+      {/* 平台标识区 */}
       <div className="flex flex-col border-b border-sidebar-border px-3 py-3 gap-2">
         <div className="flex items-center gap-2">
           <div className="flex size-8 items-center justify-center rounded-md bg-sidebar-primary">
             <Shield className="size-4 text-sidebar-primary-foreground" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="truncate text-sm font-semibold text-sidebar-foreground">安全监管平台</p>
-            <p className="truncate text-[10px] text-sidebar-foreground/50">工贸三方协同</p>
+            <p className="truncate text-sm font-semibold text-sidebar-foreground">
+              {currentWorkspace?.name || currentTeam?.name || "工作组"}
+            </p>
+            <p className="truncate text-[10px] text-sidebar-foreground/50">多方安全协管平台</p>
           </div>
         </div>
-        
-        {/* 工作组选择器 */}
-        <DropdownMenu>
-          <DropdownMenuTrigger className="flex items-center gap-2 w-full rounded-md px-2 py-1.5 text-sm bg-sidebar-accent/50 hover:bg-sidebar-accent transition-colors outline-none">
-            <MapPin className="size-3.5 text-sidebar-foreground/60" />
-            <span className="flex-1 truncate text-left text-xs font-medium">{currentWorkspace?.name || "选择工作组"}</span>
-            <ChevronDown className="size-3 text-sidebar-foreground/60" />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-56">
-            <div className="px-2 py-1.5 text-xs font-medium text-sidebar-foreground/60">切换工作组</div>
-            <DropdownMenuSeparator />
-            {workspaces.map((ws) => (
-              <DropdownMenuItem
-                key={ws.id}
-                onSelect={() => switchWorkspace(ws)}
-                className={cn(
-                  "flex flex-col items-start gap-0.5 cursor-pointer",
-                  ws.id === currentWorkspace?.id && "bg-sidebar-accent"
-                )}
-              >
-                <span className="font-medium text-sm">{ws.name}</span>
-                <span className="text-[10px] text-sidebar-foreground/60">
-                  {ws.region}
-                </span>
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        {/* 工作组管理入口（仅监管方可见） */}
-        {currentUserType === "supervisor" && (
-          <Link href="/workspace/settings">
-            <Button variant="ghost" size="sm" className="h-7 w-full justify-start text-xs">
-              <Settings className="size-3 mr-1.5" />
-              工作组管理
-            </Button>
-          </Link>
-        )}
       </div>
 
       {/* 导航菜单 */}
@@ -210,13 +178,32 @@ export default function AppSidebar() {
       </nav>
 
       {/* 底部信息 */}
-      <div className="border-t border-sidebar-border p-3 space-y-1">
+      <div className="border-t border-sidebar-border p-3 space-y-2">
+        {/* 工作组管理入口 - 可点击的组织类型统计组 */}
+        <Link
+          href="/workspace/settings"
+          className="block rounded-md bg-sidebar-accent/30 hover:bg-sidebar-accent/50 px-2 py-1.5 transition-colors"
+        >
+          <div className="flex items-center gap-2">
+            <Users className="size-3.5 text-sidebar-foreground/70" />
+            <span className="inline-flex items-center gap-1.5 text-[11px] text-sidebar-foreground/60">
+              企业 <span className="font-medium text-primary">{workspaceStats.enterpriseCount}</span>
+            </span>
+            <span className="inline-flex items-center gap-1.5 text-[11px] text-sidebar-foreground/60">
+              机构 <span className="font-medium text-primary">{workspaceStats.serviceCount}</span>
+            </span>
+            <span className="inline-flex items-center gap-1.5 text-[11px] text-sidebar-foreground/60">
+              监管 <span className="font-medium text-primary">{supervisorCount}</span>
+            </span>
+          </div>
+        </Link>
+
         {/* 我的组织入口 */}
         {orgId && (
           <Link href={`/organization/${orgId}`}>
             <Button variant="ghost" size="sm" className="h-7 w-full justify-start text-xs">
               <Building2 className="size-3 mr-1.5" />
-              我的组织
+              {currentOrganization?.name || currentTeam?.name || "我的组织"}
             </Button>
           </Link>
         )}

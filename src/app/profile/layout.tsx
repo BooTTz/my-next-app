@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Shield, LogOut } from "lucide-react";
+import { Shield, LogOut, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useAppStore } from "@/lib/store";
@@ -14,6 +14,10 @@ export default function ProfileLayout({ children }: { children: React.ReactNode 
 
   const handleLogout = () => {
     logout();
+    router.push("/login");
+  };
+
+  const handleGoHome = () => {
     router.push("/");
   };
 
@@ -27,15 +31,24 @@ export default function ProfileLayout({ children }: { children: React.ReactNode 
 
   return (
     <div className="flex flex-col h-screen">
-      {/* 简化顶部栏 */}
+      {/* 顶部栏 */}
       <header className="h-14 border-b bg-background flex items-center justify-between px-6 shrink-0">
         {/* 左侧 */}
-        <div className="flex items-center gap-2.5">
-          <Shield className="size-5 text-primary" />
-          <span className="text-lg font-semibold">工贸三方监管平台</span>
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="sm" onClick={handleGoHome} className="gap-1.5">
+            <Home className="size-4" />
+            首页
+          </Button>
+          <div className="flex items-center gap-2">
+            <Shield className="size-5 text-primary" />
+            <span className="text-lg font-semibold">工贸三方监管平台</span>
+          </div>
         </div>
         {/* 右侧 */}
         <div className="flex items-center gap-3">
+          {currentUser && (
+            <span className="text-sm text-muted-foreground">{currentUser.realName}</span>
+          )}
           <Avatar className="size-8">
             <AvatarFallback className="bg-primary/10 text-primary text-sm">
               {currentUser?.realName?.charAt(0) ?? "?"}
@@ -49,10 +62,8 @@ export default function ProfileLayout({ children }: { children: React.ReactNode 
       </header>
 
       {/* 内容区 */}
-      <main className="flex-1 overflow-auto">
-        <div className="max-w-5xl mx-auto py-8 px-6">
-          {children}
-        </div>
+      <main className="flex-1 overflow-auto bg-muted/30">
+        {children}
       </main>
     </div>
   );

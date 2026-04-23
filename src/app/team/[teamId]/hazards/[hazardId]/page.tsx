@@ -19,15 +19,15 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-export default function HazardDetailPage({ params }: { params: Promise<{ hazardId: string }> }) {
-  const { hazardId } = use(params);
+export default function HazardDetailPage({ params }: { params: Promise<{ teamId: string; hazardId: string }> }) {
+  const { teamId, hazardId } = use(params);
   const hazard = MOCK_HAZARDS.find((h) => h.id === hazardId) || MOCK_HAZARDS[0];
 
   return (
     <div className="space-y-4">
       <PageHeader title="隐患详情">
         <div className="flex items-center gap-2">
-          <Link href="/team/t1/hazards">
+          <Link href="/team/${teamId}/hazards">
             <Button variant="outline" size="sm">
               <ArrowLeft className="size-3.5" /> 返回列表
             </Button>
@@ -219,7 +219,7 @@ export default function HazardDetailPage({ params }: { params: Promise<{ hazardI
               <Separator />
               <div>
                 <p className="text-muted-foreground mb-0.5">关联任务</p>
-                <Link href={`/team/t1/tasks/${hazard.taskId}`} className="text-primary text-xs hover:underline">
+                <Link href={`/team/${teamId}/tasks/${hazard.taskId}`} className="text-primary text-xs hover:underline">
                   查看检查任务
                 </Link>
               </div>

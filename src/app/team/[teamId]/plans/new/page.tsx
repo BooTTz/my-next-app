@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,11 +18,13 @@ import Link from "next/link";
 
 export default function NewPlanPage() {
   const router = useRouter();
+  const params = useParams();
+  const teamId = params.teamId as string;
   const [selectedEnterprises, setSelectedEnterprises] = useState<string[]>([]);
 
   const handleSubmit = (isDraft: boolean) => {
     toast.success(isDraft ? "计划已保存为草稿" : "计划已发布，任务已下达");
-    router.push("/team/t1/plans");
+    router.push(`/team/${teamId}/plans`);
   };
 
   const inspectors = MOCK_MEMBERS.filter((m) => m.userType === "inspector");
@@ -30,7 +32,7 @@ export default function NewPlanPage() {
   return (
     <div className="space-y-4">
       <PageHeader title="新建检查计划">
-        <Link href="/team/t1/plans">
+        <Link href={`/team/${teamId}/plans`}>
           <Button variant="outline" size="sm">
             <ArrowLeft className="size-3.5" /> 返回列表
           </Button>
@@ -146,7 +148,7 @@ export default function NewPlanPage() {
               </Button>
               <Separator className="my-3" />
               <p className="text-xs text-muted-foreground">
-                发布后将自动为每个被检查企业创建检查任务，并通知对应的服务方人员。
+                发布后将自动为每个被检查企业创建检查任务，并通知对应的服务机构人员。
               </p>
             </CardContent>
           </Card>

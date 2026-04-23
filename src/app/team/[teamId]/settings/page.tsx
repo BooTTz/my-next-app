@@ -69,12 +69,12 @@ export default function SettingsPage() {
               <div className="space-y-2">
                 {[
                   { name: "组织管理员", desc: "全部权限", type: "所有" },
-                  { name: "监管负责人", desc: "计划创建、任务验收、报告查看、统计", type: "监管方" },
-                  { name: "监管人员", desc: "计划查看、任务验收、报告查看", type: "监管方" },
-                  { name: "检查组长", desc: "任务全流程、隐患录入、报告生成", type: "服务方" },
-                  { name: "检查员", desc: "任务执行、隐患录入", type: "服务方" },
-                  { name: "企业负责人", desc: "整改全流程、报告查看、企业管理", type: "履行方" },
-                  { name: "企业安全员", desc: "整改操作、报告查看", type: "履行方" },
+                  { name: "监管负责人", desc: "计划创建、任务验收、报告查看、统计", type: "监管部门" },
+                  { name: "监管人员", desc: "计划查看、任务验收、报告查看", type: "监管部门" },
+                  { name: "检查组长", desc: "任务全流程、隐患录入、报告生成", type: "服务机构" },
+                  { name: "检查员", desc: "任务执行、隐患录入", type: "服务机构" },
+                  { name: "企业负责人", desc: "整改全流程、报告查看、企业管理", type: "企业单位" },
+                  { name: "企业安全员", desc: "整改操作、报告查看", type: "企业单位" },
                 ].map((role) => (
                   <div key={role.name} className="flex items-center justify-between rounded-md border p-3">
                     <div>

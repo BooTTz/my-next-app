@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { Home } from "lucide-react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -24,31 +23,26 @@ export default function PageBreadcrumb({ items }: PageBreadcrumbProps) {
         <BreadcrumbList>
           {items.map((item, index) => {
             const isLast = index === items.length - 1;
-            const isFirst = index === 0;
 
             return (
               <BreadcrumbItem key={`${item.label}-${index}`}>
-                {/* 第一项加 Home 图标 */}
                 {isLast ? (
-                  <BreadcrumbPage className="font-medium text-foreground flex items-center gap-1">
-                    {isFirst && <Home className="size-3.5" />}
+                  <BreadcrumbPage className="font-medium text-foreground">
                     {item.label}
                   </BreadcrumbPage>
                 ) : item.href ? (
                   <>
                     <Link
                       href={item.href}
-                      className="flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                      className="text-sm text-muted-foreground transition-colors hover:text-foreground"
                     >
-                      {isFirst && <Home className="size-3.5" />}
                       {item.label}
                     </Link>
                     <BreadcrumbSeparator />
                   </>
                 ) : (
                   <>
-                    <span className="flex items-center gap-1 text-sm text-muted-foreground">
-                      {isFirst && <Home className="size-3.5" />}
+                    <span className="text-sm text-muted-foreground">
                       {item.label}
                     </span>
                     <BreadcrumbSeparator />

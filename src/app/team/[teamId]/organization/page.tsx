@@ -25,7 +25,7 @@ interface TreeNode {
     children: [
       {
         id: "n2",
-        name: "监管方",
+        name: "监管部门",
         type: "group",
         memberCount: 2,
         children: [
@@ -35,7 +35,7 @@ interface TreeNode {
       },
       {
         id: "n5",
-        name: "服务方",
+        name: "服务机构",
         type: "group",
         memberCount: 3,
         children: [
@@ -45,7 +45,7 @@ interface TreeNode {
       },
       {
         id: "n8",
-        name: "履行方",
+        name: "企业单位",
         type: "group",
         memberCount: 3,
         children: [

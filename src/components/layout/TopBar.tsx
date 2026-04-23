@@ -10,20 +10,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Bell, ChevronDown, LogOut, User, Settings, UserCircle } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ThemeToggle } from "@/components/shared/ThemeToggle";
 
 export default function TopBar() {
-  const { currentUser, currentTeam, currentOrganization, logout } = useAppStore();
+  const { currentUser, currentTeam, logout } = useAppStore();
   const router = useRouter();
 
   if (!currentUser || !currentTeam) return null;
-
-  const displayName = currentOrganization?.name || currentTeam?.name || "工贸三方监管平台";
-  const isNameLong = displayName.length > 10;
 
   function handleLogout() {
     logout();
@@ -31,26 +27,7 @@ export default function TopBar() {
   }
 
   return (
-    <header className="flex h-14 items-center justify-between border-b bg-card px-4">
-      {/* 左侧 - 组织名称 */}
-      <div className="flex items-center gap-2">
-        <Tooltip>
-          <TooltipTrigger className="cursor-default">
-            <div className="flex flex-col text-left">
-              <span className="truncate max-w-[200px] text-sm font-semibold leading-tight">
-                {displayName}
-              </span>
-              <span className="text-xs text-muted-foreground leading-tight">工贸三方监管平台</span>
-            </div>
-          </TooltipTrigger>
-          {isNameLong && (
-            <TooltipContent side="bottom">
-              <p>{displayName}</p>
-            </TooltipContent>
-          )}
-        </Tooltip>
-      </div>
-
+    <header className="flex h-14 items-center justify-end border-b bg-card px-4">
       {/* 右侧 - 主题 + 通知 + 用户 */}
       <div className="flex items-center gap-2">
         {/* 主题切换 */}

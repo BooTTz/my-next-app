@@ -34,7 +34,7 @@ export default function InspectorDashboard() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="服务方工作台" description="检查任务执行与管理" />
+      <PageHeader title="服务机构工作台" description="检查任务执行与管理" />
 
       {/* 统计卡片 */}
       <div className="grid grid-cols-4 gap-4">

@@ -141,9 +141,9 @@ export default function MembersPage() {
             <div className="flex items-center justify-between">
               <TabsList>
                 <TabsTrigger value="all">全部 ({teamMembers.length})</TabsTrigger>
-                <TabsTrigger value="supervisor">监管方 ({supervisors.length})</TabsTrigger>
-                <TabsTrigger value="inspector">服务方 ({inspectors.length})</TabsTrigger>
-                <TabsTrigger value="enterprise">履行方 ({enterprises.length})</TabsTrigger>
+                <TabsTrigger value="supervisor">监管部门 ({supervisors.length})</TabsTrigger>
+                <TabsTrigger value="inspector">服务机构 ({inspectors.length})</TabsTrigger>
+                <TabsTrigger value="enterprise">企业单位 ({enterprises.length})</TabsTrigger>
               </TabsList>
             </div>
 

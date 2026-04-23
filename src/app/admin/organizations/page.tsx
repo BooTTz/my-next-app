@@ -50,16 +50,16 @@ const STATUS_OPTIONS: { value: OrgStatusFilter; label: string }[] = [
 
 const TYPE_OPTIONS: { value: OrgTypeFilter; label: string }[] = [
   { value: "all", label: "全部" },
-  { value: "supervisor", label: "监管方" },
-  { value: "inspector", label: "服务方" },
-  { value: "enterprise", label: "履行方" },
+  { value: "supervisor", label: "监管部门" },
+  { value: "inspector", label: "服务机构" },
+  { value: "enterprise", label: "企业单位" },
 ];
 
 function OrgTypeBadge({ type }: { type: UserType }) {
   const map: Record<UserType, { label: string; className: string }> = {
-    supervisor: { label: "监管方", className: "bg-blue-500/10 text-blue-600 border-blue-500/30" },
-    inspector: { label: "服务方", className: "bg-green-500/10 text-green-600 border-green-500/30" },
-    enterprise: { label: "履行方", className: "bg-amber-500/10 text-amber-600 border-amber-500/30" },
+    supervisor: { label: "监管部门", className: "bg-blue-500/10 text-blue-600 border-blue-500/30" },
+    inspector: { label: "服务机构", className: "bg-green-500/10 text-green-600 border-green-500/30" },
+    enterprise: { label: "企业单位", className: "bg-amber-500/10 text-amber-600 border-amber-500/30" },
   };
   const { label, className } = map[type];
   return <Badge variant="outline" className={className}>{label}</Badge>;

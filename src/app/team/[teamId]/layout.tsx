@@ -3,7 +3,6 @@
 import AppSidebar from "@/components/layout/AppSidebar";
 import TopBar from "@/components/layout/TopBar";
 import PageBreadcrumb from "@/components/layout/PageBreadcrumb";
-import BottomBar from "@/components/layout/BottomBar";
 import { useHydrated } from "@/hooks/useHydrated";
 import { useBreadcrumbs } from "@/hooks/useBreadcrumbs";
 
@@ -28,7 +27,6 @@ export default function TeamLayout({ children }: { children: React.ReactNode }) 
         <main className="flex-1 overflow-y-auto bg-background p-6">
           <div className="animate-fade-in">{children}</div>
         </main>
-        <BottomBar />
       </div>
     </div>
   );

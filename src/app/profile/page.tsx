@@ -4,13 +4,24 @@ import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import {
   Building2,
+  Users,
+  Briefcase,
+  Clock,
+  ChevronRight,
+  Check,
   Pencil,
-  Save,
-  X,
-  Smartphone,
-  Lock,
-  LogOut,
   Camera,
+  User,
+  Phone,
+  Mail,
+  Calendar,
+  MapPin,
+  BadgeCheck,
+  AlertCircle,
+  FileText,
+  ClipboardList,
+  Plus,
+  ArrowRight,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -19,12 +30,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import {
   Select,
@@ -33,23 +47,31 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useAppStore } from "@/lib/store";
 import {
   MOCK_ORGANIZATIONS,
   MOCK_MEMBERS,
   MOCK_TEAMS,
+  MOCK_TEAM_WORKSPACES,
 } from "@/lib/mock-data";
-import type { User, Gender, Organization } from "@/lib/types";
+import type { User as UserType, Gender, Organization, Workspace } from "@/lib/types";
 import { useHydrated } from "@/hooks/useHydrated";
-import OrganizationCard from "@/components/shared/OrganizationCard";
 
+// 性别选项
 const GENDER_OPTIONS: { value: Gender; label: string }[] = [
   { value: "male", label: "男" },
   { value: "female", label: "女" },
   { value: "unknown", label: "保密" },
 ];
 
+// 城市选项
 const CITY_OPTIONS = [
   "北京市",
   "上海市",
@@ -57,7 +79,19 @@ const CITY_OPTIONS = [
   "深圳市",
   "广州市",
   "成都市",
+  "杭州市",
+  "南京市",
+  "武汉市",
+  "西安市",
 ];
+
+// 待办类型映射
+const TODO_TYPE_MAP = {
+  task: { label: "任务", icon: ClipboardList, color: "text-blue-500" },
+  hazard: { label: "隐患", icon: AlertCircle, color: "text-orange-500" },
+  report: { label: "报告", icon: FileText, color: "text-purple-500" },
+  rectification: { label: "整改", icon: Check, color: "text-green-500" },
+};
 
 function formatDate(dateStr?: string): string {
   if (!dateStr) return "-";
@@ -76,27 +110,26 @@ function genderLabel(g?: Gender): string {
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { currentUser, logout, switchTeam } = useAppStore();
+  const {
+    currentUser,
+    currentOrganization,
+    setCurrentOrganization,
+    workspaces,
+    currentWorkspace,
+    switchWorkspace,
+    lastWorkspaceId,
+    userTodos,
+    userStats,
+    updateTodo,
+    updateCurrentUser,
+  } = useAppStore();
   const hydrated = useHydrated();
 
-  const [isEditing, setIsEditing] = useState(false);
-  const [editForm, setEditForm] = useState<Partial<User>>({});
+  // 编辑弹窗状态
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editForm, setEditForm] = useState<Partial<UserType>>({});
 
-  const [phoneDialogOpen, setPhoneDialogOpen] = useState(false);
-  const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
-
-  const [phoneForm, setPhoneForm] = useState({
-    oldPhone: currentUser?.phone ?? "",
-    verifyCode: "",
-    newPhone: "",
-  });
-
-  const [passwordForm, setPasswordForm] = useState({
-    oldPassword: "",
-    newPassword: "",
-    confirmPassword: "",
-  });
-
+  // 获取用户所属组织
   const userOrganizations = useMemo(() => {
     if (!currentUser) return [];
     const memberTeamIds = new Set(
@@ -109,9 +142,58 @@ export default function ProfilePage() {
     return MOCK_ORGANIZATIONS.filter((o) => allTeamIds.has(o.id));
   }, [currentUser]);
 
+  // 获取当前组织的所有工作组
+  const organizationWorkspaces = useMemo(() => {
+    if (!currentOrganization) return workspaces;
+    const workspaceIds = MOCK_TEAM_WORKSPACES
+      .filter((tw) => tw.teamId === currentOrganization.id)
+      .map((tw) => tw.workspaceId);
+    return workspaces.filter((ws) => workspaceIds.includes(ws.id));
+  }, [currentOrganization, workspaces]);
+
+  // 打开编辑弹窗
+  const handleOpenEditDialog = () => {
+    if (!currentUser) return;
+    setEditForm({
+      realName: currentUser.realName,
+      gender: currentUser.gender,
+      cityName: currentUser.cityName,
+      birthDate: currentUser.birthDate,
+      phone: currentUser.phone,
+      email: currentUser.email,
+    });
+    setEditDialogOpen(true);
+  };
+
+  // 保存编辑
+  const handleSaveEdit = () => {
+    updateCurrentUser(editForm);
+    toast.success("保存成功");
+    setEditDialogOpen(false);
+  };
+
+  // 切换组织
+  const handleSwitchOrganization = (org: Organization) => {
+    setCurrentOrganization(org as Organization);
+    toast.success(`已切换至 ${org.name}`);
+  };
+
+  // 切换工作组
+  const handleSwitchWorkspace = (ws: Workspace) => {
+    const targetTeamId = currentOrganization?.id || "t1";
+    switchWorkspace(ws);
+    router.push(`/team/${targetTeamId}/dashboard`);
+  };
+
+  // 完成待办
+  const handleCompleteTodo = (todoId: string) => {
+    updateTodo(todoId, "completed");
+    toast.success("待办已完成");
+  };
+
   if (!hydrated) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex h-full items-center justify-center">
         <div className="size-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
       </div>
     );
@@ -122,480 +204,468 @@ export default function ProfilePage() {
     return null;
   }
 
-  const startEdit = () => {
-    setEditForm({
-      realName: currentUser.realName,
-      gender: currentUser.gender,
-      cityName: currentUser.cityName,
-      birthDate: currentUser.birthDate,
-    });
-    setIsEditing(true);
-  };
-
-  const cancelEdit = () => {
-    setIsEditing(false);
-    setEditForm({});
-  };
-
-  const saveEdit = () => {
-    // 实际应调用 API，这里仅模拟
-    toast.success("保存成功");
-    setIsEditing(false);
-  };
-
-  const handleLogout = () => {
-    logout();
-    router.push("/");
-  };
-
-  const handleOrgClick = (org: Organization) => {
-    const team = MOCK_TEAMS.find((t) => t.id === org.id);
-    if (team) {
-      switchTeam(team);
-      router.push(`/team/${team.id}/dashboard`);
-    }
-  };
-
-  const handleChangePhone = () => {
-    if (!phoneForm.verifyCode || !phoneForm.newPhone) {
-      toast.error("请填写完整信息");
-      return;
-    }
-    toast.success("手机号修改成功");
-    setPhoneDialogOpen(false);
-    setPhoneForm({
-      oldPhone: currentUser?.phone ?? "",
-      verifyCode: "",
-      newPhone: "",
-    });
-  };
-
-  const handleChangePassword = () => {
-    const { oldPassword, newPassword, confirmPassword } = passwordForm;
-    if (!oldPassword || !newPassword || !confirmPassword) {
-      toast.error("请填写完整信息");
-      return;
-    }
-    if (newPassword !== confirmPassword) {
-      toast.error("两次输入的密码不一致");
-      return;
-    }
-    if (newPassword.length < 6 || newPassword.length > 20) {
-      toast.error("密码长度需在 6-20 位之间");
-      return;
-    }
-    const hasLetter = /[a-zA-Z]/.test(newPassword);
-    const hasNumber = /\d/.test(newPassword);
-    if (!hasLetter || !hasNumber) {
-      toast.error("密码需同时包含字母和数字");
-      return;
-    }
-    toast.success("密码修改成功");
-    setPasswordDialogOpen(false);
-    setPasswordForm({ oldPassword: "", newPassword: "", confirmPassword: "" });
-  };
-
   return (
-    <div className="space-y-6">
-      {/* 页面标题区 */}
-      <div>
-        <h1 className="text-2xl font-bold">个人中心</h1>
-        <p className="text-muted-foreground mt-1">
-          管理您的个人信息和账户设置
-        </p>
+    <div className="h-full flex flex-col lg:flex-row gap-4 p-4 lg:p-6">
+      {/* 左侧区域：组织 + 工作组 + 待办 */}
+      <div className="w-full lg:w-80 shrink-0 flex flex-col gap-4">
+        {/* 组织选择 */}
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Building2 className="size-4" />
+                我的组织
+              </CardTitle>
+              <DropdownMenu>
+                <DropdownMenuTrigger className="inline-flex items-center gap-1.5 h-8 px-3 text-sm font-medium transition-colors border border-transparent rounded-md hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50">
+                  切换
+                  <ChevronRight className="size-3" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  {userOrganizations.map((org) => (
+                    <DropdownMenuItem
+                      key={org.id}
+                      onClick={() => handleSwitchOrganization(org)}
+                      className="flex items-center justify-between"
+                    >
+                      <div className="flex flex-col">
+                        <span className="font-medium">{org.name}</span>
+                        <span className="text-xs text-muted-foreground">
+                          {org.teamType === "supervisor" && "监管部门"}
+                          {org.teamType === "inspector" && "服务机构"}
+                          {org.teamType === "enterprise" && "企业单位"}
+                        </span>
+                      </div>
+                      {currentOrganization?.id === org.id && (
+                        <Badge variant="secondary" className="ml-2">当前</Badge>
+                      )}
+                    </DropdownMenuItem>
+                  ))}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="text-primary">
+                    <Plus className="size-4 mr-2" />
+                    加入新组织
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="text-primary">
+                    <Building2 className="size-4 mr-2" />
+                    创建新组织
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-0">
+            {currentOrganization ? (
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                <div className="size-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <Building2 className="size-5 text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium truncate">{currentOrganization.name}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {currentOrganization.teamType === "supervisor" && "监管部门"}
+                    {currentOrganization.teamType === "inspector" && "服务机构"}
+                    {currentOrganization.teamType === "enterprise" && "企业单位"}
+                    {" · "}{currentOrganization.region}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-6 text-muted-foreground">
+                <Building2 className="size-10 mb-2 opacity-50" />
+                <p className="text-sm">暂未加入任何组织</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* 工作组列表 */}
+        <Card className="flex-1">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Briefcase className="size-4" />
+              工作组
+              <Badge variant="secondary" className="ml-auto">
+                {organizationWorkspaces.length}
+              </Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
+            {organizationWorkspaces.length > 0 ? (
+              <div className="space-y-2">
+                {organizationWorkspaces.map((ws) => {
+                  const isLastWorkspace = ws.id === lastWorkspaceId;
+                  const isSelected = ws.id === currentWorkspace?.id;
+                  return (
+                    <button
+                      key={ws.id}
+                      onClick={() => handleSwitchWorkspace(ws)}
+                      className={`w-full text-left p-3 rounded-lg border transition-all duration-200 ${
+                        isSelected
+                          ? "border-primary bg-primary/5 shadow-sm"
+                          : "border-transparent hover:bg-muted/50 hover:border-border"
+                      } ${isLastWorkspace && !isSelected ? "bg-muted/30" : ""}`}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <p className="font-medium text-sm truncate">{ws.name}</p>
+                            {isLastWorkspace && (
+                              <Badge variant="outline" className="text-[10px] h-4 px-1 bg-orange-50 text-orange-600 border-orange-200">
+                                上次
+                              </Badge>
+                            )}
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-0.5">{ws.region}</p>
+                        </div>
+                        <ArrowRight className={`size-4 shrink-0 transition-transform ${
+                          isSelected ? "text-primary translate-x-1" : "text-muted-foreground"
+                        }`} />
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-6 text-muted-foreground">
+                <Briefcase className="size-8 mb-2 opacity-50" />
+                <p className="text-sm">暂无工作组</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
 
-      {/* 账户信息区（只读） */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">账户信息</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div>
-              <Label className="text-muted-foreground text-xs">用户ID</Label>
-              <p className="text-foreground font-medium mt-1">{currentUser.id}</p>
-            </div>
-            <div>
-              <Label className="text-muted-foreground text-xs">用户账号</Label>
-              <p className="text-foreground font-medium mt-1">{currentUser.username}</p>
-            </div>
-            <div>
-              <Label className="text-muted-foreground text-xs">手机号</Label>
-              <p className="text-foreground font-medium mt-1">{currentUser.phone}</p>
-            </div>
-            <div>
-              <Label className="text-muted-foreground text-xs">注册时间</Label>
-              <p className="text-foreground font-medium mt-1">
-                {formatDate(currentUser.createdAt)}
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* 右侧区域 */}
+      <div className="flex-1 min-w-0 flex flex-col gap-4">
+        {/* 统计信息 */}
+        <div className="grid grid-cols-3 gap-4">
+          {/* 我的团队 */}
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-3">
+                <div className="size-12 rounded-xl bg-blue-500/10 flex items-center justify-center">
+                  <Users className="size-6 text-blue-500" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">{userStats.teamCount}</p>
+                  <p className="text-xs text-muted-foreground">我的团队</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
-      {/* 基本信息区（可编辑） */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-base">基本信息</CardTitle>
-          {!isEditing && (
-            <Button variant="outline" size="sm" onClick={startEdit}>
-              <Pencil className="size-3.5 mr-1" />
-              编辑
-            </Button>
-          )}
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col md:flex-row gap-8">
-            {/* 左侧：头像 */}
-            <div className="flex flex-col items-center gap-3">
-              <Avatar className="w-24 h-24">
-                <AvatarFallback className="bg-primary/10 text-primary text-2xl">
-                  {currentUser.realName?.charAt(0) ?? "?"}
-                </AvatarFallback>
-              </Avatar>
-              {isEditing && (
-                <Button variant="ghost" size="sm" className="gap-1">
+          {/* 工作组 */}
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-3">
+                <div className="size-12 rounded-xl bg-purple-500/10 flex items-center justify-center">
+                  <Briefcase className="size-6 text-purple-500" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">{userStats.workspaceCount}</p>
+                  <p className="text-xs text-muted-foreground">工作组</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* 待处理 */}
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-3">
+                <div className="size-12 rounded-xl bg-orange-500/10 flex items-center justify-center">
+                  <AlertCircle className="size-6 text-orange-500" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">{userStats.pendingCount}</p>
+                  <p className="text-xs text-muted-foreground">待处理</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* 用户信息卡片 */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-base flex items-center gap-2">
+                <User className="size-4" />
+                个人基本信息
+              </CardTitle>
+              <Button variant="outline" size="sm" onClick={handleOpenEditDialog}>
+                <Pencil className="size-3.5 mr-1.5" />
+                编辑
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col md:flex-row gap-6">
+              {/* 头像 */}
+              <div className="flex flex-col items-center gap-3">
+                <Avatar className="w-24 h-24">
+                  <AvatarFallback className="bg-primary/10 text-primary text-3xl">
+                    {currentUser.realName?.charAt(0) ?? "?"}
+                  </AvatarFallback>
+                </Avatar>
+                <Button variant="ghost" size="sm" className="gap-1.5">
                   <Camera className="size-3.5" />
                   修改头像
                 </Button>
-              )}
-            </div>
-            {/* 右侧：信息字段 */}
-            <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div>
-                <Label className="text-muted-foreground text-xs">姓名</Label>
-                {isEditing ? (
-                  <Input
-                    className="mt-1"
-                    value={editForm.realName ?? ""}
-                    onChange={(e) =>
-                      setEditForm((prev) => ({ ...prev, realName: e.target.value }))
-                    }
-                  />
-                ) : (
-                  <p className="text-foreground font-medium mt-1">
-                    {currentUser.realName}
-                  </p>
-                )}
               </div>
-              <div>
-                <Label className="text-muted-foreground text-xs">性别</Label>
-                {isEditing ? (
-                  <Select
-                    value={editForm.gender ?? "unknown"}
-                    onValueChange={(v) =>
-                      setEditForm((prev) => ({ ...prev, gender: v as Gender }))
-                    }
-                  >
-                    <SelectTrigger className="mt-1 w-full">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {GENDER_OPTIONS.map((o) => (
-                        <SelectItem key={o.value} value={o.value}>
-                          {o.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                ) : (
-                  <p className="text-foreground font-medium mt-1">
-                    {genderLabel(currentUser.gender)}
-                  </p>
-                )}
-              </div>
-              <div>
-                <Label className="text-muted-foreground text-xs">所在城市</Label>
-                {isEditing ? (
-                  <Select
-                    value={editForm.cityName ?? ""}
-                    onValueChange={(v) =>
-                      setEditForm((prev) => ({ ...prev, cityName: v || undefined }))
-                    }
-                  >
-                    <SelectTrigger className="mt-1 w-full">
-                      <SelectValue placeholder="请选择城市" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {CITY_OPTIONS.map((city) => (
-                        <SelectItem key={city} value={city}>
-                          {city}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                ) : (
-                  <p className="text-foreground font-medium mt-1">
-                    {currentUser.cityName ?? "-"}
-                  </p>
-                )}
-              </div>
-              <div>
-                <Label className="text-muted-foreground text-xs">出生日期</Label>
-                {isEditing ? (
-                  <Input
-                    type="date"
-                    className="mt-1"
-                    value={editForm.birthDate ?? ""}
-                    onChange={(e) =>
-                      setEditForm((prev) => ({ ...prev, birthDate: e.target.value }))
-                    }
-                  />
-                ) : (
-                  <p className="text-foreground font-medium mt-1">
-                    {currentUser.birthDate ?? "-"}
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-          {isEditing && (
-            <div className="flex gap-3 mt-6 justify-end">
-              <Button variant="outline" onClick={cancelEdit}>
-                <X className="size-3.5 mr-1" />
-                取消
-              </Button>
-              <Button onClick={saveEdit}>
-                <Save className="size-3.5 mr-1" />
-                保存
-              </Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
 
-      {/* 安全操作区 */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">安全设置</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* 修改手机号 */}
-          <div className="flex items-center justify-between py-2">
-            <div className="flex items-center gap-3">
-              <Smartphone className="size-4 text-muted-foreground" />
-              <div>
-                <p className="text-sm font-medium">修改手机号</p>
-                <p className="text-xs text-muted-foreground">
-                  当前绑定手机号：{currentUser.phone}
-                </p>
-              </div>
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPhoneDialogOpen(true)}
-            >
-              修改
-            </Button>
-          </div>
-          <hr className="border-border" />
-          {/* 修改密码 */}
-          <div className="flex items-center justify-between py-2">
-            <div className="flex items-center gap-3">
-              <Lock className="size-4 text-muted-foreground" />
-              <div>
-                <p className="text-sm font-medium">修改密码</p>
-                <p className="text-xs text-muted-foreground">
-                  密码要求：6-20位，包含字母和数字
-                </p>
-              </div>
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPasswordDialogOpen(true)}
-            >
-              修改
-            </Button>
-          </div>
-          <hr className="border-border" />
-          {/* 退出登录 */}
-          <div className="flex items-center justify-between py-2">
-            <div className="flex items-center gap-3">
-              <LogOut className="size-4 text-muted-foreground" />
-              <div>
-                <p className="text-sm font-medium">退出登录</p>
-                <p className="text-xs text-muted-foreground">
-                  退出当前账号并返回首页
-                </p>
-              </div>
-            </div>
-            <Button variant="destructive" size="sm" onClick={handleLogout}>
-              退出
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+              {/* 信息字段 */}
+              <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* 姓名 */}
+                <div className="space-y-1">
+                  <Label className="text-xs text-muted-foreground flex items-center gap-1">
+                    <User className="size-3" />
+                    姓名
+                  </Label>
+                  <p className="text-sm font-medium">{currentUser.realName}</p>
+                </div>
 
-      {/* 关联组织区 */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">我的组织</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {userOrganizations.length > 0 ? (
-            <div className="flex flex-wrap gap-4">
-              {userOrganizations.map((org) => (
-                <OrganizationCard
-                  key={org.id}
-                  org={{
-                    id: org.id,
-                    name: org.name,
-                    systemLogo: org.systemLogo,
-                    teamType: org.teamType,
-                  }}
-                  onClick={() => handleOrgClick(org)}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center py-10 text-muted-foreground">
-              <Building2 className="size-10 mb-3 opacity-50" />
-              <p className="text-sm">您尚未加入任何组织</p>
-              <p className="text-xs mt-1">
-                请联系您的组织管理员获取邀请
-              </p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                {/* 性别 */}
+                <div className="space-y-1">
+                  <Label className="text-xs text-muted-foreground">性别</Label>
+                  <p className="text-sm font-medium">{genderLabel(currentUser.gender)}</p>
+                </div>
 
-      {/* 修改手机号 Dialog */}
-      <Dialog open={phoneDialogOpen} onOpenChange={setPhoneDialogOpen}>
-        <DialogContent className="sm:max-w-sm">
+                {/* 手机号 */}
+                <div className="space-y-1">
+                  <Label className="text-xs text-muted-foreground flex items-center gap-1">
+                    <Phone className="size-3" />
+                    手机号
+                  </Label>
+                  <p className="text-sm font-medium">{currentUser.phone}</p>
+                </div>
+
+                {/* 邮箱 */}
+                <div className="space-y-1">
+                  <Label className="text-xs text-muted-foreground flex items-center gap-1">
+                    <Mail className="size-3" />
+                    邮箱
+                  </Label>
+                  <p className="text-sm font-medium">{currentUser.email || "-"}</p>
+                </div>
+
+                {/* 所在城市 */}
+                <div className="space-y-1">
+                  <Label className="text-xs text-muted-foreground flex items-center gap-1">
+                    <MapPin className="size-3" />
+                    所在城市
+                  </Label>
+                  <p className="text-sm font-medium">{currentUser.cityName || "-"}</p>
+                </div>
+
+                {/* 出生日期 */}
+                <div className="space-y-1">
+                  <Label className="text-xs text-muted-foreground flex items-center gap-1">
+                    <Calendar className="size-3" />
+                    出生日期
+                  </Label>
+                  <p className="text-sm font-medium">{currentUser.birthDate || "-"}</p>
+                </div>
+
+                {/* 注册时间 */}
+                <div className="space-y-1">
+                  <Label className="text-xs text-muted-foreground flex items-center gap-1">
+                    <BadgeCheck className="size-3" />
+                    注册时间
+                  </Label>
+                  <p className="text-sm font-medium">{formatDate(currentUser.createdAt)}</p>
+                </div>
+
+                {/* 用户ID */}
+                <div className="space-y-1">
+                  <Label className="text-xs text-muted-foreground">用户ID</Label>
+                  <p className="text-sm font-medium text-muted-foreground">{currentUser.id}</p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* 我的待办 */}
+        <Card className="max-h-80">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Clock className="size-4" />
+              我的待办
+              <Badge variant="destructive" className="ml-auto">
+                {userTodos.filter((t) => t.status === "pending").length}
+              </Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <ScrollArea className="h-48 pr-3">
+              <div className="space-y-2">
+                {userTodos
+                  .filter((t) => t.status === "pending")
+                  .map((todo) => {
+                    const typeInfo = TODO_TYPE_MAP[todo.type];
+                    const TodoIcon = typeInfo.icon;
+                    return (
+                      <div
+                        key={todo.id}
+                        className="p-3 rounded-lg border bg-background hover:bg-muted/30 transition-colors group"
+                      >
+                        <div className="flex items-start gap-2">
+                          <div className={`mt-0.5 ${typeInfo.color}`}>
+                            <TodoIcon className="size-4" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <p className="text-sm font-medium truncate">{todo.title}</p>
+                              <Badge variant="outline" className="text-[10px] h-4 shrink-0">
+                                {typeInfo.label}
+                              </Badge>
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
+                              {todo.description}
+                            </p>
+                            {todo.deadline && (
+                              <p className="text-xs text-orange-500 mt-1">
+                                截止：{todo.deadline}
+                              </p>
+                            )}
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="size-7 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+                            onClick={() => handleCompleteTodo(todo.id)}
+                          >
+                            <Check className="size-3.5" />
+                          </Button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                {userTodos.filter((t) => t.status === "pending").length === 0 && (
+                  <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
+                    <Check className="size-8 mb-2 opacity-50 text-green-500" />
+                    <p className="text-sm">暂无待办事项</p>
+                  </div>
+                )}
+              </div>
+            </ScrollArea>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* 编辑个人信息弹窗 */}
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>修改手机号</DialogTitle>
+            <DialogTitle>编辑个人信息</DialogTitle>
             <DialogDescription>
-              验证原手机号后绑定新号码
+              修改您的个人基本信息
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-2">
-            <div>
-              <Label className="text-xs">原手机号</Label>
+            {/* 姓名 */}
+            <div className="space-y-1.5">
+              <Label className="text-xs">姓名</Label>
               <Input
-                className="mt-1"
-                value={phoneForm.oldPhone}
-                disabled
-              />
-            </div>
-            <div>
-              <Label className="text-xs">验证码</Label>
-              <div className="flex gap-2 mt-1">
-                <Input
-                  placeholder="请输入验证码"
-                  value={phoneForm.verifyCode}
-                  onChange={(e) =>
-                    setPhoneForm((prev) => ({
-                      ...prev,
-                      verifyCode: e.target.value,
-                    }))
-                  }
-                />
-                <Button variant="outline" size="sm" className="shrink-0">
-                  获取验证码
-                </Button>
-              </div>
-            </div>
-            <div>
-              <Label className="text-xs">新手机号</Label>
-              <Input
-                className="mt-1"
-                placeholder="请输入新手机号"
-                value={phoneForm.newPhone}
+                value={editForm.realName ?? ""}
                 onChange={(e) =>
-                  setPhoneForm((prev) => ({
-                    ...prev,
-                    newPhone: e.target.value,
-                  }))
+                  setEditForm((prev) => ({ ...prev, realName: e.target.value }))
                 }
+                placeholder="请输入姓名"
               />
             </div>
-          </div>
-          <div className="flex justify-end gap-2 mt-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPhoneDialogOpen(false)}
-            >
-              取消
-            </Button>
-            <Button size="sm" onClick={handleChangePhone}>
-              确认
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
 
-      {/* 修改密码 Dialog */}
-      <Dialog open={passwordDialogOpen} onOpenChange={setPasswordDialogOpen}>
-        <DialogContent className="sm:max-w-sm">
-          <DialogHeader>
-            <DialogTitle>修改密码</DialogTitle>
-            <DialogDescription>
-              密码需为 6-20 位，同时包含字母和数字
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-2">
-            <div>
-              <Label className="text-xs">原密码</Label>
-              <Input
-                type="password"
-                className="mt-1"
-                placeholder="请输入原密码"
-                value={passwordForm.oldPassword}
-                onChange={(e) =>
-                  setPasswordForm((prev) => ({
-                    ...prev,
-                    oldPassword: e.target.value,
-                  }))
+            {/* 性别 */}
+            <div className="space-y-1.5">
+              <Label className="text-xs">性别</Label>
+              <Select
+                value={editForm.gender ?? "unknown"}
+                onValueChange={(v) =>
+                  setEditForm((prev) => ({ ...prev, gender: v as Gender }))
                 }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {GENDER_OPTIONS.map((o) => (
+                    <SelectItem key={o.value} value={o.value}>
+                      {o.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* 手机号 */}
+            <div className="space-y-1.5">
+              <Label className="text-xs">手机号</Label>
+              <Input
+                value={editForm.phone ?? ""}
+                onChange={(e) =>
+                  setEditForm((prev) => ({ ...prev, phone: e.target.value }))
+                }
+                placeholder="请输入手机号"
               />
             </div>
-            <div>
-              <Label className="text-xs">新密码</Label>
+
+            {/* 邮箱 */}
+            <div className="space-y-1.5">
+              <Label className="text-xs">邮箱</Label>
               <Input
-                type="password"
-                className="mt-1"
-                placeholder="请输入新密码"
-                value={passwordForm.newPassword}
+                type="email"
+                value={editForm.email ?? ""}
                 onChange={(e) =>
-                  setPasswordForm((prev) => ({
-                    ...prev,
-                    newPassword: e.target.value,
-                  }))
+                  setEditForm((prev) => ({ ...prev, email: e.target.value }))
                 }
+                placeholder="请输入邮箱"
               />
             </div>
-            <div>
-              <Label className="text-xs">确认密码</Label>
+
+            {/* 所在城市 */}
+            <div className="space-y-1.5">
+              <Label className="text-xs">所在城市</Label>
+              <Select
+                value={editForm.cityName ?? ""}
+                onValueChange={(v) =>
+                  setEditForm((prev) => ({ ...prev, cityName: v || undefined }))
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="请选择城市" />
+                </SelectTrigger>
+                <SelectContent>
+                  {CITY_OPTIONS.map((city) => (
+                    <SelectItem key={city} value={city}>
+                      {city}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* 出生日期 */}
+            <div className="space-y-1.5">
+              <Label className="text-xs">出生日期</Label>
               <Input
-                type="password"
-                className="mt-1"
-                placeholder="请再次输入新密码"
-                value={passwordForm.confirmPassword}
+                type="date"
+                value={editForm.birthDate ?? ""}
                 onChange={(e) =>
-                  setPasswordForm((prev) => ({
-                    ...prev,
-                    confirmPassword: e.target.value,
-                  }))
+                  setEditForm((prev) => ({ ...prev, birthDate: e.target.value }))
                 }
               />
             </div>
           </div>
-          <div className="flex justify-end gap-2 mt-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPasswordDialogOpen(false)}
-            >
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
               取消
             </Button>
-            <Button size="sm" onClick={handleChangePassword}>
-              确认
+            <Button onClick={handleSaveEdit}>
+              保存
             </Button>
-          </div>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

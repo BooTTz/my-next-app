@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { PageHeader, ListToolbar } from "@/components/shared/PageHeader";
 import { HazardLevelBadge, HazardStatusBadge } from "@/components/shared/StatusBadge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -26,6 +27,8 @@ import {
 } from "@/components/shared/DetailDialog";
 
 export default function HazardsListPage() {
+  const params = useParams();
+  const teamId = params.teamId as string;
   const [search, setSearch] = useState("");
   const [tab, setTab] = useState("all");
   const [selectedHazard, setSelectedHazard] = useState<typeof MOCK_HAZARDS[0] | null>(null);
@@ -118,7 +121,7 @@ export default function HazardsListPage() {
                         <TableCell className="text-xs">{h.subCategoryName}</TableCell>
                         <TableCell>
                           <Link
-                            href={`/team/t1/hazards/${h.id}`}
+                            href={`/team/${teamId}/hazards/${h.id}`}
                             className="text-sm hover:text-primary transition-colors line-clamp-1 max-w-[200px]"
                           >
                             {h.description}

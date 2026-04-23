@@ -16,8 +16,8 @@ import { MOCK_PLANS, MOCK_TASKS } from "@/lib/mock-data";
 import { PLAN_TYPE_MAP } from "@/lib/types";
 import { ArrowLeft, Edit, Send, FileText, Calendar, User, MapPin } from "lucide-react";
 
-export default function PlanDetailPage({ params }: { params: Promise<{ planId: string }> }) {
-  const { planId } = use(params);
+export default function PlanDetailPage({ params }: { params: Promise<{ teamId: string; planId: string }> }) {
+  const { teamId, planId } = use(params);
   const plan = MOCK_PLANS.find((p) => p.id === planId) || MOCK_PLANS[0];
   const tasks = MOCK_TASKS.filter((t) => t.planId === plan.id);
   const progress = plan.taskCount
@@ -28,7 +28,7 @@ export default function PlanDetailPage({ params }: { params: Promise<{ planId: s
     <div className="space-y-4">
       <PageHeader title="检查计划详情">
         <div className="flex items-center gap-2">
-          <Link href="/team/t1/plans">
+          <Link href="/team/${teamId}/plans">
             <Button variant="outline" size="sm">
               <ArrowLeft className="size-3.5" /> 返回列表
             </Button>
@@ -149,7 +149,7 @@ export default function PlanDetailPage({ params }: { params: Promise<{ planId: s
                       <TableCell className="text-sm">{task.hazardCount}</TableCell>
                       <TableCell className="text-sm">{task.rectifiedCount}</TableCell>
                       <TableCell>
-                        <Link href={`/team/t1/tasks/${task.id}`}>
+                        <Link href={`/team/${teamId}/tasks/${task.id}`}>
                           <Button variant="ghost" size="icon-xs">
                             <FileText className="size-3.5" />
                           </Button>

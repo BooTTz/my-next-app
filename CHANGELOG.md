@@ -1,5 +1,35 @@
 # 版本更新记录
 
+## v1.1.5 (2026-04-23)
+
+### 包含内容
+- **个人中心页面重构**：三栏布局调整（左侧：组织+工作组，右侧：统计+个人基本信息+我的待办）
+- **我的待办功能**：从左侧移动到右侧"个人基本信息"下方
+- **面包屑导航优化**：移除首页层级，根目录直接是工作台
+- **状态管理修复**：
+  - 修复 `userTeamIds` 统计逻辑，使用 `MOCK_MEMBERS` 正确统计用户所属团队
+  - 修复 `updateTodo` 双向状态变化的 `pendingCount` 更新
+- **类型安全增强**：新增 `TodoStatus` 类型定义
+- **数据更新**：待办数据日期从 2025年 更新为 2026年
+- **UI 细节修复**：
+  - 修复 BottomBar 监管方数量硬编码问题
+  - 统一 workspace 页面待处理数量使用 `userStats.pendingCount`
+  - 修复 JSX 中文引号转义问题
+- **代码质量**：修复 TypeScript 类型错误和 ESLint 警告
+
+### 改动文件
+- `src/app/profile/page.tsx` - 个人中心页面重构
+- `src/app/page.tsx` - 根页面简化
+- `src/app/workspace/` - 工作台页面和布局
+- `src/lib/breadcrumb-config.ts` - 面包屑配置优化
+- `src/components/layout/` - 布局组件重构
+- `src/lib/store.ts` - 状态管理修复
+- `src/lib/types.ts` - 类型定义增强
+- `src/lib/mock-data.ts` - 数据更新
+- `src/hooks/useHydrated.ts` - ESLint 修复
+
+---
+
 ## v1.1.3 (2026-04-22)
 
 **标签**: `v1.1.3`  

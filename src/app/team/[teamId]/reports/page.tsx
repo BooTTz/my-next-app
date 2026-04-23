@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { PageHeader, ListToolbar } from "@/components/shared/PageHeader";
 import { ReportStatusBadge } from "@/components/shared/StatusBadge";
@@ -17,6 +17,8 @@ import { toast } from "sonner";
 
 export default function ReportsListPage() {
   const router = useRouter();
+  const params = useParams();
+  const teamId = params.teamId as string;
   const [search, setSearch] = useState("");
 
   const filtered = MOCK_REPORTS.filter(
@@ -58,7 +60,7 @@ export default function ReportsListPage() {
                     <TableCell className="font-mono text-xs">{report.reportNo}</TableCell>
                     <TableCell>
                       <Link
-                        href={`/team/t1/reports/${report.id}`}
+                        href={`/team/${teamId}/reports/${report.id}`}
                         className="font-medium text-sm hover:text-primary transition-colors"
                       >
                         {report.enterpriseName}
@@ -75,7 +77,7 @@ export default function ReportsListPage() {
                           {
                             label: "在线预览",
                             icon: <Eye className="h-4 w-4" />,
-                            onClick: () => router.push(`/team/t1/reports/${report.id}`),
+                            onClick: () => router.push(`/team/${teamId}/reports/${report.id}`),
                           },
                           {
                             label: "导出 PDF",
