@@ -1,5 +1,34 @@
 # 版本更新记录
 
+## v1.1.6 (2026-04-28)
+
+**标签**: `v1.1.6`
+**对应提交**: `75ee236`
+**GitHub**: https://github.com/BooTTz/my-next-app/releases/tag/v1.1.6
+
+### 包含内容
+- **侧边栏优化**：移除顶部工作组选择器，简化导航结构
+- **面包屑调整**：工作台页面不显示面包屑，保持简洁
+- **三方统计可点击**：底部企业/机构/监管统计入口可点击跳转至工作组设置页面
+- **新增组件**：`RoleThemeProvider.tsx` 角色主题配置组件
+
+### 改动文件
+- `src/components/layout/AppSidebar.tsx` - 侧边栏重构
+- `src/components/layout/PageBreadcrumb.tsx` - 面包屑优化
+- `src/lib/breadcrumb-config.ts` - 面包屑配置调整
+- `src/components/shared/RoleThemeProvider.tsx` - 新增
+
+### 如何恢复到此版本
+```bash
+# 方式1：创建新分支恢复（推荐）
+git checkout -b restore-v1.1.6 v1.1.6
+
+# 方式2：直接重置（慎用，会丢失之后的提交）
+git reset --hard v1.1.6
+```
+
+---
+
 ## v1.1.5 (2026-04-23)
 
 ### 包含内容
