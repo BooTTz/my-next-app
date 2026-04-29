@@ -1,5 +1,48 @@
 # 版本更新记录
 
+## v1.1.8 (2026-04-29)
+
+**标签**: `v1.1.8`  
+**对应提交**: `557a32a`  
+**GitHub**: https://github.com/BooTTz/my-next-app/releases/tag/v1.1.8
+
+### 包含内容
+- **隐患状态体系重构**：隐患状态从旧体系（discovered/notified/submitted/review_failed/closed）重构为新体系（pending_rectification/pending_acceptance/accepted），精简状态流转
+- **任务状态裁剪**：移除 `accepted`（已接收）状态，简化任务流转
+- **项目管理模块**：新增 `InspectionProject` 类型定义与 Mock 数据，支持项目管理
+- **检查计划关联项目**：新建检查计划弹窗增加"关联项目"选择字段，增强计划与项目关联
+- **检查计划分角色视图**：监管方（完整管理）、服务方（任务管理）、企业方（无权限）三视图
+- **企业隐患独立视图**：企业用户可查看独立的企业隐患列表及整改跟踪
+- **检查计划新增按钮**：新增"提交并配置检查任务"按钮，优化发布流程
+- **工作台面板优化**：各角色仪表盘统计卡片和任务列表优化调整
+- **隐患详情整改区域优化**：企业可操作的整改提交条件更新，状态流转图同步更新
+
+### 改动文件
+- `src/lib/types.ts` - 状态类型定义重构，新增 Project 类型
+- `src/lib/mock-data.ts` - 新增项目数据，隐患/任务状态更新
+- `src/app/team/[teamId]/hazards/page.tsx` - 企业独立视图+状态流转图更新
+- `src/app/team/[teamId]/hazards/[hazardId]/page.tsx` - 详情页状态适配重构
+- `src/app/team/[teamId]/plans/page.tsx` - 新增项目关联+分角色视图
+- `src/app/team/[teamId]/plans/[planId]/page.tsx` - 任务状态适配
+- `src/app/team/[teamId]/tasks/page.tsx` - 任务状态适配
+- `src/app/team/[teamId]/rectification/page.tsx` - 状态适配
+- `src/app/team/[teamId]/projects/` - 新增项目管理页面
+- `src/app/team/[teamId]/plans/new/tasks/` - 检查任务配置页面
+- `src/components/dashboard/*.tsx` - 仪表盘优化
+- `src/components/layout/AppSidebar.tsx` - 侧边栏优化
+- `src/components/shared/StatusBadge.tsx` - 状态徽章适配
+
+### 如何恢复到此版本
+```bash
+# 方式1：创建新分支恢复（推荐）
+git checkout -b restore-v1.1.8 v1.1.8
+
+# 方式2：直接重置（慎用，会丢失之后的提交）
+git reset --hard v1.1.8
+```
+
+---
+
 ## v1.1.7 (2026-04-29)
 
 **标签**: `v1.1.7`  
