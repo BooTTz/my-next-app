@@ -58,17 +58,7 @@ export default function StatisticsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Link
-          href="/workspace"
-          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <ArrowLeft className="size-4" />
-          返回工作台
-        </Link>
-      </div>
-
-      <PageHeader title="数据统计" />
+      <PageHeader title="数据统计" backHref="/workspace" backLabel="返回工作台" />
 
       {/* 统计卡片 */}
       <div className="grid grid-cols-4 gap-4">

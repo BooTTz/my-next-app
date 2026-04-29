@@ -172,10 +172,10 @@ export default function HazardsListPage() {
               title="隐患详情"
               description={`编号：${selectedHazard.hazardNo}`}
             />
-            <DetailDialogBody scrollable>
-              <div className="grid grid-cols-3 gap-6">
-                {/* 主要信息 */}
-                <div className="col-span-2 space-y-4">
+            <DetailDialogBody>
+              <div className="flex gap-6">
+                {/* 主要信息 - 左侧可滚动 */}
+                <div className="flex-1 space-y-4 max-h-[calc(85vh-180px)] overflow-y-auto pr-2">
                   <Card>
                     <CardContent className="p-5">
                       <div className="flex items-start justify-between mb-4">
@@ -264,8 +264,8 @@ export default function HazardsListPage() {
                   </Card>
                 </div>
 
-                {/* 侧边信息 */}
-                <div className="space-y-4">
+                {/* 侧边信息 - 右侧固定 */}
+                <div className="w-64 shrink-0 space-y-4">
                   {/* 状态流转 */}
                   <Card>
                     <CardContent className="pt-4">

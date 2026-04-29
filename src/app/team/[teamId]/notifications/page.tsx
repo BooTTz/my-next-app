@@ -40,17 +40,7 @@ export default function NotificationsPage() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-4">
-        <Link
-          href="/workspace"
-          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <ArrowLeft className="size-4" />
-          返回工作台
-        </Link>
-      </div>
-
-      <PageHeader title="通知中心" badge={unreadCount}>
+      <PageHeader title="通知中心" badge={unreadCount} backHref="/workspace" backLabel="返回工作台">
         <Button variant="outline" size="sm" onClick={markAllRead}>
           <MailOpen className="size-3.5" /> 全部已读
         </Button>

@@ -89,17 +89,7 @@ function TreeItem({ node, level = 0 }: { node: TreeNode; level?: number }) {
 export default function OrganizationPage() {
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-4">
-        <Link
-          href="/workspace"
-          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <ArrowLeft className="size-4" />
-          返回工作台
-        </Link>
-      </div>
-
-      <PageHeader title="组织架构">
+      <PageHeader title="组织架构" backHref="/workspace" backLabel="返回工作台">
         <Button size="sm" onClick={() => toast.info("新建节点功能")}>
           <Plus className="size-3.5" /> 新建节点
         </Button>

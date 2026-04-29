@@ -135,7 +135,7 @@ function DetailDialogBody({ className, children, scrollable = true, ...props }: 
       data-slot="detail-dialog-body"
       className={cn(
         "overflow-hidden",
-        scrollable ? "overflow-y-auto" : "",
+        scrollable ? "overflow-y-auto max-h-[calc(85vh-180px)]" : "",
         className
       )}
       {...props}

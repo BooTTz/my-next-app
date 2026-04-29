@@ -4,28 +4,49 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  Search, Download, Upload, Plus, Filter, RefreshCw
+  Search, Download, Upload, Plus, Filter, RefreshCw, ArrowLeft
 } from "lucide-react";
+import Link from "next/link";
 import type { ReactNode } from "react";
 
 interface PageHeaderProps {
   title: string;
+  subtitle?: string;
   badge?: string | number;
+  backHref?: string;
+  backLabel?: string;
   children?: ReactNode;
   className?: string;
 }
 
-export function PageHeader({ title, badge, children, className }: PageHeaderProps) {
+export function PageHeader({ title, subtitle, badge, backHref, backLabel = "返回列表", children, className }: PageHeaderProps) {
   return (
     <div className={cn("flex items-center justify-between", className)}>
-      <h1 className="text-base font-semibold tracking-tight flex items-center gap-2">
-        {title}
-        {badge !== undefined && (
-          <span className="text-sm font-medium text-muted-foreground">
-            ({typeof badge === 'number' ? `${badge} 条` : badge})
-          </span>
+      <div className="flex items-center gap-3">
+        {backHref && (
+          <Link href={backHref}>
+            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+              <ArrowLeft className="size-4 mr-1" />
+              {backLabel}
+            </Button>
+          </Link>
         )}
-      </h1>
+        <div>
+          <h1 className="text-base font-semibold tracking-tight flex items-center gap-2">
+            {title}
+            {badge !== undefined && (
+              <span className="text-sm font-medium text-muted-foreground">
+                ({typeof badge === 'number' ? `${badge} 条` : badge})
+              </span>
+            )}
+          </h1>
+          {subtitle && (
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {subtitle}
+            </p>
+          )}
+        </div>
+      </div>
       {children && <div className="flex items-center gap-2">{children}</div>}
     </div>
   );

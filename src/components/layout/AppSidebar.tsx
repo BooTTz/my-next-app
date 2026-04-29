@@ -25,17 +25,16 @@ function getNavItems(teamId: string, userType: string): NavItem[] {
 
   if (userType === "supervisor") {
     return [
-      { label: "工作台", icon: <LayoutDashboard className="size-4" />, href: `${base}/dashboard` },
+      { label: "工作台", icon: <LayoutDashboard className="size-4" />, href: `${base}/workspace` },
       {
-        label: "检查计划管理", icon: <ClipboardList className="size-4" />,
+        label: "检查管理", icon: <ClipboardList className="size-4" />,
         children: [
-          { label: "检查计划列表", href: `${base}/plans` },
-          { label: "新建检查计划", href: `${base}/plans/new` },
+          { label: "检查计划管理", href: `${base}/plans` },
+          { label: "检查任务管理", href: `${base}/tasks` },
+          { label: "隐患总览", href: `${base}/hazards` },
+          { label: "检查报告", href: `${base}/reports` },
         ],
       },
-      { label: "检查任务管理", icon: <FileCheck className="size-4" />, href: `${base}/tasks` },
-      { label: "隐患总览", icon: <AlertTriangle className="size-4" />, href: `${base}/hazards` },
-      { label: "检查报告", icon: <FileText className="size-4" />, href: `${base}/reports` },
       { label: "数据统计", icon: <BarChart3 className="size-4" />, href: `${base}/statistics` },
       // 成员管理已整合到团队详情页（/team/[teamId]）
     ];
@@ -43,7 +42,7 @@ function getNavItems(teamId: string, userType: string): NavItem[] {
 
   if (userType === "inspector") {
     return [
-      { label: "工作台", icon: <LayoutDashboard className="size-4" />, href: `${base}/dashboard` },
+      { label: "工作台", icon: <LayoutDashboard className="size-4" />, href: `${base}/workspace` },
       { label: "我的检查任务", icon: <FileCheck className="size-4" />, href: `${base}/tasks` },
       { label: "隐患管理", icon: <AlertTriangle className="size-4" />, href: `${base}/hazards` },
       {
@@ -58,7 +57,7 @@ function getNavItems(teamId: string, userType: string): NavItem[] {
 
   // enterprise
   return [
-    { label: "工作台", icon: <LayoutDashboard className="size-4" />, href: `${base}/dashboard` },
+    { label: "工作台", icon: <LayoutDashboard className="size-4" />, href: `${base}/workspace` },
     {
       label: "隐患整改", icon: <Wrench className="size-4" />,
       children: [

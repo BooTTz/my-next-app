@@ -26,13 +26,8 @@ export default function PlanDetailPage({ params }: { params: Promise<{ teamId: s
 
   return (
     <div className="space-y-4">
-      <PageHeader title="检查计划详情">
+      <PageHeader title="检查计划详情" backHref={`/team/${teamId}/plans`} backLabel="返回列表">
         <div className="flex items-center gap-2">
-          <Link href="/team/${teamId}/plans">
-            <Button variant="outline" size="sm">
-              <ArrowLeft className="size-3.5" /> 返回列表
-            </Button>
-          </Link>
           <Button variant="outline" size="sm">
             <Edit className="size-3.5" /> 编辑
           </Button>

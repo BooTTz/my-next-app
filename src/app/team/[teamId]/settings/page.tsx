@@ -18,17 +18,7 @@ export default function SettingsPage() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-4">
-        <Link
-          href={`/team/${team.id}`}
-          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <ArrowLeft className="size-4" />
-          返回组织详情
-        </Link>
-      </div>
-
-      <PageHeader title="组织设置" />
+      <PageHeader title="组织设置" backHref={`/team/${team.id}`} backLabel="返回组织详情" />
 
       <div className="grid grid-cols-3 gap-4">
         <div className="col-span-2 space-y-4">

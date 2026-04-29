@@ -33,9 +33,9 @@ export default function LoginPage() {
     const userOrgs = MOCK_ORGANIZATIONS.filter(
       (org) => org.orgAdminUserId === user.id || org.creatorId === user.id
     );
-    // 3. 已加入组织 → /workspace
+    // 3. 已加入组织 → 工作台
     if (userOrgs.length > 0) {
-      router.push("/workspace");
+      router.push(`/team/${userOrgs[0].id}/workspace`);
       return;
     }
     // 4. 未加入任何组织 → /profile

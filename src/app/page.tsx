@@ -32,7 +32,7 @@ export default function HomePage() {
 
     // 已加入组织 → 工作台（带组织上下文）
     if (userOrgs.length > 0) {
-      router.replace(`/team/${userOrgs[0].id}/dashboard`);
+      router.replace(`/team/${userOrgs[0].id}/workspace`);
       return;
     }
 

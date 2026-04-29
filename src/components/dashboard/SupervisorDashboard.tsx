@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { MOCK_PLANS, MOCK_TASKS, MOCK_HAZARDS, MOCK_NOTIFICATIONS } from "@/lib/mock-data";
 import { TASK_STATUS_MAP, HAZARD_LEVEL_MAP, HAZARD_STATUS_MAP } from "@/lib/types";
 import { TaskStatusBadge, HazardLevelBadge } from "@/components/shared/StatusBadge";
+import { useAppStore } from "@/lib/store";
 import {
   ClipboardList, FileCheck, AlertTriangle, CheckCircle2,
   Shield, TrendingUp, Building2, Clock, Bell,
@@ -19,7 +20,22 @@ import {
 
 const CHART_COLORS = ["var(--color-role-supervisor)", "var(--color-role-inspector)", "var(--color-role-enterprise)", "var(--status-warning)", "var(--status-danger)"];
 
+// 获取时间问候语
+function getGreeting() {
+  const hour = new Date().getHours();
+  if (hour < 6) return "凌晨好";
+  if (hour < 9) return "早上好";
+  if (hour < 12) return "上午好";
+  if (hour < 14) return "中午好";
+  if (hour < 18) return "下午好";
+  if (hour < 22) return "晚上好";
+  return "晚安";
+}
+
 export default function SupervisorDashboard() {
+  const { currentUser, currentWorkspace } = useAppStore();
+  const greeting = getGreeting();
+  
   const totalPlans = MOCK_PLANS.length;
   const inProgressTasks = MOCK_TASKS.filter((t) => !["completed", "cancelled"].includes(t.status)).length;
   const completedTasks = MOCK_TASKS.filter((t) => t.status === "completed").length;
@@ -65,7 +81,10 @@ export default function SupervisorDashboard() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="监管部门工作台" />
+      <PageHeader 
+        title={`${currentUser?.realName}，${greeting}`}
+        subtitle={`${currentWorkspace?.name || "工作组"}工作台`}
+      />
 
       {/* 数据卡片 - 检查任务 */}
       <div className="grid-stats">

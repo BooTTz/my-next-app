@@ -29,13 +29,8 @@ export default function TaskDetailPage({ params }: { params: Promise<{ teamId: s
 
   return (
     <div className="space-y-4">
-      <PageHeader title="检查任务详情">
+      <PageHeader title="检查任务详情" backHref={`/team/${teamId}/tasks`} backLabel="返回列表">
         <div className="flex items-center gap-2">
-          <Link href="/team/${teamId}/tasks">
-            <Button variant="outline" size="sm">
-              <ArrowLeft className="size-3.5" /> 返回列表
-            </Button>
-          </Link>
           {task.status === "assigned" && (
             <Button size="sm" onClick={() => toast.success("任务已接收")}>
               接收任务

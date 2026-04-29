@@ -25,13 +25,8 @@ export default function HazardDetailPage({ params }: { params: Promise<{ teamId:
 
   return (
     <div className="space-y-4">
-      <PageHeader title="隐患详情">
+      <PageHeader title="隐患详情" backHref={`/team/${teamId}/hazards`} backLabel="返回列表">
         <div className="flex items-center gap-2">
-          <Link href="/team/${teamId}/hazards">
-            <Button variant="outline" size="sm">
-              <ArrowLeft className="size-3.5" /> 返回列表
-            </Button>
-          </Link>
           {hazard.status === "submitted" && (
             <>
               <Button variant="outline" size="sm" onClick={() => toast.error("已退回整改")}>

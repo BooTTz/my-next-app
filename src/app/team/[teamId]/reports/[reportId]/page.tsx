@@ -30,11 +30,8 @@ export default function ReportPreviewPage({ params }: { params: Promise<{ teamId
 
   return (
     <div className="space-y-4">
-      <PageHeader title="检查报告预览">
+      <PageHeader title="检查报告预览" backHref={`/team/${teamId}/reports`} backLabel="返回">
         <div className="flex items-center gap-2">
-          <Link href="/team/${teamId}/reports">
-            <Button variant="outline" size="sm"><ArrowLeft className="size-3.5" /> 返回</Button>
-          </Link>
           <Button variant="outline" size="sm" onClick={() => toast.info("导出PDF")}>
             <Download className="size-3.5" /> 导出PDF
           </Button>

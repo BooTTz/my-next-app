@@ -12,7 +12,7 @@ export const BREADCRUMB_CONFIG: Record<string, BreadcrumbItem[]> = {
   ],
   
   // 团队工作台页面（当前组织）
-  "/team/[teamId]/dashboard": [],
+  "/team/[teamId]/workspace": [],
   
   // 检查计划管理
   "/team/[teamId]/plans": [

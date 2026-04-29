@@ -7,13 +7,29 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { HazardStatusBadge, HazardLevelBadge } from "@/components/shared/StatusBadge";
 import { MOCK_TASKS, MOCK_HAZARDS } from "@/lib/mock-data";
+import { useAppStore } from "@/lib/store";
 import {
   FileCheck, AlertTriangle, CheckCircle2, TrendingUp,
   Shield, Clock, ArrowRight, ClipboardList,
 } from "lucide-react";
 import Link from "next/link";
 
+// 获取时间问候语
+function getGreeting() {
+  const hour = new Date().getHours();
+  if (hour < 6) return "凌晨好";
+  if (hour < 9) return "早上好";
+  if (hour < 12) return "上午好";
+  if (hour < 14) return "中午好";
+  if (hour < 18) return "下午好";
+  if (hour < 22) return "晚上好";
+  return "晚安";
+}
+
 export default function EnterpriseDashboard() {
+  const { currentUser, currentWorkspace } = useAppStore();
+  const greeting = getGreeting();
+  
   // 企业e1的数据
   const myTasks = MOCK_TASKS.filter((t) => t.enterpriseId === "e1");
   const myHazards = MOCK_HAZARDS.filter((h) => h.enterpriseId === "e1" || h.enterpriseId === "e3");
@@ -32,7 +48,10 @@ export default function EnterpriseDashboard() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="企业工作台" />
+      <PageHeader 
+        title={`${currentUser?.realName}，${greeting}`}
+        subtitle={`${currentWorkspace?.name || "工作组"}工作台`}
+      />
 
       {/* 统计卡片 */}
       <div className="grid-stats">
