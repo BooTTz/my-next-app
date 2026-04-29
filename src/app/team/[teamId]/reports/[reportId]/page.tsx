@@ -25,7 +25,7 @@ export default function ReportPreviewPage({ params }: { params: Promise<{ teamId
   const enterprise = MOCK_ENTERPRISES.find((e) => e.id === task?.enterpriseId);
   const hazards = MOCK_HAZARDS.filter((h) => h.taskId === report.taskId);
 
-  const closedCount = hazards.filter((h) => h.status === "closed").length;
+  const closedCount = hazards.filter((h) => h.status === "accepted").length;
   const rectRate = hazards.length > 0 ? Math.round((closedCount / hazards.length) * 100) : 0;
 
   return (

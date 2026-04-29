@@ -7,7 +7,7 @@ import { useAppStore } from "@/lib/store";
 import {
   LayoutDashboard, ClipboardList, FileCheck, AlertTriangle,
   FileText, BarChart3, Building2, Bell,
-  Wrench, ChevronDown, ChevronRight, Shield,
+  Wrench, ChevronDown, ChevronRight, Shield, FolderKanban,
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
@@ -26,10 +26,11 @@ function getNavItems(teamId: string, userType: string): NavItem[] {
   if (userType === "supervisor") {
     return [
       { label: "工作台", icon: <LayoutDashboard className="size-4" />, href: `${base}/workspace` },
+      { label: "项目管理", icon: <FolderKanban className="size-4" />, href: `${base}/projects` },
       {
         label: "检查管理", icon: <ClipboardList className="size-4" />,
         children: [
-          { label: "检查计划管理", href: `${base}/plans` },
+          { label: "检查计划列表", href: `${base}/plans` },
           { label: "检查任务管理", href: `${base}/tasks` },
           { label: "隐患总览", href: `${base}/hazards` },
           { label: "检查报告", href: `${base}/reports` },
@@ -43,10 +44,12 @@ function getNavItems(teamId: string, userType: string): NavItem[] {
   if (userType === "inspector") {
     return [
       { label: "工作台", icon: <LayoutDashboard className="size-4" />, href: `${base}/workspace` },
-      { label: "我的检查任务", icon: <FileCheck className="size-4" />, href: `${base}/tasks` },
+      { label: "收到的项目", icon: <FolderKanban className="size-4" />, href: `${base}/projects/received` },
+      { label: "检查计划管理", icon: <ClipboardList className="size-4" />, href: `${base}/plans` },
+      { label: "检查任务列表", icon: <FileCheck className="size-4" />, href: `${base}/tasks` },
       { label: "隐患管理", icon: <AlertTriangle className="size-4" />, href: `${base}/hazards` },
       {
-        label: "检查报告", icon: <FileText className="size-4" />,
+        label: "报告管理", icon: <FileText className="size-4" />,
         children: [
           { label: "报告列表", href: `${base}/reports` },
         ],
@@ -58,15 +61,8 @@ function getNavItems(teamId: string, userType: string): NavItem[] {
   // enterprise
   return [
     { label: "工作台", icon: <LayoutDashboard className="size-4" />, href: `${base}/workspace` },
-    {
-      label: "隐患整改", icon: <Wrench className="size-4" />,
-      children: [
-        { label: "待整改", href: `${base}/rectification` },
-        { label: "整改记录", href: `${base}/hazards` },
-      ],
-    },
-    { label: "检查报告", icon: <FileText className="size-4" />, href: `${base}/reports` },
-    { label: "企业信息", icon: <Building2 className="size-4" />, href: `${base}/settings` },
+    { label: "隐患管理", icon: <AlertTriangle className="size-4" />, href: `${base}/hazards` },
+    { label: "报告列表", icon: <FileText className="size-4" />, href: `${base}/reports` },
     { label: "通知中心", icon: <Bell className="size-4" />, href: `${base}/notifications` },
   ];
 }
@@ -209,7 +205,7 @@ export default function AppSidebar() {
         {/* 平台版本信息 */}
         <div className="pt-2">
           <p className="text-[10px] text-muted-foreground/50">
-            工贸三方监管平台 v1.1.1
+            工贸三方监管平台 v1.1.8
           </p>
         </div>
       </div>

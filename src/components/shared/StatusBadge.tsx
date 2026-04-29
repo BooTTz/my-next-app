@@ -1,10 +1,10 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import type { HazardLevel, HazardStatus, PlanStatus, TaskStatus, ReportStatus } from "@/lib/types";
+import type { HazardLevel, HazardStatus, PlanStatus, TaskStatus, ReportStatus, ProjectStatus } from "@/lib/types";
 import {
   PLAN_STATUS_MAP, TASK_STATUS_MAP, HAZARD_STATUS_MAP,
-  HAZARD_LEVEL_MAP, REPORT_STATUS_MAP,
+  HAZARD_LEVEL_MAP, REPORT_STATUS_MAP, PROJECT_STATUS_MAP,
 } from "@/lib/types";
 
 type StatusVariant = "info" | "success" | "warning" | "danger" | "neutral" | "light";
@@ -58,14 +58,16 @@ const PLAN_STATUS_VARIANT: Record<PlanStatus, StatusVariant> = {
 };
 
 const TASK_STATUS_VARIANT: Record<TaskStatus, StatusVariant> = {
-  created: "neutral", assigned: "warning", accepted: "info", inspecting: "info",
+  created: "neutral", assigned: "warning", inspecting: "info",
   report_drafting: "info", report_submitted: "warning", report_rejected: "danger",
   under_review: "info", rectifying: "warning", completed: "success", overdue: "danger", cancelled: "light",
 };
 
 const HAZARD_STATUS_VARIANT: Record<HazardStatus, StatusVariant> = {
-  discovered: "neutral", notified: "warning", rectifying: "info",
-  submitted: "warning", review_failed: "danger", closed: "success", overdue: "danger",
+  pending_rectification: "warning",
+  rectifying: "info",
+  pending_acceptance: "warning",
+  accepted: "success",
 };
 
 const HAZARD_LEVEL_VARIANT: Record<HazardLevel, StatusVariant> = {
@@ -74,6 +76,10 @@ const HAZARD_LEVEL_VARIANT: Record<HazardLevel, StatusVariant> = {
 
 const REPORT_STATUS_VARIANT: Record<ReportStatus, StatusVariant> = {
   draft: "neutral", submitted: "warning", approved: "success", rejected: "danger",
+};
+
+const PROJECT_STATUS_VARIANT: Record<ProjectStatus, StatusVariant> = {
+  created: "info", in_progress: "warning", completed: "success", archived: "neutral",
 };
 
 export function PlanStatusBadge({ status }: { status: PlanStatus }) {
@@ -94,4 +100,8 @@ export function HazardLevelBadge({ level }: { level: HazardLevel }) {
 
 export function ReportStatusBadge({ status }: { status: ReportStatus }) {
   return <StatusBadge variant={REPORT_STATUS_VARIANT[status]} label={REPORT_STATUS_MAP[status]} />;
+}
+
+export function ProjectStatusBadge({ status }: { status: ProjectStatus }) {
+  return <StatusBadge variant={PROJECT_STATUS_VARIANT[status]} label={PROJECT_STATUS_MAP[status]} />;
 }

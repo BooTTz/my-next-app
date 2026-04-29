@@ -34,11 +34,13 @@ export type PlanType = "routine" | "special" | "random" | "holiday";
 /** 检查计划状态 */
 export type PlanStatus = "draft" | "published" | "in_progress" | "completed" | "archived";
 
+/** 项目状态 */
+export type ProjectStatus = "created" | "in_progress" | "completed" | "archived";
+
 /** 检查任务状态 */
 export type TaskStatus =
   | "created"
   | "assigned"
-  | "accepted"
   | "inspecting"
   | "report_drafting"
   | "report_submitted"
@@ -69,13 +71,10 @@ export type HazardSubCategory = ManagementSubCategory | OnsiteSubCategory;
 
 /** 隐患状态 */
 export type HazardStatus =
-  | "discovered"
-  | "notified"
+  | "pending_rectification"
   | "rectifying"
-  | "submitted"
-  | "review_failed"
-  | "closed"
-  | "overdue";
+  | "pending_acceptance"
+  | "accepted";
 
 /** 检查结论 */
 export type InspectionConclusion = "qualified" | "basically_qualified" | "unqualified";
@@ -339,6 +338,22 @@ export interface Enterprise {
   createdAt: string;
 }
 
+/** 项目 */
+export interface InspectionProject {
+  id: string;
+  teamId: string;
+  projectNo: string;
+  name: string;
+  description?: string;
+  assignedToTeamId: string;
+  assignedToTeamName?: string;
+  status: ProjectStatus;
+  createdAt: string;
+  completedAt?: string;
+  planCount?: number;
+  completedPlanCount?: number;
+}
+
 /** 检查计划 */
 export interface InspectionPlan {
   id: string;
@@ -355,6 +370,8 @@ export interface InspectionPlan {
   creatorId: string;
   creatorName?: string;
   status: PlanStatus;
+  projectId?: string;
+  projectName?: string;
   createdAt: string;
   updatedAt: string;
   taskCount?: number;
@@ -516,10 +533,16 @@ export const PLAN_STATUS_MAP: Record<PlanStatus, string> = {
   archived: "已归档",
 };
 
+export const PROJECT_STATUS_MAP: Record<ProjectStatus, string> = {
+  created: "已创建",
+  in_progress: "执行中",
+  completed: "已完成",
+  archived: "已归档",
+};
+
 export const TASK_STATUS_MAP: Record<TaskStatus, string> = {
   created: "已创建",
   assigned: "已下达",
-  accepted: "已接收",
   inspecting: "检查中",
   report_drafting: "报告编制中",
   report_submitted: "报告已提交",
@@ -537,13 +560,10 @@ export const HAZARD_LEVEL_MAP: Record<HazardLevel, string> = {
 };
 
 export const HAZARD_STATUS_MAP: Record<HazardStatus, string> = {
-  discovered: "已发现",
-  notified: "已通知",
+  pending_rectification: "待整改",
   rectifying: "整改中",
-  submitted: "已提交整改",
-  review_failed: "复查不通过",
-  closed: "已销号",
-  overdue: "已逾期",
+  pending_acceptance: "待验收",
+  accepted: "已验收",
 };
 
 export const HAZARD_CATEGORY_MAP: Record<HazardCategory, string> = {

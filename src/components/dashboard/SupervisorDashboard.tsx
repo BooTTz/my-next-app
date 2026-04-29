@@ -5,13 +5,13 @@ import EmptyState from "@/components/shared/EmptyState";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MOCK_PLANS, MOCK_TASKS, MOCK_HAZARDS, MOCK_NOTIFICATIONS } from "@/lib/mock-data";
+import { MOCK_PLANS, MOCK_TASKS, MOCK_HAZARDS, MOCK_NOTIFICATIONS, MOCK_PROJECTS } from "@/lib/mock-data";
 import { TASK_STATUS_MAP, HAZARD_LEVEL_MAP, HAZARD_STATUS_MAP } from "@/lib/types";
 import { TaskStatusBadge, HazardLevelBadge } from "@/components/shared/StatusBadge";
 import { useAppStore } from "@/lib/store";
 import {
   ClipboardList, FileCheck, AlertTriangle, CheckCircle2,
-  Shield, TrendingUp, Building2, Clock, Bell,
+  Shield, TrendingUp, Building2, Bell, FolderKanban, Plus, Play,
 } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -39,12 +39,17 @@ export default function SupervisorDashboard() {
   const totalPlans = MOCK_PLANS.length;
   const inProgressTasks = MOCK_TASKS.filter((t) => !["completed", "cancelled"].includes(t.status)).length;
   const completedTasks = MOCK_TASKS.filter((t) => t.status === "completed").length;
-  const pendingReview = MOCK_TASKS.filter((t) => ["report_submitted", "under_review"].includes(t.status)).length;
+  // 项目统计
+  const totalProjects = MOCK_PROJECTS.length;
+  const inProgressProjects = MOCK_PROJECTS.filter((p) => p.status === "in_progress").length;
+  const completedProjects = MOCK_PROJECTS.filter((p) => p.status === "completed").length;
+  const currentMonth = new Date().toISOString().substring(0, 7);
+  const newProjectsThisMonth = MOCK_PROJECTS.filter((p) => p.createdAt.startsWith(currentMonth)).length;
 
   const totalHazards = MOCK_HAZARDS.length;
   const majorHazards = MOCK_HAZARDS.filter((h) => h.level === "major").length;
   const generalHazards = MOCK_HAZARDS.filter((h) => h.level === "general").length;
-  const closedHazards = MOCK_HAZARDS.filter((h) => h.status === "closed").length;
+  const closedHazards = MOCK_HAZARDS.filter((h) => h.status === "accepted").length;
   const rectRate = totalHazards > 0 ? Math.round((closedHazards / totalHazards) * 100) : 0;
 
   // 任务进度数据
@@ -86,12 +91,19 @@ export default function SupervisorDashboard() {
         subtitle={`${currentWorkspace?.name || "工作组"}工作台`}
       />
 
+      {/* 数据卡片 - 项目概况 */}
+      <div className="grid-stats">
+        <StatCard title="项目总数" value={totalProjects} icon={<FolderKanban className="size-5" />} variant="primary" />
+        <StatCard title="进行中项目" value={inProgressProjects} icon={<Play className="size-5" />} variant="warning" />
+        <StatCard title="本月新增" value={newProjectsThisMonth} icon={<Plus className="size-5" />} variant="primary" />
+        <StatCard title="已完成项目" value={completedProjects} icon={<CheckCircle2 className="size-5" />} variant="success" />
+      </div>
+
       {/* 数据卡片 - 检查任务 */}
       <div className="grid-stats">
         <StatCard title="检查计划总数" value={totalPlans} icon={<ClipboardList className="size-5" />} variant="primary" />
         <StatCard title="进行中任务" value={inProgressTasks} icon={<FileCheck className="size-5" />} variant="warning" trend={{ value: 12, label: "较上月" }} />
         <StatCard title="已完成任务" value={completedTasks} icon={<CheckCircle2 className="size-5" />} variant="success" />
-        <StatCard title="待验收任务" value={pendingReview} icon={<Clock className="size-5" />} variant="danger" />
       </div>
 
       {/* 隐患概览卡片 */}

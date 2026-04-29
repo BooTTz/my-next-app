@@ -34,8 +34,8 @@ export default function EnterpriseDashboard() {
   const myTasks = MOCK_TASKS.filter((t) => t.enterpriseId === "e1");
   const myHazards = MOCK_HAZARDS.filter((h) => h.enterpriseId === "e1" || h.enterpriseId === "e3");
   const totalChecks = myTasks.length;
-  const pendingRect = myHazards.filter((h) => ["notified", "rectifying", "review_failed"].includes(h.status)).length;
-  const closedCount = myHazards.filter((h) => h.status === "closed").length;
+  const pendingRect = myHazards.filter((h) => ["pending_rectification", "rectifying"].includes(h.status)).length;
+  const closedCount = myHazards.filter((h) => h.status === "accepted").length;
   const rectRate = myHazards.length > 0 ? Math.round((closedCount / myHazards.length) * 100) : 0;
 
   const safetyGrade = "B";
@@ -89,10 +89,10 @@ export default function EnterpriseDashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {myHazards.filter((h) => h.status !== "closed").length > 0 ? (
-                myHazards.filter((h) => h.status !== "closed").map((hazard) => {
+              {myHazards.filter((h) => h.status !== "accepted").length > 0 ? (
+                myHazards.filter((h) => h.status !== "accepted").map((hazard) => {
                   const progressMap: Record<string, number> = {
-                    discovered: 10, notified: 20, rectifying: 50, submitted: 80, review_failed: 40, overdue: 30,
+                    pending_rectification: 10, rectifying: 50, pending_acceptance: 80,
                   };
                   return (
                     <div key={hazard.id} className="rounded-md border p-3">
@@ -159,7 +159,7 @@ export default function EnterpriseDashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              {myHazards.filter((h) => ["notified", "rectifying", "review_failed"].includes(h.status)).map((h) => (
+              {myHazards.filter((h) => ["pending_rectification", "rectifying"].includes(h.status)).map((h) => (
                 <Link
                   key={h.id}
                   href={`/team/t1/hazards/${h.id}`}
@@ -176,7 +176,7 @@ export default function EnterpriseDashboard() {
                   <ArrowRight className="size-4 shrink-0 text-muted-foreground" />
                 </Link>
               ))}
-              {myHazards.filter((h) => ["notified", "rectifying", "review_failed"].includes(h.status)).length === 0 && (
+              {myHazards.filter((h) => ["pending_rectification", "rectifying"].includes(h.status)).length === 0 && (
                 <EmptyState variant="notification" title="暂无待处理事项" description="当前没有需要处理的事项" className="py-6" />
               )}
             </div>

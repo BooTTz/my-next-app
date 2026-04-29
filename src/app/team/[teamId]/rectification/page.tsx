@@ -14,11 +14,11 @@ export default function RectificationPage() {
   const params = useParams();
   const teamId = params.teamId as string;
   const myHazards = MOCK_HAZARDS.filter((h) =>
-    ["notified", "rectifying", "review_failed", "submitted"].includes(h.status)
+    ["pending_rectification", "rectifying"].includes(h.status)
   );
 
   const progressMap: Record<string, number> = {
-    notified: 20, rectifying: 50, submitted: 80, review_failed: 40,
+    pending_rectification: 20, rectifying: 50, pending_acceptance: 80,
   };
 
   return (
@@ -51,7 +51,7 @@ export default function RectificationPage() {
                 </div>
                 <Link href={`/team/${teamId}/hazards/${h.id}`}>
                   <Button variant="outline" size="sm">
-                    {h.status === "review_failed" ? "重新整改" : "提交整改"}
+                    提交整改
                     <ArrowRight className="size-3.5" />
                   </Button>
                 </Link>

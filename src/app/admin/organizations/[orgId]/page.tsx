@@ -292,7 +292,12 @@ export default function OrgEditPage() {
             <FieldRow label="选择管理员" required>
               <Select value={form.adminUserId} onValueChange={(v) => setField("adminUserId", v ?? "")}>
                 <SelectTrigger>
-                  <SelectValue placeholder="请选择用户..." />
+                  <SelectValue placeholder="请选择用户...">
+                    {(value) => {
+                      const user = value ? MOCK_USERS.find((u) => u.id === value) : undefined;
+                      return user ? `${user.realName}（${user.phone}）` : value;
+                    }}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {MOCK_USERS.filter((u) => u.platformRole !== "super_admin").map((u) => (
