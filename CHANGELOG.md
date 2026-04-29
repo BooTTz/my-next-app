@@ -1,5 +1,36 @@
 # 版本更新记录
 
+## v1.1.7 (2026-04-29)
+
+**标签**: `v1.1.7`  
+**对应提交**: `9061b16`  
+**GitHub**: https://github.com/BooTTz/my-next-app/releases/tag/v1.1.7
+
+### 包含内容
+- **工作台页面重构**：统一重构所有角色（监管方/服务方/履行方）工作台
+- **导航路由调整**：`/team/[teamId]/dashboard` 更名为 `/team/[teamId]/workspace`
+- **面包屑系统升级**：集成面包屑配置到全局路由系统
+- **详情页弹窗化**：隐患详情、用户详情等改为弹窗展示
+- **UI组件优化**：DetailDialog、PageHeader 等组件完善
+
+### 改动文件
+- `src/app/team/[teamId]/workspace/page.tsx` - 重命名自 dashboard
+- `src/app/workspace/` - 工作台页面重构
+- `src/components/dashboard/*.tsx` - 各角色仪表盘优化
+- `src/components/layout/AppSidebar.tsx` - 侧边栏优化
+- `src/lib/breadcrumb-config.ts` - 面包屑配置更新
+
+### 如何恢复到此版本
+```bash
+# 方式1：创建新分支恢复（推荐）
+git checkout -b restore-v1.1.7 v1.1.7
+
+# 方式2：直接重置（慎用，会丢失之后的提交）
+git reset --hard v1.1.7
+```
+
+---
+
 ## v1.1.6 (2026-04-28)
 
 **标签**: `v1.1.6`
