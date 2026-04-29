@@ -714,7 +714,9 @@ export default function WorkspaceSettingsPage() {
               <label className="text-sm font-medium">所属行政区划</label>
               <Select value={inviteRegionId} onValueChange={setInviteRegionId}>
                 <SelectTrigger>
-                  <SelectValue placeholder="选择行政区划" />
+                  <SelectValue placeholder="选择行政区划">
+                    {(value) => MOCK_REGIONS.find((r) => r.id === value)?.name ?? value}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {MOCK_REGIONS.filter((r) => r.workspaceId === currentWorkspace.id).map((region) => (

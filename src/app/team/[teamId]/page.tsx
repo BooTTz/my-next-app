@@ -6,12 +6,12 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAppStore } from "@/lib/store";
-import { MOCK_MEMBERS, MOCK_TASKS, MOCK_HAZARDS, MOCK_REPORTS, MOCK_TEAMS } from "@/lib/mock-data";
+import { MOCK_MEMBERS, MOCK_TASKS, MOCK_HAZARDS, MOCK_REPORTS, MOCK_TEAMS, MOCK_PROJECTS } from "@/lib/mock-data";
 import { USER_TYPE_MAP } from "@/lib/types";
 import {
   ArrowLeft, Building2, Users, MapPin, Calendar,
   ClipboardList, AlertTriangle, FileText, Settings,
-  ChevronRight, GitBranch,
+  ChevronRight, GitBranch, FolderKanban, Play, Archive,
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -38,6 +38,8 @@ export default function TeamDetailPage() {
   const teamHazards = MOCK_HAZARDS.filter((h) => h.teamId === teamId);
   // 获取当前组织的报告
   const teamReports = MOCK_REPORTS.filter((r) => r.teamId === teamId);
+  // 获取当前组织的项目
+  const teamProjects = MOCK_PROJECTS.filter((p) => p.teamId === teamId);
 
   // 统计
   const stats = {
@@ -45,7 +47,7 @@ export default function TeamDetailPage() {
     completedTasks: teamTasks.filter((t) => t.status === "completed").length,
     totalHazards: teamHazards.length,
     majorHazards: teamHazards.filter((h) => h.level === "major").length,
-    pendingHazards: teamHazards.filter((h) => !["closed", "submitted"].includes(h.status)).length,
+    pendingHazards: teamHazards.filter((h) => h.status !== "accepted").length,
     totalReports: teamReports.length,
     approvedReports: teamReports.filter((r) => r.status === "approved").length,
   };
@@ -105,6 +107,62 @@ export default function TeamDetailPage() {
           </div>
         )}
       </div>
+
+      {/* 项目统计 - 仅监管方显示 */}
+      {currentTeam.teamType === "supervisor" && (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+          <Card>
+            <CardContent className="p-4 flex items-center gap-3">
+              <div className="flex size-10 items-center justify-center rounded-lg bg-blue-500/10">
+                <FolderKanban className="size-5 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">项目总数</p>
+                <p className="font-semibold text-lg">{teamProjects.length}</p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4 flex items-center gap-3">
+              <div className="flex size-10 items-center justify-center rounded-lg bg-blue-500/10">
+                <Play className="size-5 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">进行中项目</p>
+                <p className="font-semibold text-lg">
+                  {teamProjects.filter((p) => p.status === "in_progress").length}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4 flex items-center gap-3">
+              <div className="flex size-10 items-center justify-center rounded-lg bg-green-500/10">
+                <ClipboardList className="size-5 text-green-600" />
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">已完成项目</p>
+                <p className="font-semibold text-lg">
+                  {teamProjects.filter((p) => p.status === "completed").length}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4 flex items-center gap-3">
+              <div className="flex size-10 items-center justify-center rounded-lg bg-muted">
+                <Archive className="size-5 text-muted-foreground" />
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">已归档项目</p>
+                <p className="font-semibold text-lg">
+                  {teamProjects.filter((p) => p.status === "archived").length}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {/* 组织信息卡片 */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">

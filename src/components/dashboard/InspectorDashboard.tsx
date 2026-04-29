@@ -6,10 +6,10 @@ import { PageHeader } from "@/components/shared/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TaskStatusBadge } from "@/components/shared/StatusBadge";
-import { MOCK_TASKS, MOCK_HAZARDS } from "@/lib/mock-data";
+import { MOCK_TASKS, MOCK_HAZARDS, MOCK_PLANS } from "@/lib/mock-data";
 import { useAppStore } from "@/lib/store";
 import {
-  FileCheck, AlertTriangle, FileText, Eye,
+  FileText, Eye,
   Calendar, ClipboardList, Clock,
 } from "lucide-react";
 import {
@@ -34,10 +34,9 @@ export default function InspectorDashboard() {
   const greeting = getGreeting();
   
   const myTasks = MOCK_TASKS.filter((t) => t.inspectorIds.includes("u2"));
-  const pendingAccept = myTasks.filter((t) => t.status === "assigned").length;
-  const inspecting = myTasks.filter((t) => ["accepted", "inspecting"].includes(t.status)).length;
+  const inspecting = myTasks.filter((t) => ["inspecting"].includes(t.status)).length;
   const reportPending = myTasks.filter((t) => ["report_drafting", "report_rejected"].includes(t.status)).length;
-  const reviewPending = MOCK_HAZARDS.filter((h) => h.status === "submitted" && h.discoveredBy === "u2").length;
+  const managedPlans = MOCK_PLANS.length;
 
   const inspectorWorkload = [
     { name: "张敏", 任务数: 5 },
@@ -46,7 +45,7 @@ export default function InspectorDashboard() {
   ];
 
   const upcomingTasks = myTasks
-    .filter((t) => ["assigned", "accepted"].includes(t.status))
+    .filter((t) => ["assigned"].includes(t.status))
     .sort((a, b) => a.scheduledDate.localeCompare(b.scheduledDate));
 
   return (
@@ -58,10 +57,9 @@ export default function InspectorDashboard() {
 
       {/* 统计卡片 */}
       <div className="grid-stats">
-        <StatCard title="待接收任务" value={pendingAccept} icon={<FileCheck className="size-5" />} variant="warning" />
+        <StatCard title="管理计划数" value={managedPlans} icon={<ClipboardList className="size-5" />} variant="primary" />
         <StatCard title="检查中任务" value={inspecting} icon={<Eye className="size-5" />} variant="primary" />
         <StatCard title="待提交报告" value={reportPending} icon={<FileText className="size-5" />} variant="danger" />
-        <StatCard title="待复查隐患" value={reviewPending} icon={<AlertTriangle className="size-5" />} variant="warning" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -102,7 +100,7 @@ export default function InspectorDashboard() {
               </TabsContent>
               <TabsContent value="pending" className="mt-3">
                 <div className="space-y-2">
-                  {myTasks.filter((t) => ["assigned", "accepted"].includes(t.status)).map((task) => (
+                  {myTasks.filter((t) => ["assigned"].includes(t.status)).map((task) => (
                     <div key={task.id} className="flex items-center justify-between rounded-md border p-3">
                       <div>
                         <div className="flex items-center gap-2">
@@ -113,7 +111,7 @@ export default function InspectorDashboard() {
                       </div>
                     </div>
                   ))}
-                  {myTasks.filter((t) => ["assigned", "accepted"].includes(t.status)).length === 0 && (
+                  {myTasks.filter((t) => ["assigned"].includes(t.status)).length === 0 && (
                     <EmptyState variant="task" title="暂无待处理任务" description="当前没有待处理的任务" className="py-6" />
                   )}
                 </div>

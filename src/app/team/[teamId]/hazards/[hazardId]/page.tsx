@@ -27,12 +27,12 @@ export default function HazardDetailPage({ params }: { params: Promise<{ teamId:
     <div className="space-y-4">
       <PageHeader title="隐患详情" backHref={`/team/${teamId}/hazards`} backLabel="返回列表">
         <div className="flex items-center gap-2">
-          {hazard.status === "submitted" && (
+          {hazard.status === "pending_acceptance" && (
             <>
               <Button variant="outline" size="sm" onClick={() => toast.error("已退回整改")}>
                 <XCircle className="size-3.5" /> 退回整改
               </Button>
-              <Button size="sm" onClick={() => toast.success("复查通过，隐患已销号")}>
+              <Button size="sm" onClick={() => toast.success("复查通过，隐患已验收")}>
                 <CheckCircle2 className="size-3.5" /> 复查通过
               </Button>
             </>
@@ -129,7 +129,7 @@ export default function HazardDetailPage({ params }: { params: Promise<{ teamId:
           </Card>
 
           {/* 整改提交区域（企业方可操作） */}
-          {["notified", "rectifying", "review_failed"].includes(hazard.status) && (
+          {["pending_rectification", "rectifying"].includes(hazard.status) && (
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm">提交整改</CardTitle>
@@ -177,11 +177,10 @@ export default function HazardDetailPage({ params }: { params: Promise<{ teamId:
               <div className="relative space-y-3 pl-5">
                 <div className="absolute left-[7px] top-1 bottom-1 w-px bg-border" />
                 {[
-                  { status: "已发现", time: hazard.discoveredAt, active: true },
-                  { status: "已通知", time: hazard.status !== "discovered" ? hazard.discoveredAt : undefined },
-                  { status: "整改中", time: hazard.status === "rectifying" ? "进行中" : undefined },
-                  { status: "已提交整改", time: hazard.status === "submitted" ? "待复查" : undefined },
-                  { status: "已销号", time: hazard.status === "closed" ? "完成" : undefined },
+                  { status: "待整改", time: hazard.status === "pending_rectification" ? "待整改" : undefined, active: true },
+                  { status: "反馈整改", time: hazard.status !== "pending_rectification" ? "已反馈" : undefined },
+                  { status: "待验收", time: hazard.status === "pending_acceptance" ? "待复查" : undefined },
+                  { status: "已验收", time: hazard.status === "accepted" ? "完成" : undefined },
                 ].map((step, i) => (
                   <div key={i} className="relative flex items-start gap-2">
                     <div className={`absolute -left-3.5 top-1 size-2 rounded-full border-2 border-card ${

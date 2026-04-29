@@ -14,29 +14,36 @@ import {
 } from "@/components/ui/table";
 import { MOCK_PLANS, MOCK_TASKS } from "@/lib/mock-data";
 import { PLAN_TYPE_MAP } from "@/lib/types";
-import { ArrowLeft, Edit, Send, FileText, Calendar, User, MapPin } from "lucide-react";
+import { ArrowLeft, Edit, Send, FileText, Calendar, User, MapPin, FolderKanban } from "lucide-react";
+import { useAppStore } from "@/lib/store";
 
 export default function PlanDetailPage({ params }: { params: Promise<{ teamId: string; planId: string }> }) {
   const { teamId, planId } = use(params);
+  const { currentUserType } = useAppStore();
   const plan = MOCK_PLANS.find((p) => p.id === planId) || MOCK_PLANS[0];
   const tasks = MOCK_TASKS.filter((t) => t.planId === plan.id);
   const progress = plan.taskCount
     ? Math.round(((plan.completedTaskCount || 0) / plan.taskCount) * 100)
     : 0;
 
+  const isSupervisor = currentUserType === "supervisor";
+  const isInspector = currentUserType === "inspector";
+
   return (
     <div className="space-y-4">
       <PageHeader title="检查计划详情" backHref={`/team/${teamId}/plans`} backLabel="返回列表">
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
-            <Edit className="size-3.5" /> 编辑
-          </Button>
-          {plan.status === "draft" && (
-            <Button size="sm">
-              <Send className="size-3.5" /> 发布计划
+        {isInspector && (
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm">
+              <Edit className="size-3.5" /> 编辑
             </Button>
-          )}
-        </div>
+            {plan.status === "draft" && (
+              <Button size="sm">
+                <Send className="size-3.5" /> 发布计划
+              </Button>
+            )}
+          </div>
+        )}
       </PageHeader>
 
       {/* 基本信息卡片 */}
@@ -69,6 +76,15 @@ export default function PlanDetailPage({ params }: { params: Promise<{ teamId: s
           <Separator className="my-4" />
 
           <div className="grid grid-cols-4 gap-6 text-sm">
+            {plan.projectName && (
+              <div>
+                <p className="text-muted-foreground mb-1">所属项目</p>
+                <p className="flex items-center gap-1.5">
+                  <FolderKanban className="size-3.5 text-muted-foreground" />
+                  {plan.projectName}
+                </p>
+              </div>
+            )}
             <div>
               <p className="text-muted-foreground mb-1">检查时间</p>
               <p className="flex items-center gap-1.5">

@@ -24,18 +24,13 @@ export default function TaskDetailPage({ params }: { params: Promise<{ teamId: s
   const { teamId, taskId } = use(params);
   const task = MOCK_TASKS.find((t) => t.id === taskId) || MOCK_TASKS[0];
   const hazards = MOCK_HAZARDS.filter((h) => h.taskId === task.id);
-  const closedCount = hazards.filter((h) => h.status === "closed").length;
+  const closedCount = hazards.filter((h) => h.status === "accepted").length;
   const rectProgress = hazards.length > 0 ? Math.round((closedCount / hazards.length) * 100) : 0;
 
   return (
     <div className="space-y-4">
       <PageHeader title="检查任务详情" backHref={`/team/${teamId}/tasks`} backLabel="返回列表">
         <div className="flex items-center gap-2">
-          {task.status === "assigned" && (
-            <Button size="sm" onClick={() => toast.success("任务已接收")}>
-              接收任务
-            </Button>
-          )}
           {task.status === "inspecting" && (
             <Button size="sm" onClick={() => toast.success("已提交报告")}>
               <FileText className="size-3.5" /> 提交报告

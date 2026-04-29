@@ -13,7 +13,19 @@ export const BREADCRUMB_CONFIG: Record<string, BreadcrumbItem[]> = {
   
   // 团队工作台页面（当前组织）
   "/team/[teamId]/workspace": [],
-  
+
+  // 项目管理
+  "/team/[teamId]/projects": [
+    { label: "项目管理" },
+  ],
+  "/team/[teamId]/projects/[projectId]": [
+    { label: "项目管理", href: "" },
+    { label: "项目详情" },
+  ],
+  "/team/[teamId]/projects/received": [
+    { label: "收到的项目" },
+  ],
+
   // 检查计划管理
   "/team/[teamId]/plans": [
     { label: "检查计划管理" },
@@ -21,6 +33,10 @@ export const BREADCRUMB_CONFIG: Record<string, BreadcrumbItem[]> = {
   "/team/[teamId]/plans/new": [
     { label: "检查计划管理", href: "" },
     { label: "新建检查计划" },
+  ],
+  "/team/[teamId]/plans/new/tasks": [
+    { label: "检查计划管理", href: "" },
+    { label: "配置检查任务" },
   ],
   "/team/[teamId]/plans/[planId]": [
     { label: "检查计划管理", href: "" },

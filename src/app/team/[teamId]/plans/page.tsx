@@ -25,19 +25,129 @@ import {
   DetailDialogBody,
   DetailDialogFooter,
 } from "@/components/shared/DetailDialog";
-import { MOCK_PLANS, MOCK_ENTERPRISES, MOCK_MEMBERS } from "@/lib/mock-data";
+import { MOCK_PLANS, MOCK_ENTERPRISES, MOCK_MEMBERS, MOCK_PROJECTS } from "@/lib/mock-data";
 import { PLAN_TYPE_MAP } from "@/lib/types";
-import { Eye, Edit, Trash2, Copy, Save, Send } from "lucide-react";
+import { Eye, Edit, Trash2, Copy, Save, Send, ClipboardList } from "lucide-react";
 import HoverActionMenu from "@/components/shared/HoverActionMenu";
+import EmptyState from "@/components/shared/EmptyState";
 import { toast } from "sonner";
+import { useAppStore } from "@/lib/store";
+import { ShieldBan } from "lucide-react";
 
-export default function PlansListPage() {
+function SupervisorPlansView({ teamId }: { teamId: string }) {
   const router = useRouter();
-  const params = useParams();
-  const teamId = params.teamId as string;
+  const [search, setSearch] = useState("");
+
+  const filteredPlans = MOCK_PLANS.filter(
+    (p) => p.name.includes(search) || p.planNo.includes(search)
+  );
+
+  return (
+    <div className="space-y-4">
+      <PageHeader title="检查计划列表" />
+      <Card>
+        <CardContent className="p-4">
+          <ListToolbar
+            searchPlaceholder="搜索计划名称或编号..."
+            searchValue={search}
+            onSearchChange={setSearch}
+            onFilter={() => toast.info("筛选功能")}
+            onExport={() => toast.info("导出功能")}
+            onRefresh={() => toast.info("已刷新")}
+          />
+          <div className="mt-4 rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[130px]">计划编号</TableHead>
+                  <TableHead>计划名称</TableHead>
+                  <TableHead className="w-[120px]">所属项目</TableHead>
+                  <TableHead className="w-[90px]">检查类型</TableHead>
+                  <TableHead className="w-[80px]">年度</TableHead>
+                  <TableHead className="w-[90px]">状态</TableHead>
+                  <TableHead className="w-[160px]">检查时间</TableHead>
+                  <TableHead className="w-[120px]">任务进度</TableHead>
+                  <TableHead className="w-[60px] text-right">操作</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredPlans.map((plan) => {
+                  const progress = plan.taskCount
+                    ? Math.round(((plan.completedTaskCount || 0) / plan.taskCount) * 100)
+                    : 0;
+                  return (
+                    <TableRow key={plan.id} className="group">
+                      <TableCell className="font-mono text-xs">{plan.planNo}</TableCell>
+                      <TableCell>
+                        <Link
+                          href={`/team/${teamId}/plans/${plan.id}`}
+                          className="font-medium text-sm hover:text-primary transition-colors line-clamp-1"
+                        >
+                          {plan.name}
+                        </Link>
+                      </TableCell>
+                      <TableCell className="text-xs text-muted-foreground">{plan.projectName || "-"}</TableCell>
+                      <TableCell>
+                        <Badge variant="secondary" className="text-xs">
+                          {PLAN_TYPE_MAP[plan.type]}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-sm">{plan.year}</TableCell>
+                      <TableCell>
+                        <PlanStatusBadge status={plan.status} />
+                      </TableCell>
+                      <TableCell className="text-xs text-muted-foreground">
+                        {plan.startDate} ~ {plan.endDate}
+                      </TableCell>
+                      <TableCell>
+                        {plan.taskCount ? (
+                          <div className="flex items-center gap-2">
+                            <Progress value={progress} className="h-1.5 flex-1" />
+                            <span className="text-xs text-muted-foreground whitespace-nowrap">
+                              {plan.completedTaskCount}/{plan.taskCount}
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">-</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <HoverActionMenu
+                          actions={[
+                            {
+                              label: "查看详情",
+                              icon: <Eye className="h-4 w-4" />,
+                              onClick: () => router.push(`/team/${teamId}/plans/${plan.id}`),
+                            },
+                          ]}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
+          <div className="mt-4 flex items-center justify-between">
+            <p className="text-xs text-muted-foreground">共 {filteredPlans.length} 条记录</p>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="xs" disabled>上一页</Button>
+              <Button variant="outline" size="xs" className="bg-primary text-primary-foreground">1</Button>
+              <Button variant="outline" size="xs" disabled>下一页</Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+function InspectorPlansManagement({ teamId }: { teamId: string }) {
+  const router = useRouter();
   const [search, setSearch] = useState("");
   const [createOpen, setCreateOpen] = useState(false);
   const [selectedEnterprises, setSelectedEnterprises] = useState<string[]>([]);
+  const [selectedProject, setSelectedProject] = useState("");
 
   const filteredPlans = MOCK_PLANS.filter(
     (p) => p.name.includes(search) || p.planNo.includes(search)
@@ -45,9 +155,19 @@ export default function PlansListPage() {
 
   const inspectors = MOCK_MEMBERS.filter((m) => m.userType === "inspector");
 
-  const handleSubmit = (isDraft: boolean) => {
-    toast.success(isDraft ? "计划已保存为草稿" : "计划已发布，任务已下达");
+  const handleSubmit = (isDraft: boolean, goToTasks?: boolean) => {
+    if (selectedEnterprises.length === 0) {
+      toast.error("请至少选择一家被检查企业");
+      return;
+    }
+    toast.success(isDraft ? "计划已保存为草稿" : "计划已发布");
     setCreateOpen(false);
+    const savedProject = selectedProject;
+    setSelectedProject("");
+    setSelectedEnterprises([]);
+    if (goToTasks) {
+      router.push(`/team/${teamId}/plans/new/tasks`);
+    }
   };
 
   return (
@@ -76,6 +196,7 @@ export default function PlansListPage() {
                 <TableRow>
                   <TableHead className="w-[130px]">计划编号</TableHead>
                   <TableHead>计划名称</TableHead>
+                  <TableHead className="w-[120px]">所属项目</TableHead>
                   <TableHead className="w-[90px]">检查类型</TableHead>
                   <TableHead className="w-[80px]">年度</TableHead>
                   <TableHead className="w-[90px]">状态</TableHead>
@@ -101,6 +222,7 @@ export default function PlansListPage() {
                           {plan.name}
                         </Link>
                       </TableCell>
+                      <TableCell className="text-xs text-muted-foreground">{plan.projectName || "-"}</TableCell>
                       <TableCell>
                         <Badge variant="secondary" className="text-xs">
                           {PLAN_TYPE_MAP[plan.type]}
@@ -160,11 +282,8 @@ export default function PlansListPage() {
             </Table>
           </div>
 
-          {/* 分页 */}
           <div className="mt-4 flex items-center justify-between">
-            <p className="text-xs text-muted-foreground">
-              共 {filteredPlans.length} 条记录
-            </p>
+            <p className="text-xs text-muted-foreground">共 {filteredPlans.length} 条记录</p>
             <div className="flex items-center gap-2">
               <Button variant="outline" size="xs" disabled>上一页</Button>
               <Button variant="outline" size="xs" className="bg-primary text-primary-foreground">1</Button>
@@ -180,7 +299,6 @@ export default function PlansListPage() {
           <DetailDialogHeader title="新建检查计划" />
           <DetailDialogBody>
             <div className="flex gap-6">
-              {/* 主要表单 - 左侧可滚动 */}
               <div className="flex-1 space-y-4 max-h-[calc(85vh-180px)] overflow-y-auto pr-2">
                 <Card>
                   <CardHeader className="pb-3">
@@ -204,6 +322,22 @@ export default function PlansListPage() {
                           </SelectContent>
                         </Select>
                       </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>关联项目</Label>
+                      <Select
+                        value={selectedProject}
+                        onValueChange={(v) => setSelectedProject(v ?? "")}
+                      >
+                        <SelectTrigger><SelectValue placeholder="选择关联项目（可选）">
+                          {(value) => MOCK_PROJECTS.find((p) => p.id === value)?.name ?? value}
+                        </SelectValue></SelectTrigger>
+                        <SelectContent>
+                          {MOCK_PROJECTS.filter((p) => p.assignedToTeamId === "t2").map((prj) => (
+                            <SelectItem key={prj.id} value={prj.id}>{prj.name}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                     <div className="grid grid-cols-3 gap-4">
                       <div className="space-y-2">
@@ -240,7 +374,6 @@ export default function PlansListPage() {
                   </CardContent>
                 </Card>
 
-                {/* 被检查企业选择 */}
                 <Card>
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm">选择被检查企业 *</CardTitle>
@@ -273,7 +406,6 @@ export default function PlansListPage() {
                 </Card>
               </div>
 
-              {/* 侧边信息 - 右侧固定 */}
               <div className="w-64 shrink-0 space-y-4">
                 <Card>
                   <CardHeader className="pb-3">
@@ -282,6 +414,9 @@ export default function PlansListPage() {
                   <CardContent className="space-y-2">
                     <Button className="w-full" onClick={() => handleSubmit(false)}>
                       <Send className="size-3.5" /> 发布计划
+                    </Button>
+                    <Button variant="secondary" className="w-full" onClick={() => handleSubmit(false, true)}>
+                      <ClipboardList className="size-3.5" /> 提交并配置检查任务
                     </Button>
                     <Button variant="outline" className="w-full" onClick={() => handleSubmit(true)}>
                       <Save className="size-3.5" /> 保存草稿
@@ -317,6 +452,31 @@ export default function PlansListPage() {
           </DetailDialogFooter>
         </DetailDialogContent>
       </DetailDialog>
+    </div>
+  );
+}
+
+export default function PlansListPage() {
+  const { currentUserType } = useAppStore();
+  const params = useParams();
+  const teamId = params.teamId as string;
+
+  if (currentUserType === "supervisor") {
+    return <SupervisorPlansView teamId={teamId} />;
+  }
+
+  if (currentUserType === "inspector") {
+    return <InspectorPlansManagement teamId={teamId} />;
+  }
+
+  // enterprise - no permission
+  return (
+    <div className="page-container">
+      <EmptyState
+        title="无访问权限"
+        description="企业用户无法查看检查计划"
+        icon={ShieldBan}
+      />
     </div>
   );
 }

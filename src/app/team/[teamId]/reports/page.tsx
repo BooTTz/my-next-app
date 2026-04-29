@@ -11,15 +11,22 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { MOCK_REPORTS } from "@/lib/mock-data";
-import { Eye, Download, Share2 } from "lucide-react";
+import { Eye, Download, Share2, Plus } from "lucide-react";
 import HoverActionMenu from "@/components/shared/HoverActionMenu";
 import { toast } from "sonner";
+import { useAppStore } from "@/lib/store";
 
 export default function ReportsListPage() {
   const router = useRouter();
   const params = useParams();
   const teamId = params.teamId as string;
+  const { currentUserType } = useAppStore();
   const [search, setSearch] = useState("");
+
+  const isInspector = currentUserType === "inspector";
+  const isSupervisor = currentUserType === "supervisor";
+
+  const pageTitle = isSupervisor ? "报告列表" : isInspector ? "报告管理" : "报告列表";
 
   const filtered = MOCK_REPORTS.filter(
     (r) => r.reportNo.includes(search) || (r.enterpriseName || "").includes(search)
@@ -27,7 +34,13 @@ export default function ReportsListPage() {
 
   return (
     <div className="space-y-4">
-      <PageHeader title="检查报告管理" />
+      <PageHeader title={pageTitle}>
+        {isInspector && (
+          <Button size="sm" onClick={() => toast.info("生成报告 - 从已完成任务中选择")}>
+            <Plus className="size-3.5" /> 生成报告
+          </Button>
+        )}
+      </PageHeader>
 
       <Card>
         <CardContent className="p-4">

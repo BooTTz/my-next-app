@@ -11,7 +11,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { MOCK_TASKS } from "@/lib/mock-data";
+import { MOCK_TASKS, MOCK_PLANS } from "@/lib/mock-data";
 import { CONCLUSION_MAP } from "@/lib/types";
 import { Eye } from "lucide-react";
 import HoverActionMenu from "@/components/shared/HoverActionMenu";
@@ -22,6 +22,11 @@ export default function TasksListPage() {
   const params = useParams();
   const teamId = params.teamId as string;
   const [search, setSearch] = useState("");
+
+  const getTaskProjectName = (planId: string) => {
+    const plan = MOCK_PLANS.find((p) => p.id === planId);
+    return plan?.projectName;
+  };
 
   const filteredTasks = MOCK_TASKS.filter(
     (t) =>
@@ -51,6 +56,7 @@ export default function TasksListPage() {
                 <TableRow>
                   <TableHead className="w-[120px]">任务编号</TableHead>
                   <TableHead>被检查企业</TableHead>
+                  <TableHead className="w-[140px]">所属项目</TableHead>
                   <TableHead className="w-[100px]">所属计划</TableHead>
                   <TableHead className="w-[80px]">状态</TableHead>
                   <TableHead className="w-[100px]">计划日期</TableHead>
@@ -72,6 +78,9 @@ export default function TasksListPage() {
                       >
                         {task.enterpriseName}
                       </Link>
+                    </TableCell>
+                    <TableCell className="text-xs text-muted-foreground truncate max-w-[130px]">
+                      {getTaskProjectName(task.planId) || "-"}
                     </TableCell>
                     <TableCell className="text-xs text-muted-foreground truncate max-w-[100px]">
                       {task.planName?.substring(0, 8)}...
@@ -127,10 +136,6 @@ export default function TasksListPage() {
                             label: "查看详情",
                             icon: <Eye className="h-4 w-4" />,
                             onClick: () => router.push(`/team/${teamId}/tasks/${task.id}`),
-                          },
-                          {
-                            label: "接收任务",
-                            onClick: () => toast.info("接收任务"),
                           },
                           {
                             label: "验收任务",

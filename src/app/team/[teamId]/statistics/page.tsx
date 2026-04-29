@@ -20,7 +20,7 @@ const COLORS = ["#1E3A5F", "#3B82F6", "#22C55E", "#F59E0B", "#EF4444", "#8B5CF6"
 export default function StatisticsPage() {
   const totalTasks = MOCK_TASKS.length;
   const totalHazards = MOCK_HAZARDS.length;
-  const closedHazards = MOCK_HAZARDS.filter((h) => h.status === "closed").length;
+  const closedHazards = MOCK_HAZARDS.filter((h) => h.status === "accepted").length;
   const enterprises = MOCK_ENTERPRISES.length;
 
   // 各企业隐患统计
