@@ -3,7 +3,7 @@
 ## v1.1.8 (2026-04-29)
 
 **标签**: `v1.1.8`  
-**对应提交**: `TBD`  
+**对应提交**: `252b5ef`  
 **GitHub**: https://github.com/BooTTz/my-next-app/releases/tag/v1.1.8
 
 ### 包含内容
