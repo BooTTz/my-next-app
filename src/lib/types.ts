@@ -356,6 +356,8 @@ export interface InspectionItem {
   year: number;
   creatorId: string;
   creatorName?: string;
+  /** 创建组织类型：监管部门/服务机构/企业单位 */
+  creatorOrgType: UserType;
   createdAt: string;
   basis?: string;
   scope?: string;
@@ -393,6 +395,8 @@ export interface InspectionTask {
   conclusion?: InspectionConclusion;
   safetyLevel?: SafetyLevel;
   remark?: string;
+  /** 创建组织类型：监管部门/服务机构/企业单位 */
+  creatorOrgType: UserType;
   createdAt: string;
   updatedAt: string;
   hazardCount?: number;

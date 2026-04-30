@@ -32,14 +32,17 @@ import { MOCK_INSPECTION_ITEMS, MOCK_TEAMS } from "@/lib/mock-data";
 import { useAppStore } from "@/lib/store";
 import {
   ITEM_TYPE_MAP,
+  USER_TYPE_MAP,
   type PlanType,
   type PlanStatus,
+  type UserType,
   type InspectionItem,
 } from "@/lib/types";
 import {
   Eye,
   Edit,
   Trash2,
+  ClipboardList,
   Plus,
   ShieldBan,
 } from "lucide-react";
@@ -125,7 +128,7 @@ export default function InspectionItemsListPage() {
   const router = useRouter();
   const params = useParams();
   const teamId = params.teamId as string;
-  const { currentTeam, currentUser } = useAppStore();
+  const { currentTeam, currentUser, currentUserType } = useAppStore();
 
   // ---- Items state (mock data driven) ----
   const [items, setItems] = useState<InspectionItem[]>(MOCK_INSPECTION_ITEMS);
@@ -317,6 +320,7 @@ export default function InspectionItemsListPage() {
           year: formData.year,
           creatorId: currentUser?.id ?? "",
           creatorName: currentUser?.realName ?? "",
+          creatorOrgType: (currentUserType ?? "supervisor") as UserType,
           createdAt: now,
           basis: formData.basis,
           scope: formData.scope,
@@ -471,14 +475,15 @@ export default function InspectionItemsListPage() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="w-[140px]">检查编号</TableHead>
+                      <TableHead className="w-[130px]">检查编号</TableHead>
                       <TableHead>检查名称</TableHead>
-                      <TableHead className="w-[90px]">检查类型</TableHead>
-                      <TableHead className="w-[80px]">状态</TableHead>
-                      <TableHead className="w-[170px]">检查时间</TableHead>
-                      <TableHead className="w-[80px]">创建人</TableHead>
-                      <TableHead className="w-[100px]">创建时间</TableHead>
-                      <TableHead className="w-[110px]">任务进度</TableHead>
+                      <TableHead className="w-[80px]">检查类型</TableHead>
+                      <TableHead className="w-[80px]">创建组织</TableHead>
+                      <TableHead className="w-[75px]">状态</TableHead>
+                      <TableHead className="w-[160px]">检查时间</TableHead>
+                      <TableHead className="w-[70px]">创建人</TableHead>
+                      <TableHead className="w-[85px]">创建时间</TableHead>
+                      <TableHead className="w-[100px]">任务进度</TableHead>
                       <TableHead className="w-[60px] text-right">操作</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -510,6 +515,17 @@ export default function InspectionItemsListPage() {
                             </Badge>
                           </TableCell>
                           <TableCell>
+                            <span className={`inline-flex items-center rounded-md border px-1.5 py-0.5 text-[10px] font-medium ${
+                              item.creatorOrgType === "supervisor"
+                                ? "role-badge-supervisor"
+                                : item.creatorOrgType === "inspector"
+                                  ? "role-badge-inspector"
+                                  : "role-badge-enterprise"
+                            }`}>
+                              {USER_TYPE_MAP[item.creatorOrgType]}
+                            </span>
+                          </TableCell>
+                          <TableCell>
                             <PlanStatusBadge status={item.status} />
                           </TableCell>
                           <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
@@ -532,34 +548,59 @@ export default function InspectionItemsListPage() {
                             )}
                           </TableCell>
                           <TableCell className="text-right">
-                            <HoverActionMenu
-                              actions={[
-                                {
-                                  label: "查看详情",
-                                  icon: <Eye className="size-4" />,
-                                  onClick: () =>
-                                    router.push(`/team/${teamId}/inspection-items/${item.id}`),
-                                },
-                                ...(isCreator
-                                  ? [
-                                      {
-                                        label: "编辑",
-                                        icon: <Edit className="size-4" />,
-                                        onClick: () => openEditDialog(item),
-                                      } as const,
-                                      {
-                                        label: "删除",
-                                        icon: <Trash2 className="size-4" />,
-                                        onClick: () => {
-                                          setDeleteTarget(item);
-                                          setDeleteOpen(true);
-                                        },
-                                        variant: "destructive" as const,
-                                      } as const,
-                                    ]
-                                  : []),
-                              ]}
-                            />
+                            {/* 是否可创建任务（与详情页逻辑一致） */}
+                            {(() => {
+                              const canCreateTask =
+                                !!(currentUser && item.creatorId === currentUser.id) ||
+                                currentUserType === "inspector";
+                              return (
+                                <HoverActionMenu
+                                  actions={[
+                                    {
+                                      label: "查看详情",
+                                      icon: <Eye className="size-4" />,
+                                      onClick: () =>
+                                        router.push(`/team/${teamId}/inspection-items/${item.id}`),
+                                    },
+                                    ...(isCreator
+                                      ? [
+                                          {
+                                            label: "编辑",
+                                            icon: <Edit className="size-4" />,
+                                            onClick: () => openEditDialog(item),
+                                          } as const,
+                                          {
+                                            label: "删除",
+                                            icon: <Trash2 className="size-4" />,
+                                            onClick: () => {
+                                              setDeleteTarget(item);
+                                              setDeleteOpen(true);
+                                            },
+                                            variant: "destructive" as const,
+                                          } as const,
+                                        ]
+                                      : []),
+                                    ...(canCreateTask
+                                      ? [
+                                          {
+                                            label: "管理任务",
+                                            icon: <ClipboardList className="size-4" />,
+                                            onClick: () =>
+                                              router.push(`/team/${teamId}/inspection-items/${item.id}/tasks`),
+                                          } as const,
+                                        ]
+                                      : [
+                                          {
+                                            label: "查看任务",
+                                            icon: <ClipboardList className="size-4" />,
+                                            onClick: () =>
+                                              router.push(`/team/${teamId}/inspection-items/${item.id}/tasks`),
+                                          } as const,
+                                        ]),
+                                  ]}
+                                />
+                              );
+                            })()}
                           </TableCell>
                         </TableRow>
                       );

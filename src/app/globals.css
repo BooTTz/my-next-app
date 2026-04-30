@@ -309,10 +309,10 @@
 
   /* 页面内容容器 - 最大宽度限制 */
   .page-container {
-    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+    @apply max-w-7xl mx-auto px-2 sm:px-3 lg:px-4;
   }
   .page-container-narrow {
-    @apply max-w-5xl mx-auto px-4 sm:px-6 lg:px-8;
+    @apply max-w-5xl mx-auto px-2 sm:px-3 lg:px-4;
   }
 
   /* 角色标签样式 */

@@ -2,7 +2,7 @@
 
 import { use, useState, useMemo, useCallback } from "react";
 import Link from "next/link";
-import { ArrowLeft, Plus, Building2, Calendar, User, Users, ClipboardList, FileText } from "lucide-react";
+import { ArrowLeft, Plus, Building2, Calendar, Edit, User, Users, ClipboardList, FileText } from "lucide-react";
 import { toast } from "sonner";
 
 import { useAppStore } from "@/lib/store";
@@ -14,10 +14,9 @@ import {
   MOCK_ENTERPRISES,
 } from "@/lib/mock-data";
 import type { InspectionTask, Hazard, TaskStatus, UserType } from "@/lib/types";
-import { PLAN_TYPE_MAP, USER_TYPE_MAP } from "@/lib/types";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Table,
   TableHeader,
@@ -44,7 +43,6 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Popover,
@@ -153,9 +151,21 @@ function InspectorMultiSelect({
   );
 }
 
+// ─── Sub-components ──────────────────────────────────────────
+
+function ConclusionBadge({
+  conclusion,
+}: {
+  conclusion: "qualified" | "basically_qualified" | "unqualified";
+}) {
+  const variant = CONCLUSION_VARIANT[conclusion] ?? "neutral";
+  const label = CONCLUSION_LABEL[conclusion] ?? conclusion;
+  return <StatusBadge variant={variant} label={label} />;
+}
+
 // ─── Page Component ───────────────────────────────────────────
 
-export default function InspectionItemDetailPage({
+export default function InspectionItemTasksPage({
   params,
 }: {
   params: Promise<{ teamId: string; itemId: string }>;
@@ -230,9 +240,11 @@ export default function InspectionItemDetailPage({
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [taskDetailOpen, setTaskDetailOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<InspectionTask | null>(null);
+  const [editingTask, setEditingTask] = useState<InspectionTask | null>(null);
 
-  // ── Create Task Form State ────────────────────────────────
+  // ── Create/Edit Task Form State ───────────────────────────
 
+  const [isEditing, setIsEditing] = useState(false);
   const [newTaskEnterprise, setNewTaskEnterprise] = useState("");
   const [newTaskLeadInspector, setNewTaskLeadInspector] = useState("");
   const [newTaskInspectors, setNewTaskInspectors] = useState<string[]>([]);
@@ -246,6 +258,8 @@ export default function InspectionItemDetailPage({
     setNewTaskInspectors([]);
     setNewTaskDate("");
     setIsCreating(false);
+    setIsEditing(false);
+    setEditingTask(null);
   }, []);
 
   const handleCreateTask = useCallback(() => {
@@ -318,6 +332,7 @@ export default function InspectionItemDetailPage({
   }, [
     item,
     currentUser,
+    currentUserType,
     teamId,
     itemId,
     newTaskEnterprise,
@@ -327,12 +342,90 @@ export default function InspectionItemDetailPage({
     resetCreateForm,
   ]);
 
-  // ── Open Task Detail ──────────────────────────────────────
+  // ── Open Task Detail / Edit ──────────────────────────────
 
   const openTaskDetail = useCallback((task: InspectionTask) => {
     setSelectedTask(task);
     setTaskDetailOpen(true);
   }, []);
+
+  const openEditDialog = useCallback(() => {
+    if (!selectedTask) return;
+    const task = selectedTask;
+    setEditingTask(task);
+    setNewTaskEnterprise(task.enterpriseId);
+    setNewTaskLeadInspector(task.leadInspectorId);
+    setNewTaskInspectors(task.inspectorIds);
+    setNewTaskDate(task.scheduledDate);
+    setIsEditing(true);
+    setTaskDetailOpen(false);
+    setCreateDialogOpen(true);
+  }, [selectedTask]);
+
+  const handleUpdateTask = useCallback(() => {
+    if (!item || !currentUser || !editingTask) return;
+
+    if (!newTaskEnterprise) {
+      toast.error("请选择被检查企业");
+      return;
+    }
+    if (!newTaskLeadInspector) {
+      toast.error("请选择检查组长");
+      return;
+    }
+    if (newTaskInspectors.length === 0) {
+      toast.error("请至少选择1名检查人员");
+      return;
+    }
+    if (!newTaskDate) {
+      toast.error("请选择计划检查日期");
+      return;
+    }
+
+    setIsCreating(true);
+
+    setTimeout(() => {
+      const enterprise = MOCK_ENTERPRISES.find(
+        (e) => e.id === newTaskEnterprise,
+      );
+      const leadInspector = MOCK_MEMBERS.find(
+        (m) => m.userId === newTaskLeadInspector,
+      );
+      const inspectorMembers = MOCK_MEMBERS.filter((m) =>
+        newTaskInspectors.includes(m.userId),
+      );
+
+      const idx = MOCK_TASKS.findIndex((t) => t.id === editingTask.id);
+      if (idx !== -1) {
+        MOCK_TASKS[idx] = {
+          ...MOCK_TASKS[idx],
+          enterpriseId: newTaskEnterprise,
+          enterpriseName: enterprise?.name ?? "未知企业",
+          inspectorIds: newTaskInspectors,
+          inspectorNames: inspectorMembers.map((m) => m.user?.realName ?? ""),
+          leadInspectorId: newTaskLeadInspector,
+          leadInspectorName: leadInspector?.user?.realName ?? "",
+          scheduledDate: newTaskDate,
+          updatedAt: new Date().toISOString().split("T")[0],
+        };
+      }
+
+      toast.success(`任务 ${editingTask.taskNo} 已更新`);
+      setCreateDialogOpen(false);
+      resetCreateForm();
+      setIsCreating(false);
+      setRefreshKey((k) => k + 1);
+    }, 600);
+  }, [
+    item,
+    currentUser,
+    editingTask,
+    newTaskEnterprise,
+    newTaskLeadInspector,
+    newTaskInspectors,
+    newTaskDate,
+    resetCreateForm,
+  ]);
 
   // ── Guard: item not found ─────────────────────────────────
 
@@ -356,140 +449,40 @@ export default function InspectionItemDetailPage({
 
   return (
     <div className="page-container space-y-4">
-      {/* ── Header Section ────────────────────────────── */}
-      <div className="space-y-3">
-        {/* Back button + item number + status + type */}
-        <div className="flex items-start justify-between">
-          <div className="flex items-center gap-3">
-            <Link href={`/team/${teamId}/inspection-items`}>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-muted-foreground hover:text-foreground"
-              >
-                <ArrowLeft className="size-4 mr-1" />
-                返回
-              </Button>
-            </Link>
-            <span className="font-mono text-sm text-muted-foreground">
-              {item.itemNo}
-            </span>
-            <StatusBadge
-              variant={
-                item.status === "in_progress"
-                  ? "info"
-                  : item.status === "completed"
-                    ? "success"
-                    : item.status === "draft"
-                      ? "neutral"
-                      : item.status === "published"
-                        ? "warning"
-                        : "light"
-              }
-              label={
-                item.status === "in_progress"
-                  ? "执行中"
-                  : item.status === "completed"
-                    ? "已完成"
-                    : item.status === "draft"
-                      ? "草稿"
-                      : item.status === "published"
-                        ? "已发布"
-                        : "已归档"
-              }
-            />
-            <Badge variant="outline" className="text-xs">
-              {PLAN_TYPE_MAP[item.type]}
-            </Badge>
-          </div>
-        </div>
-
-        {/* Item name */}
-        <div>
-          <h1 className="text-xl font-semibold tracking-tight">{item.name}</h1>
-          {item.description && (
-            <p className="mt-1 text-sm text-muted-foreground">
-              {item.description}
-            </p>
-          )}
-        </div>
-
-        {/* Progress bar */}
+      {/* ── Header ─────────────────────────────────────── */}
+      <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="flex-1 space-y-1">
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-muted-foreground">任务进度</span>
-              <span className="text-xs text-muted-foreground">
-                {completedCount}/{totalCount} 项任务已完成
-              </span>
-            </div>
-            <Progress value={progressValue} />
+          <Link href={`/team/${teamId}/inspection-items`}>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <ArrowLeft className="size-4 mr-1" />
+              返回
+            </Button>
+          </Link>
+          <div>
+            <h1 className="text-lg font-semibold tracking-tight">{item.name}</h1>
+            <p className="text-xs text-muted-foreground">
+              检查编号：{item.itemNo}
+            </p>
           </div>
         </div>
       </div>
 
-      {/* ── Basic Info Card ───────────────────────────── */}
-      <Card size="sm">
-        <CardHeader>
-          <CardTitle>基本信息</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 gap-x-8 gap-y-3 text-sm">
-            <InfoRow label="检查时间" value={`${item.startDate} ~ ${item.endDate}`} />
-            <InfoRow label="计划年度" value={`${item.year}年`} />
-            <InfoRow label="创建人" value={item.creatorName ?? "-"} />
-            <InfoRow
-              label="创建组织"
-              value={
-                <span className={`inline-flex items-center rounded-md border px-1.5 py-0.5 text-[10px] font-medium ${
-                  item.creatorOrgType === "supervisor"
-                    ? "role-badge-supervisor"
-                    : item.creatorOrgType === "inspector"
-                      ? "role-badge-inspector"
-                      : "role-badge-enterprise"
-                }`}>
-                  {USER_TYPE_MAP[item.creatorOrgType]}
-                </span>
-              }
-            />
-            <InfoRow label="创建时间" value={item.createdAt} />
-            <InfoRow label="检查依据" value={item.basis ?? "-"} />
-            <InfoRow label="检查范围" value={item.scope ?? "-"} />
+      {/* ── Progress Bar ──────────────────────────────── */}
+      <div className="flex items-center gap-3">
+        <div className="flex-1 space-y-1">
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-muted-foreground">任务进度</span>
+            <span className="text-xs text-muted-foreground">
+              {completedCount}/{totalCount} 项任务已完成
+            </span>
           </div>
-        </CardContent>
-      </Card>
-
-      {/* ── Participants Section ───────────────────────── */}
-      <Card size="sm">
-        <CardHeader>
-          <CardTitle>参与单位</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Supervisors */}
-            <ParticipantGroup
-              title="监管部门"
-              badgeClass="role-badge-supervisor"
-              icon={<Building2 className="size-4 icon-supervisor" />}
-              names={item.supervisorTeamNames}
-            />
-            {/* Inspectors */}
-            <ParticipantGroup
-              title="服务机构"
-              badgeClass="role-badge-inspector"
-              icon={<Building2 className="size-4 icon-inspector" />}
-              names={item.inspectorTeamNames}
-            />
-            {/* Enterprises */}
-            <ParticipantGroup
-              title="企业"
-              badgeClass="role-badge-enterprise"
-              icon={<Building2 className="size-4 icon-enterprise" />}
-              names={item.enterpriseTeamNames}
-            />
-          </div>
-        </CardContent>
-      </Card>
+          <Progress value={progressValue} />
+        </div>
+      </div>
 
       {/* ── Tasks Section ─────────────────────────────── */}
       <div className="space-y-3">
@@ -591,13 +584,18 @@ export default function InspectionItemDetailPage({
         )}
       </div>
 
-      {/* ── Create Task Dialog ────────────────────────── */}
-      <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+      {/* ── Create/Edit Task Dialog ──────────────────── */}
+      <Dialog open={createDialogOpen} onOpenChange={(open) => {
+        setCreateDialogOpen(open);
+        if (!open) resetCreateForm();
+      }}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>创建检查任务</DialogTitle>
+            <DialogTitle>{isEditing ? "编辑检查任务" : "创建检查任务"}</DialogTitle>
             <DialogDescription>
-              为 &ldquo;{item.name}&rdquo; 创建新的检查任务
+              {isEditing
+                ? `正在编辑任务 ${editingTask?.taskNo}`
+                : `为 "${item.name}" 创建新的检查任务`}
             </DialogDescription>
           </DialogHeader>
 
@@ -702,10 +700,10 @@ export default function InspectionItemDetailPage({
             </Button>
             <LoadingButton
               loading={isCreating}
-              loadingText="创建中..."
-              onClick={handleCreateTask}
+              loadingText={isEditing ? "保存中..." : "创建中..."}
+              onClick={isEditing ? handleUpdateTask : handleCreateTask}
             >
-              创建
+              {isEditing ? "保存修改" : "创建"}
             </LoadingButton>
           </div>
         </DialogContent>
@@ -840,7 +838,18 @@ export default function InspectionItemDetailPage({
             </div>
           )}
 
-          <div className="flex items-center justify-end pt-2">
+          <div className="flex items-center gap-2 pt-2">
+            {canCreateTask && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={openEditDialog}
+              >
+                <Edit className="size-3.5 mr-1" />
+                编辑
+              </Button>
+            )}
+            <div className="flex-1" />
             <Button
               variant="outline"
               onClick={() => setTaskDetailOpen(false)}
@@ -852,60 +861,4 @@ export default function InspectionItemDetailPage({
       </Dialog>
     </div>
   );
-}
-
-// ─── Sub-components ──────────────────────────────────────────
-
-function InfoRow({ label, value }: { label: string; value: string | React.ReactNode }) {
-  return (
-    <div>
-      <p className="text-xs text-muted-foreground mb-0.5">{label}</p>
-      <p className="text-sm">{value}</p>
-    </div>
-  );
-}
-
-function ParticipantGroup({
-  title,
-  badgeClass,
-  icon,
-  names,
-}: {
-  title: string;
-  badgeClass: string;
-  icon: React.ReactNode;
-  names: string[];
-}) {
-  return (
-    <div>
-      <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1.5">
-        {icon}
-        {title}
-      </p>
-      <div className="flex flex-wrap gap-1.5">
-        {names.length > 0 ? (
-          names.map((name, i) => (
-            <span
-              key={i}
-              className={`inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium ${badgeClass}`}
-            >
-              {name}
-            </span>
-          ))
-        ) : (
-          <span className="text-xs text-muted-foreground">无</span>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function ConclusionBadge({
-  conclusion,
-}: {
-  conclusion: "qualified" | "basically_qualified" | "unqualified";
-}) {
-  const variant = CONCLUSION_VARIANT[conclusion] ?? "neutral";
-  const label = CONCLUSION_LABEL[conclusion] ?? conclusion;
-  return <StatusBadge variant={variant} label={label} />;
 }
