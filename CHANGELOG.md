@@ -1,5 +1,43 @@
 # 版本更新记录
 
+## v1.1.9 (2026-04-30)
+
+**标签**: `v1.1.9`  
+**对应提交**: `0ba3e52`  
+**GitHub**: https://github.com/BooTTz/my-next-app/releases/tag/v1.1.9
+
+### 包含内容
+- **检查事项模块新增**：新增检查事项（InspectionItems）完整模块，包含列表、详情、新建/编辑功能
+- **UI 布局一致性优化**：统一检查事项列表工具栏布局，搜索/筛选/新增按钮整合到同一区域
+- **页面结构清理**：移除已废弃的 plans、projects、tasks 相关页面文件
+- **各角色仪表盘优化**：企业/服务/监管三方仪表盘细节调整
+- **侧边栏与面包屑更新**：AppSidebar 导航结构调整，面包屑配置同步更新
+- **类型定义增强**：新增 InspectionItem 相关类型定义，Mock 数据补充
+
+### 改动文件
+- `src/app/team/[teamId]/inspection-items/` - 新增检查事项模块（列表+详情页）
+- `src/app/team/[teamId]/hazards/page.tsx` - 隐患列表 UI 微调
+- `src/app/team/[teamId]/page.tsx` - 团队详情页调整
+- `src/app/team/[teamId]/statistics/page.tsx` - 统计页面优化
+- `src/components/dashboard/*.tsx` - 各角色仪表盘优化
+- `src/components/layout/AppSidebar.tsx` - 侧边栏导航调整
+- `src/components/shared/StatusBadge.tsx` - 状态徽章更新
+- `src/lib/breadcrumb-config.ts` - 面包屑配置更新
+- `src/lib/mock-data.ts` - Mock 数据扩展
+- `src/lib/types.ts` - 类型定义增强
+- 移除废弃页面：plans/ projects/ tasks/ 相关文件
+
+### 如何恢复到此版本
+```bash
+# 方式1：创建新分支恢复（推荐）
+git checkout -b restore-v1.1.9 v1.1.9
+
+# 方式2：直接重置（慎用，会丢失之后的提交）
+git reset --hard v1.1.9
+```
+
+---
+
 ## v1.1.8 (2026-04-29)
 
 **标签**: `v1.1.8`  
