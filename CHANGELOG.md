@@ -1,5 +1,40 @@
 # 版本更新记录
 
+## v1.2.1 (2026-04-30)
+
+**标签**: `v1.2.1`  
+**对应提交**: `2fc1fcb`  
+**GitHub**: https://github.com/BooTTz/my-next-app/releases/tag/v1.2.1
+
+### 包含内容
+- **平台管理后台UI一致性修复**：面包屑改用 `useBreadcrumbs` 动态渲染，添加"平台管理后台"根节点；侧边栏移除多余"平台用户管理"分组标签
+- **组件规范化**：删除确认改用 `ConfirmDialog` 组件统一规范；新建用户按钮改用 `LoadingButton` 防重复提交；列表空状态改用 `EmptyState` 组件（`SearchEmpty`/`ListEmpty`）
+- **检查事项任务管理增强**：详情页增强，任务列表独立页完善，操作菜单标准化
+- **新增 ImageUpload 图片上传组件**
+- **ThemeToggle 主题切换组件优化**
+- **类型定义与 Mock 数据补充完善**
+
+### 改动文件
+- `src/app/admin/layout.tsx` - 管理后台布局（面包屑+侧边栏）重构
+- `src/app/admin/users/page.tsx` - 用户管理：ConfirmDialog+LoadingButton+EmptyState
+- `src/app/admin/organizations/page.tsx` - 组织管理：ConfirmDialog+EmptyState
+- `src/lib/breadcrumb-config.ts` - 面包屑配置添加"平台管理后台"根节点
+- `src/app/team/[teamId]/inspection-items/` - 检查事项模块增强
+- `src/app/team/[teamId]/statistics/page.tsx` - 统计页面优化
+- `src/components/shared/ThemeToggle.tsx` - 主题切换优化
+- `src/components/shared/ImageUpload.tsx` - 新增图片上传组件
+- `src/lib/types.ts` - 类型定义补充
+- `src/lib/mock-data.ts` - Mock 数据扩展
+
+### 如何恢复到此版本
+```bash
+# 方式1：创建新分支恢复（推荐）
+git checkout -b restore-v1.2.1 v1.2.1
+
+# 方式2：直接重置（慎用，会丢失之后的提交）
+git reset --hard v1.2.1
+```
+
 ## v1.2.0 (2026-04-30)
 
 **标签**: `v1.2.0`  
