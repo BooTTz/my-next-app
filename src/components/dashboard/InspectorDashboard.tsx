@@ -6,7 +6,7 @@ import { PageHeader } from "@/components/shared/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TaskStatusBadge } from "@/components/shared/StatusBadge";
-import { MOCK_TASKS, MOCK_HAZARDS, MOCK_PLANS } from "@/lib/mock-data";
+import { MOCK_TASKS, MOCK_HAZARDS, MOCK_INSPECTION_ITEMS } from "@/lib/mock-data";
 import { useAppStore } from "@/lib/store";
 import {
   FileText, Eye,
@@ -36,7 +36,7 @@ export default function InspectorDashboard() {
   const myTasks = MOCK_TASKS.filter((t) => t.inspectorIds.includes("u2"));
   const inspecting = myTasks.filter((t) => ["inspecting"].includes(t.status)).length;
   const reportPending = myTasks.filter((t) => ["report_drafting", "report_rejected"].includes(t.status)).length;
-  const managedPlans = MOCK_PLANS.length;
+  const managedItems = MOCK_INSPECTION_ITEMS.length;
 
   const inspectorWorkload = [
     { name: "张敏", 任务数: 5 },
@@ -57,7 +57,7 @@ export default function InspectorDashboard() {
 
       {/* 统计卡片 */}
       <div className="grid-stats">
-        <StatCard title="管理计划数" value={managedPlans} icon={<ClipboardList className="size-5" />} variant="primary" />
+        <StatCard title="管理事项数" value={managedItems} icon={<ClipboardList className="size-5" />} variant="primary" />
         <StatCard title="检查中任务" value={inspecting} icon={<Eye className="size-5" />} variant="primary" />
         <StatCard title="待提交报告" value={reportPending} icon={<FileText className="size-5" />} variant="danger" />
       </div>

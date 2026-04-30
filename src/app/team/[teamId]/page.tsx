@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAppStore } from "@/lib/store";
-import { MOCK_MEMBERS, MOCK_TASKS, MOCK_HAZARDS, MOCK_REPORTS, MOCK_TEAMS, MOCK_PROJECTS } from "@/lib/mock-data";
+import { MOCK_MEMBERS, MOCK_TASKS, MOCK_HAZARDS, MOCK_REPORTS, MOCK_TEAMS, MOCK_INSPECTION_ITEMS } from "@/lib/mock-data";
 import { USER_TYPE_MAP } from "@/lib/types";
 import {
   ArrowLeft, Building2, Users, MapPin, Calendar,
@@ -38,8 +38,8 @@ export default function TeamDetailPage() {
   const teamHazards = MOCK_HAZARDS.filter((h) => h.teamId === teamId);
   // 获取当前组织的报告
   const teamReports = MOCK_REPORTS.filter((r) => r.teamId === teamId);
-  // 获取当前组织的项目
-  const teamProjects = MOCK_PROJECTS.filter((p) => p.teamId === teamId);
+  // 获取当前组织的检查事项
+  const teamProjects = MOCK_INSPECTION_ITEMS.filter((p) => p.teamId === teamId);
 
   // 统计
   const stats = {

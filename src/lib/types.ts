@@ -34,9 +34,6 @@ export type PlanType = "routine" | "special" | "random" | "holiday";
 /** 检查计划状态 */
 export type PlanStatus = "draft" | "published" | "in_progress" | "completed" | "archived";
 
-/** 项目状态 */
-export type ProjectStatus = "created" | "in_progress" | "completed" | "archived";
-
 /** 检查任务状态 */
 export type TaskStatus =
   | "created"
@@ -338,52 +335,49 @@ export interface Enterprise {
   createdAt: string;
 }
 
-/** 项目 */
-export interface InspectionProject {
-  id: string;
+/** 检查参与者 */
+export interface InspectionParticipant {
   teamId: string;
-  projectNo: string;
-  name: string;
-  description?: string;
-  assignedToTeamId: string;
-  assignedToTeamName?: string;
-  status: ProjectStatus;
-  createdAt: string;
-  completedAt?: string;
-  planCount?: number;
-  completedPlanCount?: number;
+  teamName: string;
+  role: "supervisor" | "inspector" | "enterprise";
 }
 
-/** 检查计划 */
-export interface InspectionPlan {
+/** 检查事项 */
+export interface InspectionItem {
   id: string;
   teamId: string;
-  planNo: string;
+  itemNo: string;
   name: string;
   type: PlanType;
-  year: number;
+  status: PlanStatus;
+  description?: string;
   startDate: string;
   endDate: string;
-  description?: string;
-  scope?: string;
-  basis?: string;
+  year: number;
   creatorId: string;
   creatorName?: string;
-  status: PlanStatus;
-  projectId?: string;
-  projectName?: string;
   createdAt: string;
-  updatedAt: string;
+  basis?: string;
+  scope?: string;
+  institutionCount: number;
+  enterpriseCount: number;
   taskCount?: number;
   completedTaskCount?: number;
+  // 参与者——展开存储以简化查询
+  supervisorTeamIds: string[];
+  supervisorTeamNames: string[];
+  inspectorTeamIds: string[];
+  inspectorTeamNames: string[];
+  enterpriseTeamIds: string[];
+  enterpriseTeamNames: string[];
 }
 
 /** 检查任务 */
 export interface InspectionTask {
   id: string;
   teamId: string;
-  planId: string;
-  planName?: string;
+  inspectionItemId: string;
+  inspectionItemName?: string;
   taskNo: string;
   enterpriseId: string;
   enterpriseName?: string;
@@ -472,6 +466,7 @@ export interface InspectionReport {
   enterpriseName?: string;
   taskNo?: string;
   planName?: string;
+  inspectionItemName?: string;
 }
 
 /** 通知 */
@@ -533,12 +528,10 @@ export const PLAN_STATUS_MAP: Record<PlanStatus, string> = {
   archived: "已归档",
 };
 
-export const PROJECT_STATUS_MAP: Record<ProjectStatus, string> = {
-  created: "已创建",
-  in_progress: "执行中",
-  completed: "已完成",
-  archived: "已归档",
-};
+/** 检查事项类型映射（复用检查计划类型） */
+export const ITEM_TYPE_MAP = PLAN_TYPE_MAP;
+/** 检查事项状态映射（复用检查计划状态） */
+export const ITEM_STATUS_MAP = PLAN_STATUS_MAP;
 
 export const TASK_STATUS_MAP: Record<TaskStatus, string> = {
   created: "已创建",

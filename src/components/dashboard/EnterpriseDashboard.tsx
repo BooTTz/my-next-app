@@ -142,7 +142,7 @@ export default function EnterpriseDashboard() {
                       <span className="text-xs font-mono text-muted-foreground">{task.taskNo}</span>
                       <span className="text-xs text-muted-foreground">{task.scheduledDate}</span>
                     </div>
-                    <p className="mt-1 text-sm font-medium">{task.planName?.substring(0, 20)}...</p>
+                    <p className="mt-1 text-sm font-medium">{task.inspectionItemName?.substring(0, 20)}...</p>
                     <p className="mt-0.5 text-xs text-muted-foreground">
                       隐患 {task.hazardCount} 条 · 已整改 {task.rectifiedCount} 条
                     </p>

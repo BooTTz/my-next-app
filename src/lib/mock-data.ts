@@ -2,11 +2,11 @@
  * 工贸三方监管平台 - Mock 数据
  * ======================================== */
 import type {
-  User, Team, TeamMember, Enterprise, InspectionPlan,
+  User, Team, TeamMember, Enterprise, InspectionItem,
   InspectionTask, Hazard, InspectionReport, Notification,
   Workspace, RegionNode, TeamWorkspace, WorkspaceAdmin,
   Organization, Certificate, OrganizationStats,
-  UserTodo, InspectionProject,
+  UserTodo,
 } from "./types";
 
 // ============ 用户数据 ============
@@ -117,33 +117,99 @@ export const MOCK_ENTERPRISES: Enterprise[] = [
   { id: "e5", teamId: "t7", name: "博兴县兴隆轻工制品有限公司", creditCode: "91371625MA3EXAMPLE5", legalPerson: "钱兴隆", safetyDirector: "孙建设", safetyDirectorPhone: "13800002003", industry: "lightIndustry", scale: "small", employeeCount: 120, address: "博兴县店子镇轻工产业区16号", riskLevel: "blue", status: "active", createdAt: "2025-02-10" },
 ];
 
-// ============ 项目数据 ============
-export const MOCK_PROJECTS: InspectionProject[] = [
-  { id: "prj1", teamId: "t1", projectNo: "XM-2025-001", name: "2025年度工贸行业综合监管项目", description: "对辖区内工贸企业开展年度综合安全检查与监管", assignedToTeamId: "t2", assignedToTeamName: "博兴安全技术服务有限公司", status: "in_progress", createdAt: "2025-01-10", planCount: 2, completedPlanCount: 1 },
-  { id: "prj2", teamId: "t1", projectNo: "XM-2025-002", name: "有限空间作业安全专项整治项目", description: "重点检查涉及有限空间作业的企业安全管理情况", assignedToTeamId: "t2", assignedToTeamName: "博兴安全技术服务有限公司", status: "in_progress", createdAt: "2025-02-20", planCount: 1, completedPlanCount: 0 },
-  { id: "prj3", teamId: "t1", projectNo: "XM-2025-003", name: "2025年春节前安全生产保障项目", description: "春节前安全生产专项保障工作", assignedToTeamId: "t2", assignedToTeamName: "博兴安全技术服务有限公司", status: "completed", createdAt: "2025-01-05", completedAt: "2025-02-06", planCount: 1, completedPlanCount: 1 },
-  { id: "prj4", teamId: "t1", projectNo: "XM-2025-004", name: "2025年度双随机抽查监管项目", description: "按照双随机一公开要求开展年度抽查监管", assignedToTeamId: "t2", assignedToTeamName: "博兴安全技术服务有限公司", status: "created", createdAt: "2025-03-15", planCount: 1, completedPlanCount: 0 },
-];
-
-// ============ 检查计划 ============
-export const MOCK_PLANS: InspectionPlan[] = [
-  { id: "p1", teamId: "t1", planNo: "JHBX-2025-001", name: "2025年度工贸企业日常安全检查计划（第一季度）", type: "routine", year: 2025, startDate: "2025-01-15", endDate: "2025-03-31", description: "针对辖区内工贸企业开展日常安全生产检查", scope: "博兴县全部在产工贸企业", basis: "《安全生产法》《工贸行业安全生产监管办法》", creatorId: "u1", creatorName: "李伟", status: "in_progress", projectId: "prj1", projectName: "2025年度工贸行业综合监管项目", createdAt: "2025-01-12", updatedAt: "2025-01-15", taskCount: 5, completedTaskCount: 2 },
-  { id: "p2", teamId: "t1", planNo: "JHBX-2025-002", name: "2025年春节前安全生产专项检查", type: "holiday", year: 2025, startDate: "2025-01-20", endDate: "2025-02-05", description: "春节前安全生产专项检查，重点检查消防安全、用电安全等", scope: "全县重点工贸企业", basis: "关于做好2025年春节期间安全生产工作的通知", creatorId: "u1", creatorName: "李伟", status: "completed", projectId: "prj3", projectName: "2025年春节前安全生产保障项目", createdAt: "2025-01-10", updatedAt: "2025-02-06", taskCount: 3, completedTaskCount: 3 },
-  { id: "p3", teamId: "t1", planNo: "JHBX-2025-003", name: "有限空间作业安全专项检查", type: "special", year: 2025, startDate: "2025-03-01", endDate: "2025-04-30", description: "重点检查涉及有限空间作业的企业安全管理情况", scope: "涉及有限空间作业的工贸企业", basis: "《工贸企业有限空间作业安全管理与监督暂行规定》", creatorId: "u1", creatorName: "李伟", status: "published", projectId: "prj2", projectName: "有限空间作业安全专项整治项目", createdAt: "2025-02-20", updatedAt: "2025-02-25", taskCount: 4, completedTaskCount: 0 },
-  { id: "p4", teamId: "t1", planNo: "JHBX-2025-004", name: "2025年度工贸企业双随机检查计划", type: "random", year: 2025, startDate: "2025-04-01", endDate: "2025-06-30", description: "按照双随机一公开要求开展安全检查", scope: "随机抽取被检查企业和检查人员", creatorId: "u1", creatorName: "李伟", status: "draft", projectId: "prj4", projectName: "2025年度双随机抽查监管项目", createdAt: "2025-03-15", updatedAt: "2025-03-15", taskCount: 0, completedTaskCount: 0 },
-  { id: "p5", teamId: "t1", planNo: "JHBX-2025-005", name: "2025年第二季度日常安全检查计划", type: "routine", year: 2025, startDate: "2025-04-01", endDate: "2025-06-30", description: "第二季度工贸企业常规安全检查", creatorId: "u1", creatorName: "李伟", status: "draft", projectId: "prj1", projectName: "2025年度工贸行业综合监管项目", createdAt: "2025-03-20", updatedAt: "2025-03-20", taskCount: 0, completedTaskCount: 0 },
+// ============ 检查事项 ============
+export const MOCK_INSPECTION_ITEMS: InspectionItem[] = [
+  {
+    id: "ii1", teamId: "t1",
+    itemNo: "JCBX-2025-001", name: "2025年度工贸企业日常安全检查（第一季度）",
+    type: "routine", status: "in_progress",
+    description: "针对辖区内工贸企业开展日常安全生产检查",
+    startDate: "2025-01-15", endDate: "2025-03-31", year: 2025,
+    creatorId: "u1", creatorName: "李伟", createdAt: "2025-01-12",
+    basis: "《安全生产法》《工贸行业安全生产监管办法》",
+    scope: "博兴县全部在产工贸企业",
+    institutionCount: 1, enterpriseCount: 5,
+    taskCount: 5, completedTaskCount: 2,
+    supervisorTeamIds: ["t1"], supervisorTeamNames: ["博兴县应急管理局"],
+    inspectorTeamIds: ["t2"], inspectorTeamNames: ["博兴安全技术服务有限公司"],
+    enterpriseTeamIds: ["t3", "t4", "t5", "t6", "t7"],
+    enterpriseTeamNames: ["博兴县鑫盛金属制品有限公司", "山东博兴华宇建材有限公司", "博兴县天成机械加工厂", "博兴县宏达纺织有限公司", "博兴县兴隆轻工制品有限公司"],
+  },
+  {
+    id: "ii2", teamId: "t1",
+    itemNo: "JCBX-2025-002", name: "2025年春节前安全生产专项检查",
+    type: "holiday", status: "completed",
+    description: "春节前安全生产专项检查，重点检查消防安全、用电安全等",
+    startDate: "2025-01-20", endDate: "2025-02-05", year: 2025,
+    creatorId: "u1", creatorName: "李伟", createdAt: "2025-01-10",
+    basis: "关于做好2025年春节期间安全生产工作的通知",
+    scope: "全县重点工贸企业",
+    institutionCount: 1, enterpriseCount: 2,
+    taskCount: 3, completedTaskCount: 3,
+    supervisorTeamIds: ["t1"], supervisorTeamNames: ["博兴县应急管理局"],
+    inspectorTeamIds: ["t2"], inspectorTeamNames: ["博兴安全技术服务有限公司"],
+    enterpriseTeamIds: ["t1", "t3"],
+    enterpriseTeamNames: ["博兴县应急管理局", "博兴县鑫盛金属制品有限公司"],
+  },
+  {
+    id: "ii3", teamId: "t2",
+    itemNo: "JCBX-2025-003", name: "有限空间作业安全专项检查",
+    type: "special", status: "published",
+    description: "重点检查涉及有限空间作业的企业安全管理情况",
+    startDate: "2025-03-01", endDate: "2025-04-30", year: 2025,
+    creatorId: "u2", creatorName: "张敏", createdAt: "2025-02-20",
+    basis: "《工贸企业有限空间作业安全管理与监督暂行规定》",
+    scope: "涉及有限空间作业的工贸企业",
+    institutionCount: 1, enterpriseCount: 2,
+    taskCount: 2, completedTaskCount: 0,
+    supervisorTeamIds: ["t1"], supervisorTeamNames: ["博兴县应急管理局"],
+    inspectorTeamIds: ["t2"], inspectorTeamNames: ["博兴安全技术服务有限公司"],
+    enterpriseTeamIds: ["t3", "t5"],
+    enterpriseTeamNames: ["博兴县鑫盛金属制品有限公司", "博兴县天成机械加工厂"],
+  },
+  {
+    id: "ii4", teamId: "t3",
+    itemNo: "JCBX-2025-004", name: "企业自查自纠专项",
+    type: "routine", status: "draft",
+    description: "企业内部安全生产自查自纠",
+    startDate: "2025-04-01", endDate: "2025-04-30", year: 2025,
+    creatorId: "u4", creatorName: "陈杰", createdAt: "2025-03-25",
+    scope: "企业内部各生产车间",
+    institutionCount: 1, enterpriseCount: 1,
+    taskCount: 0, completedTaskCount: 0,
+    supervisorTeamIds: ["t1"], supervisorTeamNames: ["博兴县应急管理局"],
+    inspectorTeamIds: ["t2"], inspectorTeamNames: ["博兴安全技术服务有限公司"],
+    enterpriseTeamIds: ["t3"],
+    enterpriseTeamNames: ["博兴县鑫盛金属制品有限公司"],
+  },
+  {
+    id: "ii5", teamId: "t1",
+    itemNo: "JCBX-2025-005", name: "2025年度双随机抽查",
+    type: "random", status: "draft",
+    description: "按照双随机一公开要求开展安全检查",
+    startDate: "2025-04-01", endDate: "2025-06-30", year: 2025,
+    creatorId: "u1", creatorName: "李伟", createdAt: "2025-03-15",
+    basis: "双随机一公开监管要求",
+    scope: "随机抽取被检查企业和检查人员",
+    institutionCount: 1, enterpriseCount: 5,
+    taskCount: 0, completedTaskCount: 0,
+    supervisorTeamIds: ["t1"], supervisorTeamNames: ["博兴县应急管理局"],
+    inspectorTeamIds: ["t2"], inspectorTeamNames: ["博兴安全技术服务有限公司"],
+    enterpriseTeamIds: ["t3", "t4", "t5", "t6", "t7"],
+    enterpriseTeamNames: ["博兴县鑫盛金属制品有限公司", "山东博兴华宇建材有限公司", "博兴县天成机械加工厂", "博兴县宏达纺织有限公司", "博兴县兴隆轻工制品有限公司"],
+  },
 ];
 
 // ============ 检查任务 ============
 export const MOCK_TASKS: InspectionTask[] = [
-  { id: "tk1", teamId: "t1", planId: "p1", planName: "2025年度工贸企业日常安全检查计划（第一季度）", taskNo: "RW-2025-001", enterpriseId: "e1", enterpriseName: "博兴县鑫盛金属制品有限公司", inspectorIds: ["u2","u3"], inspectorNames: ["张敏","王强"], leadInspectorId: "u2", leadInspectorName: "张敏", scheduledDate: "2025-02-10", actualStartDate: "2025-02-10", actualEndDate: "2025-02-10", status: "completed", conclusion: "basically_qualified", safetyLevel: "B", createdAt: "2025-01-15", updatedAt: "2025-02-12", hazardCount: 8, rectifiedCount: 8 },
-  { id: "tk2", teamId: "t1", planId: "p1", planName: "2025年度工贸企业日常安全检查计划（第一季度）", taskNo: "RW-2025-002", enterpriseId: "e2", enterpriseName: "山东博兴华宇建材有限公司", inspectorIds: ["u2","u6"], inspectorNames: ["张敏","孙浩"], leadInspectorId: "u2", leadInspectorName: "张敏", scheduledDate: "2025-02-15", actualStartDate: "2025-02-15", actualEndDate: "2025-02-16", status: "completed", conclusion: "qualified", safetyLevel: "A", createdAt: "2025-01-15", updatedAt: "2025-02-18", hazardCount: 3, rectifiedCount: 3 },
-  { id: "tk3", teamId: "t1", planId: "p1", planName: "2025年度工贸企业日常安全检查计划（第一季度）", taskNo: "RW-2025-003", enterpriseId: "e3", enterpriseName: "博兴县天成机械加工厂", inspectorIds: ["u3","u6"], inspectorNames: ["王强","孙浩"], leadInspectorId: "u3", leadInspectorName: "王强", scheduledDate: "2025-03-05", actualStartDate: "2025-03-05", status: "rectifying", createdAt: "2025-01-15", updatedAt: "2025-03-08", hazardCount: 12, rectifiedCount: 7 },
-  { id: "tk4", teamId: "t1", planId: "p1", planName: "2025年度工贸企业日常安全检查计划（第一季度）", taskNo: "RW-2025-004", enterpriseId: "e4", enterpriseName: "博兴县宏达纺织有限公司", inspectorIds: ["u2","u3"], inspectorNames: ["张敏","王强"], leadInspectorId: "u2", leadInspectorName: "张敏", scheduledDate: "2025-03-15", status: "inspecting", createdAt: "2025-01-15", updatedAt: "2025-03-15", hazardCount: 5, rectifiedCount: 0 },
-  { id: "tk5", teamId: "t1", planId: "p1", planName: "2025年度工贸企业日常安全检查计划（第一季度）", taskNo: "RW-2025-005", enterpriseId: "e5", enterpriseName: "博兴县兴隆轻工制品有限公司", inspectorIds: ["u6"], inspectorNames: ["孙浩"], leadInspectorId: "u6", leadInspectorName: "孙浩", scheduledDate: "2025-03-25", status: "assigned", createdAt: "2025-01-15", updatedAt: "2025-01-15", hazardCount: 0, rectifiedCount: 0 },
-  { id: "tk6", teamId: "t1", planId: "p2", planName: "2025年春节前安全生产专项检查", taskNo: "RW-2025-006", enterpriseId: "e1", enterpriseName: "博兴县鑫盛金属制品有限公司", inspectorIds: ["u2","u3","u6"], inspectorNames: ["张敏","王强","孙浩"], leadInspectorId: "u2", leadInspectorName: "张敏", scheduledDate: "2025-01-22", actualStartDate: "2025-01-22", actualEndDate: "2025-01-22", status: "completed", conclusion: "basically_qualified", safetyLevel: "B", createdAt: "2025-01-10", updatedAt: "2025-01-25", hazardCount: 6, rectifiedCount: 6 },
-  { id: "tk7", teamId: "t1", planId: "p3", planName: "有限空间作业安全专项检查", taskNo: "RW-2025-007", enterpriseId: "e1", enterpriseName: "博兴县鑫盛金属制品有限公司", inspectorIds: ["u2","u3"], inspectorNames: ["张敏","王强"], leadInspectorId: "u2", leadInspectorName: "张敏", scheduledDate: "2025-03-10", status: "inspecting", createdAt: "2025-02-25", updatedAt: "2025-03-02", hazardCount: 0, rectifiedCount: 0 },
-  { id: "tk8", teamId: "t1", planId: "p3", planName: "有限空间作业安全专项检查", taskNo: "RW-2025-008", enterpriseId: "e3", enterpriseName: "博兴县天成机械加工厂", inspectorIds: ["u6"], inspectorNames: ["孙浩"], leadInspectorId: "u6", leadInspectorName: "孙浩", scheduledDate: "2025-03-20", status: "assigned", createdAt: "2025-02-25", updatedAt: "2025-02-25", hazardCount: 0, rectifiedCount: 0 },
+  { id: "tk1", teamId: "t1", inspectionItemId: "ii1", inspectionItemName: "2025年度工贸企业日常安全检查（第一季度）", taskNo: "RW-2025-001", enterpriseId: "e1", enterpriseName: "博兴县鑫盛金属制品有限公司", inspectorIds: ["u2","u3"], inspectorNames: ["张敏","王强"], leadInspectorId: "u2", leadInspectorName: "张敏", scheduledDate: "2025-02-10", actualStartDate: "2025-02-10", actualEndDate: "2025-02-10", status: "completed", conclusion: "basically_qualified", safetyLevel: "B", createdAt: "2025-01-15", updatedAt: "2025-02-12", hazardCount: 8, rectifiedCount: 8 },
+  { id: "tk2", teamId: "t1", inspectionItemId: "ii1", inspectionItemName: "2025年度工贸企业日常安全检查（第一季度）", taskNo: "RW-2025-002", enterpriseId: "e2", enterpriseName: "山东博兴华宇建材有限公司", inspectorIds: ["u2","u6"], inspectorNames: ["张敏","孙浩"], leadInspectorId: "u2", leadInspectorName: "张敏", scheduledDate: "2025-02-15", actualStartDate: "2025-02-15", actualEndDate: "2025-02-16", status: "completed", conclusion: "qualified", safetyLevel: "A", createdAt: "2025-01-15", updatedAt: "2025-02-18", hazardCount: 3, rectifiedCount: 3 },
+  { id: "tk3", teamId: "t1", inspectionItemId: "ii1", inspectionItemName: "2025年度工贸企业日常安全检查（第一季度）", taskNo: "RW-2025-003", enterpriseId: "e3", enterpriseName: "博兴县天成机械加工厂", inspectorIds: ["u3","u6"], inspectorNames: ["王强","孙浩"], leadInspectorId: "u3", leadInspectorName: "王强", scheduledDate: "2025-03-05", actualStartDate: "2025-03-05", status: "rectifying", createdAt: "2025-01-15", updatedAt: "2025-03-08", hazardCount: 12, rectifiedCount: 7 },
+  { id: "tk4", teamId: "t1", inspectionItemId: "ii1", inspectionItemName: "2025年度工贸企业日常安全检查（第一季度）", taskNo: "RW-2025-004", enterpriseId: "e4", enterpriseName: "博兴县宏达纺织有限公司", inspectorIds: ["u2","u3"], inspectorNames: ["张敏","王强"], leadInspectorId: "u2", leadInspectorName: "张敏", scheduledDate: "2025-03-15", status: "inspecting", createdAt: "2025-01-15", updatedAt: "2025-03-15", hazardCount: 5, rectifiedCount: 0 },
+  { id: "tk5", teamId: "t1", inspectionItemId: "ii1", inspectionItemName: "2025年度工贸企业日常安全检查（第一季度）", taskNo: "RW-2025-005", enterpriseId: "e5", enterpriseName: "博兴县兴隆轻工制品有限公司", inspectorIds: ["u6"], inspectorNames: ["孙浩"], leadInspectorId: "u6", leadInspectorName: "孙浩", scheduledDate: "2025-03-25", status: "assigned", createdAt: "2025-01-15", updatedAt: "2025-01-15", hazardCount: 0, rectifiedCount: 0 },
+  { id: "tk6", teamId: "t1", inspectionItemId: "ii2", inspectionItemName: "2025年春节前安全生产专项检查", taskNo: "RW-2025-006", enterpriseId: "e1", enterpriseName: "博兴县鑫盛金属制品有限公司", inspectorIds: ["u2","u3","u6"], inspectorNames: ["张敏","王强","孙浩"], leadInspectorId: "u2", leadInspectorName: "张敏", scheduledDate: "2025-01-22", actualStartDate: "2025-01-22", actualEndDate: "2025-01-22", status: "completed", conclusion: "basically_qualified", safetyLevel: "B", createdAt: "2025-01-10", updatedAt: "2025-01-25", hazardCount: 6, rectifiedCount: 6 },
+  { id: "tk7", teamId: "t1", inspectionItemId: "ii3", inspectionItemName: "有限空间作业安全专项检查", taskNo: "RW-2025-007", enterpriseId: "e1", enterpriseName: "博兴县鑫盛金属制品有限公司", inspectorIds: ["u2","u3"], inspectorNames: ["张敏","王强"], leadInspectorId: "u2", leadInspectorName: "张敏", scheduledDate: "2025-03-10", status: "inspecting", createdAt: "2025-02-25", updatedAt: "2025-03-02", hazardCount: 0, rectifiedCount: 0 },
+  { id: "tk8", teamId: "t1", inspectionItemId: "ii3", inspectionItemName: "有限空间作业安全专项检查", taskNo: "RW-2025-008", enterpriseId: "e3", enterpriseName: "博兴县天成机械加工厂", inspectorIds: ["u6"], inspectorNames: ["孙浩"], leadInspectorId: "u6", leadInspectorName: "孙浩", scheduledDate: "2025-03-20", status: "assigned", createdAt: "2025-02-25", updatedAt: "2025-02-25", hazardCount: 0, rectifiedCount: 0 },
 ];
 
 // ============ 隐患数据 ============
@@ -160,10 +226,10 @@ export const MOCK_HAZARDS: Hazard[] = [
 
 // ============ 检查报告 ============
 export const MOCK_REPORTS: InspectionReport[] = [
-  { id: "r1", teamId: "t1", taskId: "tk1", reportNo: "BG-2025-001", generatedBy: "u2", generatedByName: "张敏", generatedAt: "2025-02-12", status: "approved", version: 1, enterpriseName: "博兴县鑫盛金属制品有限公司", taskNo: "RW-2025-001", planName: "2025年度工贸企业日常安全检查计划（第一季度）" },
-  { id: "r2", teamId: "t1", taskId: "tk2", reportNo: "BG-2025-002", generatedBy: "u2", generatedByName: "张敏", generatedAt: "2025-02-18", status: "approved", version: 1, enterpriseName: "山东博兴华宇建材有限公司", taskNo: "RW-2025-002", planName: "2025年度工贸企业日常安全检查计划（第一季度）" },
-  { id: "r3", teamId: "t1", taskId: "tk6", reportNo: "BG-2025-003", generatedBy: "u2", generatedByName: "张敏", generatedAt: "2025-01-25", status: "approved", version: 2, enterpriseName: "博兴县鑫盛金属制品有限公司", taskNo: "RW-2025-006", planName: "2025年春节前安全生产专项检查" },
-  { id: "r4", teamId: "t1", taskId: "tk3", reportNo: "BG-2025-004", generatedBy: "u3", generatedByName: "王强", generatedAt: "2025-03-10", status: "submitted", version: 1, enterpriseName: "博兴县天成机械加工厂", taskNo: "RW-2025-003", planName: "2025年度工贸企业日常安全检查计划（第一季度）" },
+  { id: "r1", teamId: "t1", taskId: "tk1", reportNo: "BG-2025-001", generatedBy: "u2", generatedByName: "张敏", generatedAt: "2025-02-12", status: "approved", version: 1, enterpriseName: "博兴县鑫盛金属制品有限公司", taskNo: "RW-2025-001", inspectionItemName: "2025年度工贸企业日常安全检查（第一季度）" },
+  { id: "r2", teamId: "t1", taskId: "tk2", reportNo: "BG-2025-002", generatedBy: "u2", generatedByName: "张敏", generatedAt: "2025-02-18", status: "approved", version: 1, enterpriseName: "山东博兴华宇建材有限公司", taskNo: "RW-2025-002", inspectionItemName: "2025年度工贸企业日常安全检查（第一季度）" },
+  { id: "r3", teamId: "t1", taskId: "tk6", reportNo: "BG-2025-003", generatedBy: "u2", generatedByName: "张敏", generatedAt: "2025-01-25", status: "approved", version: 2, enterpriseName: "博兴县鑫盛金属制品有限公司", taskNo: "RW-2025-006", inspectionItemName: "2025年春节前安全生产专项检查" },
+  { id: "r4", teamId: "t1", taskId: "tk3", reportNo: "BG-2025-004", generatedBy: "u3", generatedByName: "王强", generatedAt: "2025-03-10", status: "submitted", version: 1, enterpriseName: "博兴县天成机械加工厂", taskNo: "RW-2025-003", inspectionItemName: "2025年度工贸企业日常安全检查（第一季度）" },
 ];
 
 // ============ 通知数据 ============

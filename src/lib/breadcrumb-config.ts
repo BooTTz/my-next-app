@@ -14,44 +14,15 @@ export const BREADCRUMB_CONFIG: Record<string, BreadcrumbItem[]> = {
   // 团队工作台页面（当前组织）
   "/team/[teamId]/workspace": [],
 
-  // 项目管理
-  "/team/[teamId]/projects": [
-    { label: "项目管理" },
+  // 检查事项
+  "/team/[teamId]/inspection-items": [
+    { label: "检查事项" },
   ],
-  "/team/[teamId]/projects/[projectId]": [
-    { label: "项目管理", href: "" },
-    { label: "项目详情" },
-  ],
-  "/team/[teamId]/projects/received": [
-    { label: "收到的项目" },
+  "/team/[teamId]/inspection-items/[itemId]": [
+    { label: "检查事项", href: "" },
+    { label: "检查事项详情" },
   ],
 
-  // 检查计划管理
-  "/team/[teamId]/plans": [
-    { label: "检查计划管理" },
-  ],
-  "/team/[teamId]/plans/new": [
-    { label: "检查计划管理", href: "" },
-    { label: "新建检查计划" },
-  ],
-  "/team/[teamId]/plans/new/tasks": [
-    { label: "检查计划管理", href: "" },
-    { label: "配置检查任务" },
-  ],
-  "/team/[teamId]/plans/[planId]": [
-    { label: "检查计划管理", href: "" },
-    { label: "计划详情" },
-  ],
-  
-  // 检查任务管理
-  "/team/[teamId]/tasks": [
-    { label: "检查任务管理" },
-  ],
-  "/team/[teamId]/tasks/[taskId]": [
-    { label: "检查任务管理", href: "" },
-    { label: "任务详情" },
-  ],
-  
   // 隐患管理
   "/team/[teamId]/hazards": [
     { label: "隐患管理" },
@@ -63,16 +34,16 @@ export const BREADCRUMB_CONFIG: Record<string, BreadcrumbItem[]> = {
   
   // 报告管理
   "/team/[teamId]/reports": [
-    { label: "报告管理" },
+    { label: "检查报告" },
   ],
   "/team/[teamId]/reports/[reportId]": [
-    { label: "报告管理", href: "" },
+    { label: "检查报告", href: "" },
     { label: "报告详情" },
   ],
   
   // 数据统计
   "/team/[teamId]/statistics": [
-    { label: "数据统计" },
+    { label: "统计分析" },
   ],
   
   // 组织成员管理
@@ -92,11 +63,6 @@ export const BREADCRUMB_CONFIG: Record<string, BreadcrumbItem[]> = {
     { label: "监管部门列表" },
   ],
   
-  // 通知中心
-  "/team/[teamId]/notifications": [
-    { label: "通知中心" },
-  ],
-  
   // 组织设置
   "/team/[teamId]/settings": [
     { label: "组织设置" },
@@ -110,6 +76,11 @@ export const BREADCRUMB_CONFIG: Record<string, BreadcrumbItem[]> = {
   // 组织管理（工作组子页面）
   "/team/[teamId]/organization": [
     { label: "组织管理" },
+  ],
+  
+  // 通知中心
+  "/team/[teamId]/notifications": [
+    { label: "通知中心" },
   ],
   
   // 组织详情页

@@ -136,7 +136,7 @@ function EnterpriseHazardsView({ teamId }: { teamId: string }) {
                             </span>
                           </TableCell>
                           <TableCell className="text-xs truncate max-w-[120px]">
-                            {task?.planName ? `${task.planName.substring(0, 6)}...` : "-"}
+                            {task?.inspectionItemName ? `${task.inspectionItemName.substring(0, 6)}...` : "-"}
                           </TableCell>
                           <TableCell className="text-xs">
                             <div className="flex items-center gap-1">
@@ -222,7 +222,7 @@ function EnterpriseHazardsView({ teamId }: { teamId: string }) {
                           <p className="text-muted-foreground mb-1">关联检查任务</p>
                           <p className="flex items-center gap-1.5">
                             <ClipboardList className="size-3.5 text-muted-foreground" />
-                            {getTaskInfo(selectedHazard.taskId)?.planName || "-"}
+                            {getTaskInfo(selectedHazard.taskId)?.inspectionItemName || "-"}
                           </p>
                         </div>
                         <div>
