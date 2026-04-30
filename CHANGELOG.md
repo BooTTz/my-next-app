@@ -1,5 +1,27 @@
 # 版本更新记录
 
+## v1.2.0 (2026-04-30)
+
+**标签**: `v1.2.0`  
+**对应提交**: `792e2c9`  
+**GitHub**: https://github.com/BooTTz/my-next-app/releases/tag/v1.2.0
+
+### 包含内容
+- **检查事项任务管理增强**：新增检查事项任务列表独立页面，支持检查任务的创建/查看/编辑操作
+- **权限差异化展示**：有管理权限的用户显示"管理任务"（含创建/编辑），其他用户显示"查看任务"（仅列表查看）
+- **任务编辑功能**：任务详情弹窗新增"编辑"按钮，支持修改被检查企业、检查组长、检查人员、计划日期
+- **创建组织类型字段**：InspectionItem 和 InspectionTask 接口新增 `creatorOrgType` 字段，详情页展示创建组织标签
+- **页面布局边距优化**：`page-container` 左右 padding 值减半（`px-4→px-2`, `px-6→px-3`, `px-8→px-4`）
+
+### 改动文件
+- `src/app/team/[teamId]/inspection-items/[itemId]/tasks/page.tsx` - **新增**检查任务管理页（含创建/编辑弹窗）
+- `src/app/team/[teamId]/inspection-items/page.tsx` - 操作菜单新增「查看任务」入口
+- `src/app/team/[teamId]/inspection-items/[itemId]/page.tsx` - 详情页展示创建组织类型
+- `src/lib/types.ts` - InspectionItem/InspectionTask 新增 `creatorOrgType` 字段
+- `src/lib/mock-data.ts` - Mock 数据补充 `creatorOrgType`
+- `src/app/globals.css` - page-container/page-container-narrow padding 减半
+- `public/test*-*.png` - 测试截图
+
 ## v1.1.9 (2026-04-30)
 
 **标签**: `v1.1.9`  
