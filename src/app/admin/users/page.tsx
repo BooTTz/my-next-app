@@ -35,6 +35,9 @@ import {
   DetailDialogBody,
   DetailDialogFooter,
 } from "@/components/shared/DetailDialog";
+import ConfirmDialog from "@/components/shared/ConfirmDialog";
+import { LoadingButton } from "@/components/ui/loading-button";
+import EmptyState, { ListEmpty, SearchEmpty } from "@/components/shared/EmptyState";
 
 const STATUS_OPTIONS: { value: UserStatus | "all"; label: string }[] = [
   { value: "all", label: "全部" },
@@ -132,6 +135,7 @@ export default function UsersListPage() {
 
   // 新建用户
   const [createOpen, setCreateOpen] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
   const [newUser, setNewUser] = useState<NewUserForm>({
     username: "",
     phone: "",
@@ -179,6 +183,8 @@ export default function UsersListPage() {
       toast.error(error);
       return;
     }
+    setIsCreating(true);
+    // 模拟异步创建
     toast.success("用户创建成功");
     setCreateOpen(false);
     setNewUser({
@@ -189,6 +195,7 @@ export default function UsersListPage() {
       paidTier: "free",
       gender: "unknown",
     });
+    setIsCreating(false);
   }
 
   return (
@@ -293,7 +300,7 @@ export default function UsersListPage() {
               <Button variant="outline" onClick={() => setCreateOpen(false)}>
                 取消
               </Button>
-              <Button onClick={handleCreate}>创建</Button>
+              <LoadingButton loading={isCreating} onClick={handleCreate}>创建</LoadingButton>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -395,8 +402,12 @@ export default function UsersListPage() {
                 ))}
                 {filteredUsers.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center py-8 text-muted-foreground text-sm">
-                      未找到匹配的用户
+                    <TableCell colSpan={8} className="text-center py-8">
+                      {search ? (
+                        <SearchEmpty keyword={search} onClear={() => setSearch("")} className="py-0" />
+                      ) : (
+                        <ListEmpty onAdd={() => setCreateOpen(true)} addLabel="新建用户" className="py-0" />
+                      )}
                     </TableCell>
                   </TableRow>
                 )}
@@ -423,28 +434,16 @@ export default function UsersListPage() {
         </CardContent>
       </Card>
 
-      {/* 删除确认 Dialog */}
-      <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-        <DialogContent className="sm:max-w-sm">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <AlertTriangle className="size-5 text-amber-500" />
-              确认删除
-            </DialogTitle>
-            <DialogDescription>
-              确定要删除用户 <strong>{deleteTarget?.realName}</strong> 吗？此操作不可恢复。
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteOpen(false)}>
-              取消
-            </Button>
-            <Button variant="destructive" onClick={confirmDelete}>
-              删除
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* 删除确认 */}
+      <ConfirmDialog
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        title="确认删除"
+        description={`确定要删除用户 ${deleteTarget?.realName} 吗？此操作不可恢复。`}
+        variant="danger"
+        confirmText="删除"
+        onConfirm={confirmDelete}
+      />
 
       {/* 用户详情弹窗 */}
       {selectedUser && (

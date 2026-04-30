@@ -2,7 +2,7 @@
 
 import { use, useState, useMemo, useCallback } from "react";
 import Link from "next/link";
-import { ArrowLeft, Plus, Building2, Calendar, User, Users, ClipboardList, FileText } from "lucide-react";
+import { ArrowLeft, Plus, Building2, Calendar, User, Users, ClipboardList, FileText, Pencil, Trash2, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 
 import { useAppStore } from "@/lib/store";
@@ -58,6 +58,9 @@ import StatusBadge, {
   HazardStatusBadge,
 } from "@/components/shared/StatusBadge";
 import EmptyState from "@/components/shared/EmptyState";
+import HoverActionMenu from "@/components/shared/HoverActionMenu";
+import ImageUpload from "@/components/shared/ImageUpload";
+import ConfirmDialog from "@/components/shared/ConfirmDialog";
 
 // ─── Constants ───────────────────────────────────────────────
 
@@ -164,6 +167,9 @@ export default function InspectionItemDetailPage({
 
   const { currentUser, currentUserType } = useAppStore();
 
+  // ── Refresh Key ──────────────────────────────────────────
+  const [refreshKey, setRefreshKey] = useState(0);
+
   // ── Data ──────────────────────────────────────────────────
 
   const item = useMemo(
@@ -173,7 +179,7 @@ export default function InspectionItemDetailPage({
 
   const tasks = useMemo(
     () => MOCK_TASKS.filter((t) => t.inspectionItemId === itemId),
-    [itemId],
+    [itemId, refreshKey],
   );
 
   const hazardsByTaskId = useMemo(() => {
@@ -238,7 +244,16 @@ export default function InspectionItemDetailPage({
   const [newTaskInspectors, setNewTaskInspectors] = useState<string[]>([]);
   const [newTaskDate, setNewTaskDate] = useState("");
   const [isCreating, setIsCreating] = useState(false);
-  const [, setRefreshKey] = useState(0);
+
+  // ── Acceptance Dialog State ──────────────────────────────
+  const [acceptDialogOpen, setAcceptDialogOpen] = useState(false);
+  const [acceptTask, setAcceptTask] = useState<InspectionTask | null>(null);
+  const [acceptAcceptor, setAcceptAcceptor] = useState("");
+  const [acceptImages, setAcceptImages] = useState<string[]>([]);
+  const [acceptRemark, setAcceptRemark] = useState("");
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [deleteTask, setDeleteTask] = useState<InspectionTask | null>(null);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   const resetCreateForm = useCallback(() => {
     setNewTaskEnterprise("");
@@ -318,6 +333,7 @@ export default function InspectionItemDetailPage({
   }, [
     item,
     currentUser,
+    currentUserType,
     teamId,
     itemId,
     newTaskEnterprise,
@@ -334,11 +350,74 @@ export default function InspectionItemDetailPage({
     setTaskDetailOpen(true);
   }, []);
 
+  // ── Accept / Delete / Edit Handlers ────────────────────────
+
+  const handleOpenAccept = useCallback((task: InspectionTask) => {
+    setAcceptTask(task);
+    if (task.acceptance) {
+      setAcceptAcceptor(task.acceptance.acceptorName ?? "");
+      setAcceptImages(task.acceptance.acceptanceImages);
+      setAcceptRemark(task.acceptance.acceptanceRemark ?? "");
+    } else {
+      setAcceptAcceptor("");
+      setAcceptImages([]);
+      setAcceptRemark("");
+    }
+    setAcceptDialogOpen(true);
+  }, []);
+
+  const handleSubmitAccept = useCallback(() => {
+    if (!acceptTask) return;
+    if (!acceptAcceptor.trim()) {
+      toast.error("请输入验收人");
+      return;
+    }
+
+    const taskIdx = MOCK_TASKS.findIndex((t) => t.id === acceptTask.id);
+    if (taskIdx < 0) return;
+
+    Object.assign(MOCK_TASKS[taskIdx], {
+      acceptance: {
+        acceptorId: acceptAcceptor,
+        acceptorName: acceptAcceptor,
+        acceptanceDate: new Date().toISOString().split("T")[0],
+        acceptanceImages: acceptImages,
+        acceptanceRemark: acceptRemark || undefined,
+      },
+    });
+
+    setRefreshKey((k) => k + 1);
+    toast.success("验收信息已提交");
+    setAcceptDialogOpen(false);
+  }, [acceptTask, acceptAcceptor, acceptImages, acceptRemark]);
+
+  const handleDeleteTask = useCallback((task: InspectionTask) => {
+    setDeleteTask(task);
+    setDeleteConfirmOpen(true);
+  }, []);
+
+  const confirmDelete = useCallback(() => {
+    if (!deleteTask) return;
+    const taskIdx = MOCK_TASKS.findIndex((t) => t.id === deleteTask.id);
+    if (taskIdx >= 0) {
+      MOCK_TASKS.splice(taskIdx, 1);
+      setRefreshKey((k) => k + 1);
+      toast.success(`任务 ${deleteTask.taskNo} 已删除`);
+    }
+    setDeleteConfirmOpen(false);
+    setDeleteTask(null);
+  }, [deleteTask]);
+
+  const handleEditTask = useCallback((task: InspectionTask) => {
+    setAcceptTask(task);
+    setEditDialogOpen(true);
+  }, []);
+
   // ── Guard: item not found ─────────────────────────────────
 
   if (!item) {
     return (
-      <div className="page-container">
+      <div>
         <EmptyState
           variant="default"
           title="未找到检查事项"
@@ -355,7 +434,7 @@ export default function InspectionItemDetailPage({
   // ── Render ────────────────────────────────────────────────
 
   return (
-    <div className="page-container space-y-4">
+    <div className="space-y-4">
       {/* ── Header Section ────────────────────────────── */}
       <div className="space-y-3">
         {/* Back button + item number + status + type */}
@@ -544,6 +623,7 @@ export default function InspectionItemDetailPage({
                   <TableHead>检查人员</TableHead>
                   <TableHead>隐患数量</TableHead>
                   <TableHead>检查结论</TableHead>
+                  <TableHead className="w-[70px]">操作</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -582,6 +662,28 @@ export default function InspectionItemDetailPage({
                       ) : (
                         <span className="text-muted-foreground">-</span>
                       )}
+                    </TableCell>
+                    <TableCell onClick={(e) => e.stopPropagation()}>
+                      <HoverActionMenu
+                        actions={[
+                          {
+                            label: task.acceptance ? "修改验收" : "验收",
+                            icon: <CheckCircle className="size-3.5" />,
+                            onClick: () => handleOpenAccept(task),
+                          },
+                          {
+                            label: "编辑",
+                            icon: <Pencil className="size-3.5" />,
+                            onClick: () => handleEditTask(task),
+                          },
+                          {
+                            label: "删除",
+                            icon: <Trash2 className="size-3.5" />,
+                            variant: "destructive",
+                            onClick: () => handleDeleteTask(task),
+                          },
+                        ]}
+                      />
                     </TableCell>
                   </TableRow>
                 ))}
@@ -711,6 +813,102 @@ export default function InspectionItemDetailPage({
         </DialogContent>
       </Dialog>
 
+      {/* ── Delete Confirm Dialog ────────────────────── */}
+      <ConfirmDialog
+        open={deleteConfirmOpen}
+        onOpenChange={setDeleteConfirmOpen}
+        title="确认删除"
+        description={`确定要删除任务 "${deleteTask?.taskNo ?? ""}" 吗？此操作不可撤销。`}
+        variant="danger"
+        confirmText="删除"
+        onConfirm={confirmDelete}
+      />
+
+      {/* ── Acceptance Dialog ─────────────────────────── */}
+      <Dialog open={acceptDialogOpen} onOpenChange={setAcceptDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{acceptTask?.acceptance ? "修改验收" : "任务验收"}</DialogTitle>
+            <DialogDescription>
+              {acceptTask?.acceptance ? "修改任务的验收信息" : `填写 "${acceptTask?.taskNo ?? ""}" 的验收情况`}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-2">
+            {/* Acceptor */}
+            <div className="space-y-2">
+              <Label>
+                验收人 <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                value={acceptAcceptor}
+                onChange={(e) => setAcceptAcceptor(e.target.value)}
+                placeholder="请输入验收人姓名"
+              />
+            </div>
+
+            {/* Images (mock: comma-separated URLs) */}
+            <div className="space-y-2">
+              <Label>验收图片</Label>
+              <ImageUpload
+                value={acceptImages}
+                onChange={setAcceptImages}
+                maxCount={9}
+              />
+            </div>
+
+            {/* Remark */}
+            <div className="space-y-2">
+              <Label>验收备注</Label>
+              <textarea
+                className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                value={acceptRemark}
+                onChange={(e) => setAcceptRemark(e.target.value)}
+                placeholder="验收情况说明（选填）"
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center justify-end gap-2 pt-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setAcceptDialogOpen(false);
+                setAcceptTask(null);
+              }}
+            >
+              取消
+            </Button>
+            <LoadingButton
+              loading={false}
+              onClick={handleSubmitAccept}
+            >
+              {acceptTask?.acceptance ? "保存修改" : "提交验收"}
+            </LoadingButton>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* ── Edit Dialog ──────────────────────────────── */}
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>编辑任务</DialogTitle>
+            <DialogDescription>
+              编辑任务 &ldquo;{acceptTask?.taskNo ?? ""}&rdquo; 的信息
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-8 text-center text-sm text-muted-foreground">
+            任务编辑功能开发中，敬请期待
+          </div>
+          <div className="flex items-center justify-end pt-2">
+            <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
+              关闭
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* ── Task Detail Dialog ────────────────────────── */}
       <Dialog open={taskDetailOpen} onOpenChange={setTaskDetailOpen}>
         <DialogContent className="sm:max-w-2xl">
@@ -779,6 +977,60 @@ export default function InspectionItemDetailPage({
               </div>
 
               <Separator />
+
+              {/* Acceptance Info */}
+              {selectedTask.acceptance && (
+                <>
+                  <div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <CheckCircle className="size-4 text-status-success" />
+                      <h3 className="text-sm font-medium">验收信息</h3>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <p className="text-muted-foreground mb-1">验收人</p>
+                        <p className="flex items-center gap-1.5">
+                          <User className="size-3.5 text-muted-foreground" />
+                          {selectedTask.acceptance.acceptorName}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground mb-1">验收日期</p>
+                        <p className="flex items-center gap-1.5">
+                          <Calendar className="size-3.5 text-muted-foreground" />
+                          {selectedTask.acceptance.acceptanceDate}
+                        </p>
+                      </div>
+                    </div>
+                    {selectedTask.acceptance.acceptanceImages.length > 0 && (
+                      <div className="mt-3">
+                        <p className="text-muted-foreground mb-1.5 text-xs">验收图片</p>
+                        <div className="flex flex-wrap gap-2">
+                          {selectedTask.acceptance.acceptanceImages.map((url, i) => (
+                            <div
+                              key={i}
+                              className="relative size-20 rounded-md border overflow-hidden bg-muted"
+                            >
+                              <img
+                                src={url}
+                                alt={`验收图片 ${i + 1}`}
+                                className="size-full object-cover"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {selectedTask.acceptance.acceptanceRemark && (
+                      <div className="mt-3">
+                        <p className="text-muted-foreground mb-1 text-xs">验收备注</p>
+                        <p className="text-sm whitespace-pre-wrap">{selectedTask.acceptance.acceptanceRemark}</p>
+                      </div>
+                    )}
+                  </div>
+                  <Separator />
+                </>
+              )}
 
               {/* Hazard sub-table */}
               <div>

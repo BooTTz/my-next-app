@@ -35,6 +35,8 @@ import {
   DetailDialogBody,
   DetailDialogFooter,
 } from "@/components/shared/DetailDialog";
+import ConfirmDialog from "@/components/shared/ConfirmDialog";
+import EmptyState, { ListEmpty, SearchEmpty } from "@/components/shared/EmptyState";
 
 type OrgStatus = "active" | "inactive" | "archived";
 type OrgStatusFilter = OrgStatus | "all";
@@ -299,11 +301,12 @@ export default function OrganizationsListPage() {
                 })}
                 {filteredOrgs.length === 0 && (
                   <TableRow>
-                    <TableCell
-                      colSpan={9}
-                      className="text-center py-8 text-muted-foreground text-sm"
-                    >
-                      未找到匹配的组织
+                    <TableCell colSpan={9} className="text-center py-8">
+                      {search ? (
+                        <SearchEmpty keyword={search} onClear={() => setSearch("")} className="py-0" />
+                      ) : (
+                        <ListEmpty className="py-0" />
+                      )}
                     </TableCell>
                   </TableRow>
                 )}
@@ -330,31 +333,16 @@ export default function OrganizationsListPage() {
         </CardContent>
       </Card>
 
-      {/* 删除确认 Dialog */}
-      <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-        <DialogContent className="sm:max-w-sm">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <AlertTriangle className="size-5 text-amber-500" />
-              确认删除
-            </DialogTitle>
-            <DialogDescription>
-              确定要删除该组织吗？删除后不可恢复。仅允许删除无关联工作组的组织。
-            </DialogDescription>
-          </DialogHeader>
-          <p className="text-sm text-muted-foreground">
-            组织名称：<strong className="text-foreground">{deleteTarget?.name}</strong>
-          </p>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteOpen(false)}>
-              取消
-            </Button>
-            <Button variant="destructive" onClick={confirmDelete}>
-              删除
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* 删除确认 */}
+      <ConfirmDialog
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        title="确认删除"
+        description={`确定要删除组织 ${deleteTarget?.name} 吗？此操作不可恢复。`}
+        variant="danger"
+        confirmText="删除"
+        onConfirm={confirmDelete}
+      />
 
       {/* 注销多重确认 Dialog */}
       <Dialog open={archiveOpen} onOpenChange={setArchiveOpen}>

@@ -401,6 +401,17 @@ export interface InspectionTask {
   updatedAt: string;
   hazardCount?: number;
   rectifiedCount?: number;
+  /** 验收信息 */
+  acceptance?: AcceptanceInfo;
+}
+
+/** 验收信息 */
+export interface AcceptanceInfo {
+  acceptorId: string;
+  acceptorName?: string;
+  acceptanceDate: string;
+  acceptanceImages: string[];
+  acceptanceRemark?: string;
 }
 
 /** 隐患 */

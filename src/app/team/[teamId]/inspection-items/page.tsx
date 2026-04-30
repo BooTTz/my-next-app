@@ -367,7 +367,7 @@ export default function InspectionItemsListPage() {
   // ---- Early return: no current team ----
   if (!currentTeam) {
     return (
-      <div className="page-container">
+      <div>
         <EmptyState
           title="无法加载"
           description="当前团队信息不可用"
@@ -397,7 +397,7 @@ export default function InspectionItemsListPage() {
   const filterActive = typeFilter !== ALL_VALUE || statusFilter !== ALL_VALUE;
 
   return (
-    <div className="page-container space-y-4">
+    <div className="space-y-4">
       {/* Page Header */}
       <PageHeader title="检查事项" badge={visibleItems.length > 0 ? visibleItems.length : undefined} />
 

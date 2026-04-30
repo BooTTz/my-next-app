@@ -94,20 +94,25 @@ export const BREADCRUMB_CONFIG: Record<string, BreadcrumbItem[]> = {
   
   // 管理员页面
   "/admin/users": [
+    { label: "平台管理后台" },
     { label: "用户管理" },
   ],
   "/admin/users/[userId]": [
+    { label: "平台管理后台" },
     { label: "用户管理", href: "/admin/users" },
     { label: "用户详情" },
   ],
   "/admin/organizations": [
+    { label: "平台管理后台" },
     { label: "组织管理" },
   ],
   "/admin/organizations/new": [
+    { label: "平台管理后台" },
     { label: "组织管理", href: "/admin/organizations" },
     { label: "新建组织" },
   ],
   "/admin/organizations/[orgId]": [
+    { label: "平台管理后台" },
     { label: "组织管理", href: "/admin/organizations" },
     { label: "组织详情" },
   ],

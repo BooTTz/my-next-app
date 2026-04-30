@@ -429,7 +429,7 @@ export default function StatisticsPage() {
 
   if (!teamId) {
     return (
-      <div className="page-container">
+      <div className="space-y-4">
         <PageHeader title="统计分析" />
         <p className="text-sm text-muted-foreground">请先选择组织</p>
       </div>
@@ -437,7 +437,7 @@ export default function StatisticsPage() {
   }
 
   return (
-    <div className="page-container">
+    <div className="space-y-4">
       <PageHeader title="统计分析" />
 
       {currentUserType === "supervisor" && <SupervisorStats teamId={teamId} />}

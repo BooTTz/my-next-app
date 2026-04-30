@@ -27,6 +27,14 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ThemeToggle } from "@/components/shared/ThemeToggle";
+import { useBreadcrumbs } from "@/hooks/useBreadcrumbs";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import type { ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
 
@@ -70,9 +78,6 @@ function AdminSidebar() {
 
       {/* 导航菜单 */}
       <nav className="flex-1 p-3 space-y-1">
-        <div className="text-xs font-medium text-muted-foreground px-3 py-2">
-          平台用户管理
-        </div>
         <NavItem href="/admin/users" icon={Users} label="用户管理" />
         <NavItem href="/admin/organizations" icon={Building2} label="组织管理" />
       </nav>
@@ -88,6 +93,7 @@ function AdminSidebar() {
 function AdminTopBar() {
   const { currentUser, logout } = useAppStore();
   const router = useRouter();
+  const breadcrumbs = useBreadcrumbs();
 
   function handleLogout() {
     logout();
@@ -98,12 +104,43 @@ function AdminTopBar() {
 
   return (
     <header className="h-14 border-b bg-background flex items-center justify-between px-6">
-      {/* 左侧：面包屑简化为静态文字 */}
-      <div className="text-sm text-muted-foreground">
-        <span className="text-foreground font-medium">超级管理员</span>
-        <span className="mx-2 text-muted-foreground/40">/</span>
-        <span>平台管理后台</span>
-      </div>
+      {/* 左侧：面包屑 */}
+      <Breadcrumb>
+        <BreadcrumbList>
+          {breadcrumbs.length > 0 ? (
+            breadcrumbs.map((item, index) => {
+              const isLast = index === breadcrumbs.length - 1;
+              return (
+                <BreadcrumbItem key={`${item.label}-${index}`}>
+                  {index > 0 && <BreadcrumbSeparator />}
+                  {isLast ? (
+                    <BreadcrumbPage className="text-xs font-medium">
+                      {item.label}
+                    </BreadcrumbPage>
+                  ) : item.href ? (
+                    <Link
+                      href={item.href}
+                      className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {item.label}
+                    </Link>
+                  ) : (
+                    <span className="text-xs text-muted-foreground">
+                      {item.label}
+                    </span>
+                  )}
+                </BreadcrumbItem>
+              );
+            })
+          ) : (
+            <BreadcrumbItem>
+              <BreadcrumbPage className="text-xs font-medium">
+                平台管理后台
+              </BreadcrumbPage>
+            </BreadcrumbItem>
+          )}
+        </BreadcrumbList>
+      </Breadcrumb>
 
       {/* 右侧：ThemeToggle + 超管头像下拉 */}
       <div className="flex items-center gap-2">
