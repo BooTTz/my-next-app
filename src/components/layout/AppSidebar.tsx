@@ -4,10 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/lib/store";
+import { useState } from "react";
 import {
   LayoutDashboard, ClipboardList, AlertTriangle,
   FileText, BarChart3, Building2,
-  ChevronRight, Shield,
+  ChevronRight, ChevronDown, Shield, Search,
 } from "lucide-react";
 
 interface NavItem {
@@ -16,10 +17,15 @@ interface NavItem {
   href: string;
 }
 
-function getNavItems(teamId: string): NavItem[] {
+interface NavGroup {
+  label: string;
+  icon: React.ReactNode;
+  children: NavItem[];
+}
+
+function getInspectionChildren(teamId: string): NavItem[] {
   const base = `/team/${teamId}`;
   return [
-    { label: "工作台", icon: <LayoutDashboard className="size-4" />, href: `${base}/workspace` },
     { label: "检查事项", icon: <ClipboardList className="size-4" />, href: `${base}/inspection-items` },
     { label: "隐患管理", icon: <AlertTriangle className="size-4" />, href: `${base}/hazards` },
     { label: "检查报告", icon: <FileText className="size-4" />, href: `${base}/reports` },
@@ -30,10 +36,12 @@ function getNavItems(teamId: string): NavItem[] {
 export default function AppSidebar() {
   const pathname = usePathname();
   const { currentTeam, currentUserType, currentOrganization, currentWorkspace } = useAppStore();
+  const [inspectionOpen, setInspectionOpen] = useState(true);
 
   if (!currentTeam) return null;
 
-  const navItems = getNavItems(currentTeam.id);
+  const inspectionChildren = getInspectionChildren(currentTeam.id);
+  const isInspectionActive = inspectionChildren.some((child) => pathname.startsWith(child.href));
   const orgId = currentOrganization?.id || currentTeam?.id;
 
   // 获取当前工作组的统计数据
@@ -63,24 +71,64 @@ export default function AppSidebar() {
 
       {/* 导航菜单 */}
       <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-0.5">
-        {navItems.map((item) => {
-          const isActive = pathname === item.href;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex items-center gap-2.5 rounded-md px-3 py-2 text-sm transition-colors",
-                isActive
-                  ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
-                  : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+        {/* 工作台 */}
+        <Link
+          href={`/team/${currentTeam.id}/workspace`}
+          className={cn(
+            "flex items-center gap-2.5 rounded-md px-3 py-2 text-sm transition-colors",
+            pathname === `/team/${currentTeam.id}/workspace`
+              ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+              : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+          )}
+        >
+          <LayoutDashboard className="size-4" />
+          <span>工作台</span>
+        </Link>
+
+        {/* 检查（折叠组） */}
+        <div>
+          <button
+            onClick={() => setInspectionOpen(!inspectionOpen)}
+            className={cn(
+              "flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-sm transition-colors",
+              isInspectionActive
+                ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+                : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+            )}
+          >
+            <Search className="size-4" />
+            <span>检查</span>
+            <span className="ml-auto">
+              {inspectionOpen ? (
+                <ChevronDown className="size-3.5" />
+              ) : (
+                <ChevronRight className="size-3.5" />
               )}
-            >
-              {item.icon}
-              <span>{item.label}</span>
-            </Link>
-          );
-        })}
+            </span>
+          </button>
+          {inspectionOpen && (
+            <div className="ml-2 mt-0.5 space-y-0.5 border-l border-sidebar-border pl-2">
+              {inspectionChildren.map((child) => {
+                const isActive = pathname.startsWith(child.href);
+                return (
+                  <Link
+                    key={child.href}
+                    href={child.href}
+                    className={cn(
+                      "flex items-center gap-2.5 rounded-md px-3 py-1.5 text-sm transition-colors",
+                      isActive
+                        ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+                        : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+                    )}
+                  >
+                    {child.icon}
+                    <span>{child.label}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </nav>
 
       {/* 底部信息 */}

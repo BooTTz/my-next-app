@@ -478,143 +478,347 @@ export default function WorkspaceSettingsPage() {
 
         {/* 监管部门列表 */}
         <TabsContent value="supervisor" className="mt-4">
-          <Card>
-            <CardContent className="p-4">
-              <div className="space-y-3">
-                {supervisorTeams.map((team) => {
-                  const members = MOCK_MEMBERS.filter(
-                    (m) => m.teamId === team.id && m.userType === "supervisor"
-                  );
-                  return (
-                    <div key={team.id} className="p-4 rounded-lg border">
-                      <div className="flex items-center justify-between mb-3">
+          <div className="flex gap-4">
+            {/* 左侧行政区划树 */}
+            <Card className="w-72 shrink-0">
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm font-medium">行政区划</CardTitle>
+                  <Button variant="ghost" size="sm" className="h-7" onClick={() => handleOpenAddRegion(null)}>
+                    <Plus className="size-3.5" />
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="max-h-[400px] overflow-y-auto">
+                  {MOCK_REGIONS.filter((r) => r.workspaceId === currentWorkspace.id).map((region) => (
+                    <RegionTreeNode
+                      key={region.id}
+                      node={region}
+                      onSelect={setSelectedRegionId}
+                      selectedId={selectedRegionId}
+                      onEdit={handleOpenEditRegion}
+                      onDelete={handleDeleteRegion}
+                      onAddChild={handleOpenAddRegion}
+                    />
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* 右侧组织列表 */}
+            <Card className="flex-1">
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm font-medium">
+                    {selectedRegionId
+                      ? `监管部门 (${selectedRegionTeams.filter(t => t.teamType === "supervisor").length})`
+                      : `监管部门 (${supervisorTeams.length})`}
+                  </CardTitle>
+                  <Button size="sm" className="h-8" onClick={() => setInviteDialogOpen(true)}>
+                    <UserPlus className="size-3.5 mr-1.5" />
+                    邀请组织
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-0">
+                {/* 搜索 */}
+                <div className="relative mb-4">
+                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+                  <Input
+                    placeholder="搜索组织名称..."
+                    value={teamSearch}
+                    onChange={(e) => setTeamSearch(e.target.value)}
+                    className="pl-9 h-8"
+                  />
+                  {teamSearch && (
+                    <button className="absolute right-2 top-1/2 -translate-y-1/2" onClick={() => setTeamSearch("")}>
+                      <X className="size-4 text-muted-foreground hover:text-foreground" />
+                    </button>
+                  )}
+                </div>
+                {/* 组织列表 */}
+                <div className="space-y-3">
+                  {(teamSearch
+                    ? filteredTeams.filter(t => t.teamType === "supervisor")
+                    : selectedRegionId
+                      ? selectedRegionTeams.filter(t => t.teamType === "supervisor")
+                      : supervisorTeams
+                  ).map((team) => {
+                    const members = MOCK_MEMBERS.filter((m) => m.teamId === team.id && m.userType === "supervisor");
+                    return (
+                      <div key={team.id} className="flex items-center justify-between p-3 rounded-lg border hover:bg-accent/50 transition-colors">
                         <div className="flex items-center gap-3">
-                          <Avatar className="size-10">
-                            <AvatarFallback className="bg-blue-500/10 text-blue-600">
+                          <Avatar className="size-9">
+                            <AvatarFallback className="bg-blue-500/10 text-blue-600 text-sm">
                               {team.name.charAt(0)}
                             </AvatarFallback>
                           </Avatar>
                           <div>
-                            <p className="font-medium">{team.name}</p>
-                            <p className="text-xs text-muted-foreground">{team.description}</p>
+                            <div className="flex items-center gap-2">
+                              <p className="font-medium text-sm">{team.name}</p>
+                              <Badge className="bg-blue-500/10 text-blue-600 dark:text-blue-400 text-[10px]">
+                                {USER_TYPE_MAP[team.teamType]}
+                              </Badge>
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-0.5">{team.description}</p>
                           </div>
                         </div>
-                        <Link href={`/team/${team.id}`}>
-                          <Button variant="outline" size="sm">管理组织</Button>
-                        </Link>
+                        <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <Users className="size-3" /> {team.memberCount} 人
+                          </span>
+                          <Link href={`/team/${team.id}`}>
+                            <Button variant="ghost" size="sm" className="h-7">管理组织</Button>
+                          </Link>
+                        </div>
                       </div>
-                      <div className="flex flex-wrap gap-2">
-                        {members.map((m) => (
-                          <Badge key={m.userId} variant="secondary">
-                            {m.user?.realName} ({m.roleName})
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
-                {supervisorTeams.length === 0 && (
-                  <p className="text-center text-muted-foreground py-8">暂无监管部门组织</p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+                    );
+                  })}
+                  {(teamSearch
+                    ? filteredTeams.filter(t => t.teamType === "supervisor")
+                    : selectedRegionId
+                      ? selectedRegionTeams.filter(t => t.teamType === "supervisor")
+                      : supervisorTeams
+                  ).length === 0 && (
+                    <p className="text-center text-muted-foreground py-8">暂无监管部门组织</p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
 
         {/* 服务机构列表 */}
         <TabsContent value="inspector" className="mt-4">
-          <Card>
-            <CardContent className="p-4">
-              <div className="space-y-3">
-                {inspectorTeams.map((team) => {
-                  const members = MOCK_MEMBERS.filter(
-                    (m) => m.teamId === team.id && m.userType === "inspector"
-                  );
-                  return (
-                    <div key={team.id} className="p-4 rounded-lg border">
-                      <div className="flex items-center justify-between mb-3">
+          <div className="flex gap-4">
+            {/* 左侧行政区划树 */}
+            <Card className="w-72 shrink-0">
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm font-medium">行政区划</CardTitle>
+                  <Button variant="ghost" size="sm" className="h-7" onClick={() => handleOpenAddRegion(null)}>
+                    <Plus className="size-3.5" />
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="max-h-[400px] overflow-y-auto">
+                  {MOCK_REGIONS.filter((r) => r.workspaceId === currentWorkspace.id).map((region) => (
+                    <RegionTreeNode
+                      key={region.id}
+                      node={region}
+                      onSelect={setSelectedRegionId}
+                      selectedId={selectedRegionId}
+                      onEdit={handleOpenEditRegion}
+                      onDelete={handleDeleteRegion}
+                      onAddChild={handleOpenAddRegion}
+                    />
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* 右侧组织列表 */}
+            <Card className="flex-1">
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm font-medium">
+                    {selectedRegionId
+                      ? `服务机构 (${selectedRegionTeams.filter(t => t.teamType === "inspector").length})`
+                      : `服务机构 (${inspectorTeams.length})`}
+                  </CardTitle>
+                  <Button size="sm" className="h-8" onClick={() => setInviteDialogOpen(true)}>
+                    <UserPlus className="size-3.5 mr-1.5" />
+                    邀请组织
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-0">
+                {/* 搜索 */}
+                <div className="relative mb-4">
+                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+                  <Input
+                    placeholder="搜索组织名称..."
+                    value={teamSearch}
+                    onChange={(e) => setTeamSearch(e.target.value)}
+                    className="pl-9 h-8"
+                  />
+                  {teamSearch && (
+                    <button className="absolute right-2 top-1/2 -translate-y-1/2" onClick={() => setTeamSearch("")}>
+                      <X className="size-4 text-muted-foreground hover:text-foreground" />
+                    </button>
+                  )}
+                </div>
+                {/* 组织列表 */}
+                <div className="space-y-3">
+                  {(teamSearch
+                    ? filteredTeams.filter(t => t.teamType === "inspector")
+                    : selectedRegionId
+                      ? selectedRegionTeams.filter(t => t.teamType === "inspector")
+                      : inspectorTeams
+                  ).map((team) => {
+                    const members = MOCK_MEMBERS.filter((m) => m.teamId === team.id && m.userType === "inspector");
+                    return (
+                      <div key={team.id} className="flex items-center justify-between p-3 rounded-lg border hover:bg-accent/50 transition-colors">
                         <div className="flex items-center gap-3">
-                          <Avatar className="size-10">
-                            <AvatarFallback className="bg-green-500/10 text-green-600">
+                          <Avatar className="size-9">
+                            <AvatarFallback className="bg-green-500/10 text-green-600 text-sm">
                               {team.name.charAt(0)}
                             </AvatarFallback>
                           </Avatar>
                           <div>
-                            <p className="font-medium">{team.name}</p>
-                            <p className="text-xs text-muted-foreground">
+                            <div className="flex items-center gap-2">
+                              <p className="font-medium text-sm">{team.name}</p>
+                              <Badge className="bg-green-500/10 text-green-600 dark:text-green-400 text-[10px]">
+                                {USER_TYPE_MAP[team.teamType]}
+                              </Badge>
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-0.5">
                               {team.qualification && `资质: ${team.qualification}`}
                               {team.mainServiceField && ` · ${team.mainServiceField}`}
                             </p>
                           </div>
                         </div>
-                        <Link href={`/team/${team.id}`}>
-                          <Button variant="outline" size="sm">管理组织</Button>
-                        </Link>
+                        <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <Users className="size-3" /> {team.memberCount} 人
+                          </span>
+                          <Link href={`/team/${team.id}`}>
+                            <Button variant="ghost" size="sm" className="h-7">管理组织</Button>
+                          </Link>
+                        </div>
                       </div>
-                      <div className="flex flex-wrap gap-2">
-                        {members.map((m) => (
-                          <Badge key={m.userId} variant="secondary">
-                            {m.user?.realName} ({m.roleName})
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
-                {inspectorTeams.length === 0 && (
-                  <p className="text-center text-muted-foreground py-8">暂无服务机构组织</p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+                    );
+                  })}
+                  {(teamSearch
+                    ? filteredTeams.filter(t => t.teamType === "inspector")
+                    : selectedRegionId
+                      ? selectedRegionTeams.filter(t => t.teamType === "inspector")
+                      : inspectorTeams
+                  ).length === 0 && (
+                    <p className="text-center text-muted-foreground py-8">暂无服务机构组织</p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
 
         {/* 企业单位列表 */}
         <TabsContent value="enterprise" className="mt-4">
-          <Card>
-            <CardContent className="p-4">
-              <div className="space-y-3">
-                {enterpriseTeams.map((team) => {
-                  const members = MOCK_MEMBERS.filter(
-                    (m) => m.teamId === team.id && m.userType === "enterprise"
-                  );
-                  return (
-                    <div key={team.id} className="p-4 rounded-lg border">
-                      <div className="flex items-center justify-between mb-3">
+          <div className="flex gap-4">
+            {/* 左侧行政区划树 */}
+            <Card className="w-72 shrink-0">
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm font-medium">行政区划</CardTitle>
+                  <Button variant="ghost" size="sm" className="h-7" onClick={() => handleOpenAddRegion(null)}>
+                    <Plus className="size-3.5" />
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="max-h-[400px] overflow-y-auto">
+                  {MOCK_REGIONS.filter((r) => r.workspaceId === currentWorkspace.id).map((region) => (
+                    <RegionTreeNode
+                      key={region.id}
+                      node={region}
+                      onSelect={setSelectedRegionId}
+                      selectedId={selectedRegionId}
+                      onEdit={handleOpenEditRegion}
+                      onDelete={handleDeleteRegion}
+                      onAddChild={handleOpenAddRegion}
+                    />
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* 右侧组织列表 */}
+            <Card className="flex-1">
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm font-medium">
+                    {selectedRegionId
+                      ? `企业单位 (${selectedRegionTeams.filter(t => t.teamType === "enterprise").length})`
+                      : `企业单位 (${enterpriseTeams.length})`}
+                  </CardTitle>
+                  <Button size="sm" className="h-8" onClick={() => setInviteDialogOpen(true)}>
+                    <UserPlus className="size-3.5 mr-1.5" />
+                    邀请组织
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-0">
+                {/* 搜索 */}
+                <div className="relative mb-4">
+                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+                  <Input
+                    placeholder="搜索组织名称..."
+                    value={teamSearch}
+                    onChange={(e) => setTeamSearch(e.target.value)}
+                    className="pl-9 h-8"
+                  />
+                  {teamSearch && (
+                    <button className="absolute right-2 top-1/2 -translate-y-1/2" onClick={() => setTeamSearch("")}>
+                      <X className="size-4 text-muted-foreground hover:text-foreground" />
+                    </button>
+                  )}
+                </div>
+                {/* 组织列表 */}
+                <div className="space-y-3">
+                  {(teamSearch
+                    ? filteredTeams.filter(t => t.teamType === "enterprise")
+                    : selectedRegionId
+                      ? selectedRegionTeams.filter(t => t.teamType === "enterprise")
+                      : enterpriseTeams
+                  ).map((team) => {
+                    const members = MOCK_MEMBERS.filter((m) => m.teamId === team.id && m.userType === "enterprise");
+                    return (
+                      <div key={team.id} className="flex items-center justify-between p-3 rounded-lg border hover:bg-accent/50 transition-colors">
                         <div className="flex items-center gap-3">
-                          <Avatar className="size-10">
-                            <AvatarFallback className="bg-amber-500/10 text-amber-600">
+                          <Avatar className="size-9">
+                            <AvatarFallback className="bg-amber-500/10 text-amber-600 text-sm">
                               {team.name.charAt(0)}
                             </AvatarFallback>
                           </Avatar>
                           <div>
-                            <p className="font-medium">{team.name}</p>
-                            <p className="text-xs text-muted-foreground">
+                            <div className="flex items-center gap-2">
+                              <p className="font-medium text-sm">{team.name}</p>
+                              <Badge className="bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[10px]">
+                                {USER_TYPE_MAP[team.teamType]}
+                              </Badge>
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-0.5">
                               {team.industryType && `${team.industryType} · ${team.subIndustryField || ""}`}
                               {team.scale && ` · ${team.scale === "large" ? "大型" : team.scale === "medium" ? "中型" : team.scale === "small" ? "小型" : "微型"}企业`}
                             </p>
                           </div>
                         </div>
-                        <Link href={`/team/${team.id}`}>
-                          <Button variant="outline" size="sm">管理组织</Button>
-                        </Link>
+                        <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <Users className="size-3" /> {team.memberCount} 人
+                          </span>
+                          <Link href={`/team/${team.id}`}>
+                            <Button variant="ghost" size="sm" className="h-7">管理组织</Button>
+                          </Link>
+                        </div>
                       </div>
-                      <div className="flex flex-wrap gap-2">
-                        {members.map((m) => (
-                          <Badge key={m.userId} variant="secondary">
-                            {m.user?.realName} ({m.roleName})
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
-                {enterpriseTeams.length === 0 && (
-                  <p className="text-center text-muted-foreground py-8">暂无企业单位组织</p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+                    );
+                  })}
+                  {(teamSearch
+                    ? filteredTeams.filter(t => t.teamType === "enterprise")
+                    : selectedRegionId
+                      ? selectedRegionTeams.filter(t => t.teamType === "enterprise")
+                      : enterpriseTeams
+                  ).length === 0 && (
+                    <p className="text-center text-muted-foreground py-8">暂无企业单位组织</p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
       </Tabs>
 

@@ -4,12 +4,13 @@ import AppSidebar from "@/components/layout/AppSidebar";
 import { TopBarActions } from "@/components/layout/TopBar";
 import { useHydrated } from "@/hooks/useHydrated";
 import { useAppStore } from "@/lib/store";
-import { LayoutDashboard } from "lucide-react";
-import Link from "next/link";
+import PageBreadcrumb from "@/components/layout/PageBreadcrumb";
+import { useBreadcrumbs } from "@/hooks/useBreadcrumbs";
 
 export default function TeamLayout({ children }: { children: React.ReactNode }) {
   const hydrated = useHydrated();
   const { currentTeam } = useAppStore();
+  const breadcrumbs = useBreadcrumbs();
 
   if (!hydrated) {
     return (
@@ -25,15 +26,7 @@ export default function TeamLayout({ children }: { children: React.ReactNode }) 
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* 顶部区域：左侧面包屑 + 右侧操作按钮 */}
         <header className="flex h-12 items-center justify-between border-b bg-card px-4">
-          <div className="flex items-center gap-2">
-            <Link
-              href={currentTeam ? `/team/${currentTeam.id}/workspace` : "/workspace"}
-              className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <LayoutDashboard className="size-4" />
-              <span className="hidden sm:inline">工作台</span>
-            </Link>
-          </div>
+          <PageBreadcrumb items={breadcrumbs} />
           <TopBarActions />
         </header>
         <main className="flex-1 overflow-y-auto bg-background p-6">

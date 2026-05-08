@@ -14,35 +14,48 @@ export const BREADCRUMB_CONFIG: Record<string, BreadcrumbItem[]> = {
   // 团队工作台页面（当前组织）
   "/team/[teamId]/workspace": [],
 
-  // 检查事项
+  // 组织详情
+  "/team/[teamId]": [
+    { label: "工作组管理", href: "/workspace/settings" },
+    { label: "组织详情" },
+  ],
+
+  // 检查 - 子模块
   "/team/[teamId]/inspection-items": [
+    { label: "检查" },
     { label: "检查事项" },
   ],
   "/team/[teamId]/inspection-items/[itemId]": [
+    { label: "检查" },
     { label: "检查事项", href: "" },
     { label: "检查事项详情" },
   ],
 
   // 隐患管理
   "/team/[teamId]/hazards": [
+    { label: "检查" },
     { label: "隐患管理" },
   ],
   "/team/[teamId]/hazards/[hazardId]": [
+    { label: "检查" },
     { label: "隐患管理", href: "" },
     { label: "隐患详情" },
   ],
   
   // 报告管理
   "/team/[teamId]/reports": [
+    { label: "检查" },
     { label: "检查报告" },
   ],
   "/team/[teamId]/reports/[reportId]": [
+    { label: "检查" },
     { label: "检查报告", href: "" },
     { label: "报告详情" },
   ],
   
   // 数据统计
   "/team/[teamId]/statistics": [
+    { label: "检查" },
     { label: "统计分析" },
   ],
   
